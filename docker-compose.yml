@@ -1,0 +1,50 @@
+name: devdatabase
+
+services:
+  sqlserver:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: ${sapassword}
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+    ports:
+      - "5433:1433"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"${sapassword}\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
+
+  initdb:
+    container_name: initdb
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    command: >
+      bash -c '
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "${sapassword}" -v varApiPassword="${apipassword}" -d master -i docker-entrypoint-initdb.d/init.sql;
+      echo "All done!";
+      '
+
+  flyway:
+    container_name: flyway
+    image: redgate/flyway:latest
+    depends_on:
+      initdb:
+        condition: service_completed_successfully
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./db/migrations:/flyway/migrations
+    environment:
+      FLYWAY_URL: jdbc:sqlserver://sqlserver:1433;databaseName=GolfLeague;TrustServerCertificate=True;
+      FLYWAY_USER: sa
+      FLYWAY_PASSWORD: ${sapassword}
+      FLYWAY_LOCATIONS: filesystem:./migrations
+    command: ["migrate"]
