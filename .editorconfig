@@ -21,6 +21,14 @@ tab_width = 4
 end_of_line = crlf
 insert_final_newline = false
 
+#### SQL ####
+
+[*.sql]
+indent_size = 4
+tab_width = 4
+indent_style = tab
+trim_trailing_whitespace = true
+
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
 
