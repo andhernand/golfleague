@@ -1,4 +1,4 @@
-CREATE USER [golfleagueapi] FOR LOGIN [golfleagueapi] WITH DEFAULT_SCHEMA=[dbo];
+CREATE USER [golfleagueapi] FOR LOGIN [golfleagueapi] WITH DEFAULT_SCHEMA = [dbo];
 GO
 
 CREATE ROLE [golfleagueapipermissions];

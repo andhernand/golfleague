@@ -143,7 +143,6 @@ BEGIN
 		Gender = @gender
 	WHERE
 		MemberID = @memberID;
-
 END
 GO
 
