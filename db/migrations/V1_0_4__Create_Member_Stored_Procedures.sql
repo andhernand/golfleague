@@ -74,7 +74,7 @@ BEGIN
 			RAISERROR ('The parameter @memberTypeID for procedure [dbo].[usp_Member_Insert] may not be NULL.', 16, 1);
 		END
 
-	IF (ISDATE(@joinDate) = 0)
+	IF (@joinDate IS NULL)
 		BEGIN
 			RAISERROR ('The parameter @joinDate for procedure [dbo].[usp_Member_Insert] may not be NULL.', 16, 1);
 		END
@@ -120,7 +120,7 @@ BEGIN
 			RAISERROR ('The parameter @memberTypeID for procedure [dbo].[usp_Member_Update] may not be NULL.', 16, 1);
 		END
 
-	IF (ISDATE(@joinDate) = 0)
+	IF (@joinDate IS NULL)
 		BEGIN
 			RAISERROR ('The parameter @joinDate for procedure [dbo].[usp_Member_Update] may not be NULL.', 16, 1);
 		END
