@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		db\migrations\V1_0_3__Create_MemberType_Stored_Procedures.sql = db\migrations\V1_0_3__Create_MemberType_Stored_Procedures.sql
 		db\migrations\V1_0_4__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_4__Create_Member_Stored_Procedures.sql
 		db\migrations\V1_0_5__Create_TournamentType_Stored_Procedures.sql = db\migrations\V1_0_5__Create_TournamentType_Stored_Procedures.sql
+		db\migrations\V1_0_6__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_6__Create_Tournament_Stored_Procedures.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"

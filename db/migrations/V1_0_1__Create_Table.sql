@@ -39,7 +39,7 @@ CREATE TABLE [dbo].[Tournament]
 (
 	[TournamentID] INT IDENTITY(1, 1) NOT NULL,
 	[Name] NVARCHAR(256) NOT NULL,
-	[TournamentTypeID] INT NULL,
+	[TournamentTypeID] INT NOT NULL,
 	CONSTRAINT [PK_Tournament_TournamentID]
 	PRIMARY KEY CLUSTERED ([TournamentID] ASC),
 	CONSTRAINT [FK_TournamentType_Tournament_TournamentTypeID]
