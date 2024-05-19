@@ -12,7 +12,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE [dbo].[usp_MemberType_Get]
+CREATE PROCEDURE [dbo].[usp_MemberType_GetByMemberTypeId]
 	@memberTypeId INT
 AS
 BEGIN
@@ -20,7 +20,7 @@ BEGIN
 
 	IF (@memberTypeId <= 0 OR @memberTypeId IS NULL)
 		BEGIN
-			RAISERROR('The parameter @memberTypeId for procedure [dbo].[usp_MemberType_Get] may not be NULL.', 16, 1);
+			RAISERROR('The parameter @memberTypeId for procedure [dbo].[usp_MemberType_GetByMemberTypeId] may not be NULL.', 16, 1);
 		END
 
 	SELECT
@@ -36,7 +36,7 @@ GO
 
 CREATE PROCEDURE [dbo].[usp_MemberType_Insert]
 	@name NVARCHAR(256),
-	@fee DECIMAL(19,2)
+	@fee DECIMAL(19,2) = NUll
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -63,12 +63,12 @@ BEGIN
 
 	IF (@memberTypeId <= 0 OR @memberTypeId IS NULL)
 		BEGIN
-			RAISERROR('The parameter @memberTypeId for procedure [dbo].[usp_MemberType_Update] cannot be NULL.', 16, 1);
+			RAISERROR('The parameter @memberTypeId for procedure [dbo].[usp_MemberType_Update] may not be NULL.', 16, 1);
 		END
 
 	IF (@name IS NULL OR LEN(@name) = 0)
 		BEGIN
-			RAISERROR('The parameter @name for procedure [dbo].[usp_MemberType_Update] cannot be NULL.', 16, 1);
+			RAISERROR('The parameter @name for procedure [dbo].[usp_MemberType_Update] may not be NULL.', 16, 1);
 		END
 
 	UPDATE

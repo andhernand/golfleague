@@ -11,14 +11,14 @@ GO
 CREATE TABLE [dbo].[Member]
 (
 	[MemberID] INT IDENTITY(1, 1) NOT NULL,
-	[LastName] NVARCHAR(256) NULL,
-	[FirstName] NVARCHAR(256) NULL,
-	[MemberTypeID] INT NULL,
+	[LastName] NVARCHAR(256) NOT NULL,
+	[FirstName] NVARCHAR(256) NOT NULL,
+	[MemberTypeID] INT NOT NULL,
 	[Phone] NVARCHAR(256) NULL,
 	[Handicap] TINYINT NULL,
-	[JoinDate] DATE NULL,
+	[JoinDate] DATE NOT NULL,
 	[Coach] INT NULL,
-	[Gender] NCHAR(1) NULL,
+	[Gender] NCHAR(1) NOT NULL,
 	CONSTRAINT [PK_Member_MemberID]
 	PRIMARY KEY CLUSTERED ([MemberID] ASC),
 	CONSTRAINT [FK_MemberType_Member_MemberTypeID]
