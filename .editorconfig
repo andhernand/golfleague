@@ -29,6 +29,12 @@ tab_width = 4
 indent_style = tab
 trim_trailing_whitespace = true
 
+[*.md]
+trim_trailing_whitespace = false
+
+[*.json]
+insert_final_newline = false
+
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
 
