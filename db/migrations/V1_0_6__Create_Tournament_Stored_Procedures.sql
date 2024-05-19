@@ -34,6 +34,28 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE [dbo].[usp_Tournament_GetByTournamentTypeId]
+	@tournamentTypeId INT
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	IF (@tournamentTypeId <= 0 OR @tournamentTypeId IS NULL)
+		BEGIN
+			RAISERROR ('The parameter @tournamentTypeId for procedure [dbo].[usp_Tournament_GetByTournamentTypeId] may not be NULL.', 16, 1);
+		END
+
+	SELECT
+		t.TournamentID,
+		t.Name,
+		t.TournamentTypeID
+	FROM
+		[dbo].[Tournament] t
+	WHERE
+		t.TournamentTypeID = @tournamentTypeId;
+END
+GO
+
 CREATE PROCEDURE [dbo].[usp_Tournament_Insert]
 	@name NVARCHAR(256),
 	@tournamentTypeId INT
