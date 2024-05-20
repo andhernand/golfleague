@@ -85,9 +85,8 @@ BEGIN
 		END
 
 	INSERT INTO [dbo].[Member] (LastName, FirstName, MemberTypeID, Phone, Handicap, JoinDate, Coach, Gender)
+	OUTPUT INSERTED.MemberID
 	VALUES (@lastName, @firstName, @memberTypeID, @phone, @handicap, @joinDate, @coach, @gender);
-
-	SELECT SCOPE_IDENTITY() AS memberId;
 END
 GO
 

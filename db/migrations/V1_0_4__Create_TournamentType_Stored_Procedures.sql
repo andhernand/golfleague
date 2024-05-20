@@ -44,9 +44,8 @@ BEGIN
 		END
 
 	INSERT INTO [dbo].[TournamentType] (Name)
+	OUTPUT INSERTED.TournamentTypeID
 	VALUES (@name);
-
-	SELECT SCOPE_IDENTITY() AS tournamentTypeId;
 END
 GO
 

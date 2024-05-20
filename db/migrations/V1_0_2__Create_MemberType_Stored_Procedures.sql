@@ -47,9 +47,8 @@ BEGIN
 		END
 
 	INSERT INTO [dbo].[MemberType] (Name, Fee)
+	OUTPUT INSERTED.MemberTypeId
 	VALUES (@name, @fee);
-
-	SELECT SCOPE_IDENTITY() AS memberTypeId;
 END
 GO
 
