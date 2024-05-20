@@ -6,6 +6,30 @@ namespace GolfLeague.Api.Mapping;
 
 public static class ContractMapping
 {
+    public static MemberTypeResponse MapToResponse(this MemberType memberType)
+    {
+        return new MemberTypeResponse
+        {
+            MemberTypeId = memberType.MemberTypeId,
+            Name = memberType.Name,
+            Fee = memberType.Fee
+        };
+    }
+
+    public static MemberTypesResponse MapToResponse(this IEnumerable<MemberType> memberTypeResponses)
+    {
+        return new MemberTypesResponse { MemberTypes = memberTypeResponses.Select(MapToResponse) };
+    }
+
+    public static MemberType MapToMemberType(this CreateMemberTypeRequest request)
+    {
+        return new MemberType
+        {
+            Name = request.Name,
+            Fee = request.Fee
+        };
+    }
+
     public static MemberResponse MapToResponse(this Member member)
     {
         return new MemberResponse
