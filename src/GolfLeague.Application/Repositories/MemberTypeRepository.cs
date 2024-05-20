@@ -48,18 +48,10 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var memberType = await connection.QuerySingleOrDefaultAsync<MemberType>(
-            new CommandDefinition("""
-                                  SELECT
-                                      mt.MemberTypeId,
-                                      mt.Name,
-                                      mt.Fee
-                                  FROM
-                                      [dbo].[MemberType] mt
-                                  WHERE
-                                      mt.Name = @name;
-                                  """,
+            new CommandDefinition(
+                "dbo.usp_MemberType_GetByName",
                 new { name },
-                commandType: CommandType.Text,
+                commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
         return memberType;
     }

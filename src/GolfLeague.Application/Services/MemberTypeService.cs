@@ -22,4 +22,9 @@ public class MemberTypeService(IMemberTypeRepository memberTypeRepository, IVali
     {
         return await memberTypeRepository.GetAllMemberTypesAsync(token);
     }
+
+    public async Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default)
+    {
+        return await memberTypeRepository.GetMemberTypeByNameAsync(name, token);
+    }
 }

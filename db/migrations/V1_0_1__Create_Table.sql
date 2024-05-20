@@ -4,7 +4,9 @@ CREATE TABLE [dbo].[MemberType]
 	[Name]       NVARCHAR(256)       NOT NULL,
 	[Fee]        DECIMAL(19, 2)      NULL,
 	CONSTRAINT [PK_MemberType_MemberTypeID]
-		PRIMARY KEY CLUSTERED (MemberTypeId ASC)
+		PRIMARY KEY CLUSTERED (MemberTypeId ASC),
+	CONSTRAINT [AK_MemberType_Name]
+		UNIQUE (Name)
 );
 GO
 
