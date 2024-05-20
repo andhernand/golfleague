@@ -1,4 +1,5 @@
 using GolfLeague.Api.Endpoints;
+using GolfLeague.Api.Mapping;
 using GolfLeague.Application;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapApiEndpoints();
 
 app.Run();
