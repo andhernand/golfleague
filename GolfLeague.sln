@@ -5,15 +5,15 @@ VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5DA8DFB2-5075-443A-97E1-4326150454C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfLeague.Api", "src\GolfLeague.Api\GolfLeague.Api.csproj", "{198D4EFA-38BA-48B9-B538-DA87D725FF3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GolfLeague.Api", "src\GolfLeague.Api\GolfLeague.Api.csproj", "{198D4EFA-38BA-48B9-B538-DA87D725FF3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfLeague.Application", "src\GolfLeague.Application\GolfLeague.Application.csproj", "{20036310-76A2-46FC-A134-03C96528834C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GolfLeague.Application", "src\GolfLeague.Application\GolfLeague.Application.csproj", "{20036310-76A2-46FC-A134-03C96528834C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfLeague.Contracts", "src\GolfLeague.Contracts\GolfLeague.Contracts.csproj", "{C8F11DDE-75BA-4AC6-A241-1630BF2482A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GolfLeague.Contracts", "src\GolfLeague.Contracts\GolfLeague.Contracts.csproj", "{C8F11DDE-75BA-4AC6-A241-1630BF2482A4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{30AE1C55-6F5A-4A28-928E-722491032BAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfLeague.Api.Tests.Integration", "tests\GolfLeague.Api.Tests.Integration\GolfLeague.Api.Tests.Integration.csproj", "{B3540A44-9193-4D45-965E-E17E0220B773}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GolfLeague.Api.Tests.Integration", "tests\GolfLeague.Api.Tests.Integration\GolfLeague.Api.Tests.Integration.csproj", "{B3540A44-9193-4D45-965E-E17E0220B773}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "db", "db", "{985CDD1D-7B55-4A5F-8D21-3EE454328101}"
 	ProjectSection(SolutionItems) = preProject
@@ -24,12 +24,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 	ProjectSection(SolutionItems) = preProject
 		db\migrations\V1_0_0__Create_User.sql = db\migrations\V1_0_0__Create_User.sql
 		db\migrations\V1_0_1__Create_Table.sql = db\migrations\V1_0_1__Create_Table.sql
-		db\migrations\V1_0_2__Seed_Data.sql = db\migrations\V1_0_2__Seed_Data.sql
-		db\migrations\V1_0_3__Create_MemberType_Stored_Procedures.sql = db\migrations\V1_0_3__Create_MemberType_Stored_Procedures.sql
-		db\migrations\V1_0_4__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_4__Create_Member_Stored_Procedures.sql
-		db\migrations\V1_0_5__Create_TournamentType_Stored_Procedures.sql = db\migrations\V1_0_5__Create_TournamentType_Stored_Procedures.sql
-		db\migrations\V1_0_6__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_6__Create_Tournament_Stored_Procedures.sql
-		db\migrations\V1_0_7__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_7__Create_TournamentParticipation_Stored_Procedures.sql
+		db\migrations\V1_0_2__Create_MemberType_Stored_Procedures.sql = db\migrations\V1_0_2__Create_MemberType_Stored_Procedures.sql
+		db\migrations\V1_0_3__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_3__Create_Member_Stored_Procedures.sql
+		db\migrations\V1_0_4__Create_TournamentType_Stored_Procedures.sql = db\migrations\V1_0_4__Create_TournamentType_Stored_Procedures.sql
+		db\migrations\V1_0_5__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_5__Create_Tournament_Stored_Procedures.sql
+		db\migrations\V1_0_6__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_6__Create_TournamentParticipation_Stored_Procedures.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"
@@ -40,16 +39,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		docker-compose.yml = docker-compose.yml
 		global.json = global.json
 		License = License
+		db\migrations\GolfLeague_Database_Seed_Data.sql = db\migrations\GolfLeague_Database_Seed_Data.sql
 		README.md = README.md
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A0B9D493-709D-4A19-BFCC-681B7B7E73EB}
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -108,11 +102,17 @@ Global
 		{B3540A44-9193-4D45-965E-E17E0220B773}.Release|x86.ActiveCfg = Release|Any CPU
 		{B3540A44-9193-4D45-965E-E17E0220B773}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{198D4EFA-38BA-48B9-B538-DA87D725FF3D} = {5DA8DFB2-5075-443A-97E1-4326150454C1}
 		{20036310-76A2-46FC-A134-03C96528834C} = {5DA8DFB2-5075-443A-97E1-4326150454C1}
 		{C8F11DDE-75BA-4AC6-A241-1630BF2482A4} = {5DA8DFB2-5075-443A-97E1-4326150454C1}
 		{B3540A44-9193-4D45-965E-E17E0220B773} = {30AE1C55-6F5A-4A28-928E-722491032BAD}
 		{0760049B-6127-4618-9F18-49C5C174E0D2} = {985CDD1D-7B55-4A5F-8D21-3EE454328101}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A0B9D493-709D-4A19-BFCC-681B7B7E73EB}
 	EndGlobalSection
 EndGlobal

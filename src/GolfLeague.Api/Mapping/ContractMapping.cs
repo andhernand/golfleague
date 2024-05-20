@@ -1,4 +1,5 @@
 ﻿using GolfLeague.Application.Models;
+using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Mapping;
@@ -24,5 +25,20 @@ public static class ContractMapping
     public static MembersResponse MapToResponse(this IEnumerable<Member> members)
     {
         return new MembersResponse { Members = members.Select(MapToResponse) };
+    }
+
+    public static Member MapToMember(this CreateMemberRequest request)
+    {
+        return new Member
+        {
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Gender = request.Gender,
+            JoinDate = request.JoinDate,
+            MemberTypeId = request.MemberTypeId,
+            Handicap = request.Handicap,
+            Phone = request.Phone,
+            Coach = request.Coach
+        };
     }
 }

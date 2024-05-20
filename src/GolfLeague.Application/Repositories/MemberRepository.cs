@@ -29,4 +29,9 @@ public class MemberRepository(IDbConnectionFactory connectionFactory) : IMemberR
             cancellationToken: token));
         return member;
     }
+
+    public Task<Member> Create(Member member, CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -1,8 +1,7 @@
-﻿namespace GolfLeague.Application.Models;
+﻿namespace GolfLeague.Contracts.Requests;
 
-public class Member
+public class CreateMemberRequest
 {
-    public int? MemberId { get; init; }
     public required string LastName { get; init; }
     public required string FirstName { get; init; }
     public required int MemberTypeId { get; init; }

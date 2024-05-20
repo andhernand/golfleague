@@ -1,6 +1,6 @@
 ﻿namespace GolfLeague.Api;
 
-public static  class GolfApiEndpoints
+public static class GolfApiEndpoints
 {
     private const string ApiBase = "api";
 
@@ -8,9 +8,11 @@ public static  class GolfApiEndpoints
     {
         private const string Base = $"{ApiBase}/members";
 
-        public const string GroupName = "Members";
-        
-        public const string GetAllMembers = Base;
-        public const string GetMemberById = $"{Base}/{{id}}";
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:int}}";
+        public const string GetAll = Base;
+        public const string Update = $"{Base}/{{id:int}}";
+        public const string Delete = $"{Base}/{{id:int}}";
+        public const string Tag = "Members";
     }
 }

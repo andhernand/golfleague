@@ -6,4 +6,5 @@ public interface IMemberRepository
 {
     Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default);
     Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default);
+    Task<Member> Create(Member member, CancellationToken token = default);
 }
