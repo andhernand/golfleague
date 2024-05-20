@@ -43,4 +43,24 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
                 cancellationToken: token));
         return memberTypes;
     }
+
+    public async Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var memberType = await connection.QuerySingleOrDefaultAsync<MemberType>(
+            new CommandDefinition("""
+                                  SELECT
+                                      mt.MemberTypeId,
+                                      mt.Name,
+                                      mt.Fee
+                                  FROM
+                                      [dbo].[MemberType] mt
+                                  WHERE
+                                      mt.Name = @name;
+                                  """,
+                new { name },
+                commandType: CommandType.Text,
+                cancellationToken: token));
+        return memberType;
+    }
 }
