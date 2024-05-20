@@ -9,4 +9,9 @@ public class MemberService(IMemberRepository memberRepository) : IMemberService
     {
         return await memberRepository.GetAllMembersAsync(token);
     }
+
+    public async Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default)
+    {
+        return await memberRepository.GetMemberByIdAsync(id, token);
+    }
 }

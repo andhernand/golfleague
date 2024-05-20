@@ -6,7 +6,6 @@ public static class EndpointsExtensions
 {
     public static IEndpointRouteBuilder MapApiEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapMemberEndpoints();
-        return app;
+        return app.MapMemberEndpoints();
     }
 }

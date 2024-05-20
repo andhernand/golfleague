@@ -11,11 +11,22 @@ public class MemberRepository(IDbConnectionFactory connectionFactory) : IMemberR
 {
     public async Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(token);
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
         var members = await connection.QueryAsync<Member>(new CommandDefinition(
             "dbo.usp_Member_GetAll",
             commandType: CommandType.StoredProcedure,
             cancellationToken: token));
         return members;
+    }
+
+    public async Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var member = await connection.QuerySingleOrDefaultAsync<Member>(new CommandDefinition(
+            "dbo.usp_Member_GetByMemberId",
+            new { memberId = id },
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: token));
+        return member;
     }
 }

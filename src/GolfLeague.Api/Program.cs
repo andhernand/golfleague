@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 using var config = builder.Configuration;
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApiDocument();
+builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
 
 builder.Services.AddGolfLeagueApplication();
@@ -15,8 +15,8 @@ await using var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseOpenApi();
-    app.UseSwaggerUi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.MapApiEndpoints();

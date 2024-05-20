@@ -5,4 +5,5 @@ namespace GolfLeague.Application.Repositories;
 public interface IMemberRepository
 {
     Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default);
+    Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default);
 }

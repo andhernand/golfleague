@@ -4,7 +4,8 @@ public static class MemberEndpointsExtensions
 {
     public static IEndpointRouteBuilder MapMemberEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGetAllMembers();
-        return app;
+        return app
+            .MapGetAllMembers()
+            .MapGetMemberById();
     }
 }
