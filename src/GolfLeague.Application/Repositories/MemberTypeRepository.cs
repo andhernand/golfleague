@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using System.Data;
+
+using Dapper;
 
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
@@ -14,6 +16,7 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
             new CommandDefinition(
                 "dbo.usp_MemberType_Insert",
                 new { name = memberType.Name, fee = memberType.Fee },
+                commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
         return insertedMemberTypeId;
     }
@@ -25,7 +28,19 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
             new CommandDefinition(
                 "dbo.usp_MemberType_GetByMemberTypeId",
                 new { memberTypeId = id },
+                commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
         return memberType;
+    }
+
+    public async Task<IEnumerable<MemberType>> GetAllMemberTypesAsync(CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var memberTypes = await connection.QueryAsync<MemberType>(
+            new CommandDefinition(
+                "dbo.usp_MemberType_GetAll",
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+        return memberTypes;
     }
 }

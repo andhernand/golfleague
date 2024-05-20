@@ -14,4 +14,9 @@ public class MemberTypeService(IMemberTypeRepository memberTypeRepository) : IMe
     {
         return await memberTypeRepository.GetMemberTypeByIdAsync(id, token);
     }
+
+    public async Task<IEnumerable<MemberType>> GetAllMemberTypesAsync(CancellationToken token = default)
+    {
+        return await memberTypeRepository.GetAllMemberTypesAsync(token);
+    }
 }
