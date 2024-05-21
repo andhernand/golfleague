@@ -2,7 +2,6 @@
 
 using GolfLeague.Application.Models;
 using GolfLeague.Application.Repositories;
-using GolfLeague.Application.Services;
 
 namespace GolfLeague.Application.Validators;
 

@@ -24,11 +24,6 @@ public class MemberTypeService(IMemberTypeRepository memberTypeRepository, IVali
         return await memberTypeRepository.GetAllMemberTypesAsync(token);
     }
 
-    public async Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default)
-    {
-        return await memberTypeRepository.GetMemberTypeByNameAsync(name, token);
-    }
-
     public async Task<MemberType?> UpdateAsync(MemberType memberType, CancellationToken token = default)
     {
         await validator.ValidateAndThrowAsync(memberType, token);
