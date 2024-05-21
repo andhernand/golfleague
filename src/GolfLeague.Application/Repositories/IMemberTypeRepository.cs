@@ -8,4 +8,6 @@ public interface IMemberTypeRepository
     Task<MemberType?> GetMemberTypeByIdAsync(int id, CancellationToken token = default);
     Task<IEnumerable<MemberType>> GetAllMemberTypesAsync(CancellationToken token = default);
     Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default);
+    Task<bool> UpdateAsync(MemberType memberType, CancellationToken token = default);
+    Task<bool> ExistsByIdAsync(int id, CancellationToken token = default);
 }

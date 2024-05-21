@@ -4,7 +4,7 @@ using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Endpoints.MemberTypes;
 
-public static class GetMemberType
+public static class GetMemberTypeEndpoint
 {
     public const string Name = "GetMemberType";
 

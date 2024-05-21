@@ -55,4 +55,27 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
                 cancellationToken: token));
         return memberType;
     }
+
+    public async Task<bool> UpdateAsync(MemberType memberType, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var result = await connection.ExecuteAsync(
+            new CommandDefinition(
+                "dbo.usp_MemberType_Update",
+                memberType,
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+        return result > 0;
+    }
+
+    public async Task<bool> ExistsByIdAsync(int id, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        return await connection.ExecuteScalarAsync<bool>(
+            new CommandDefinition(
+                "SELECT COUNT(1) FROM [dbo].[MemberType] WHERE MemberTypeId = @id;",
+                new { id },
+                commandType: CommandType.Text,
+                cancellationToken: token));
+    }
 }

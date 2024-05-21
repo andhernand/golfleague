@@ -30,6 +30,16 @@ public static class ContractMapping
         };
     }
 
+    public static MemberType MapToMemberType(this UpdateMemberTypeRequest request, int id)
+    {
+        return new MemberType
+        {
+            MemberTypeId = id,
+            Name = request.Name, 
+            Fee = request.Fee
+        };
+    }
+
     public static MemberResponse MapToResponse(this Member member)
     {
         return new MemberResponse

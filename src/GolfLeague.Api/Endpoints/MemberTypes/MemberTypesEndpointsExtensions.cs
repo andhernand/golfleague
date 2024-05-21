@@ -7,6 +7,7 @@ public static class MemberTypesEndpointsExtensions
         return app
             .MapCreateMemberType()
             .MapGetMemberType()
-            .MapGetAllMembersTypes();
+            .MapGetAllMembersTypes()
+            .MapUpdateMemberType();
     }
 }

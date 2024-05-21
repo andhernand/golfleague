@@ -5,7 +5,8 @@ using GolfLeague.Application.Repositories;
 
 namespace GolfLeague.Application.Services;
 
-public class MemberTypeService(IMemberTypeRepository memberTypeRepository, IValidator<MemberType> validator) : IMemberTypeService
+public class MemberTypeService(IMemberTypeRepository memberTypeRepository, IValidator<MemberType> validator)
+    : IMemberTypeService
 {
     public async Task<int> CreateAsync(MemberType memberType, CancellationToken token = default)
     {
@@ -26,5 +27,18 @@ public class MemberTypeService(IMemberTypeRepository memberTypeRepository, IVali
     public async Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default)
     {
         return await memberTypeRepository.GetMemberTypeByNameAsync(name, token);
+    }
+
+    public async Task<MemberType?> UpdateAsync(MemberType memberType, CancellationToken token = default)
+    {
+        await validator.ValidateAndThrowAsync(memberType, token);
+        var memberTypeExists = await memberTypeRepository.ExistsByIdAsync(memberType.MemberTypeId, token);
+        if (!memberTypeExists)
+        {
+            return null;
+        }
+
+        await memberTypeRepository.UpdateAsync(memberType, token);
+        return memberType;
     }
 }

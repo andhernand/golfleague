@@ -22,7 +22,7 @@ public static class CreateMemberTypeEndpoint
                 var response = memberType.MapToResponse();
                 return TypedResults.CreatedAtRoute(
                     response,
-                    GetMemberType.Name,
+                    GetMemberTypeEndpoint.Name,
                     new { id = memberType.MemberTypeId });
             })
             .WithName(Name)
