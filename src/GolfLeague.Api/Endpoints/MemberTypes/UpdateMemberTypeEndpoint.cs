@@ -28,6 +28,7 @@ public static class UpdateMemberTypeEndpoint
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.MemberTypes.Tag)
+            .Accepts<UpdateMemberTypeRequest>(isOptional: false, contentType: "application/json")
             .Produces<MemberTypeResponse>(contentType: "application/json")
             .Produces(StatusCodes.Status404NotFound)
             .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest);

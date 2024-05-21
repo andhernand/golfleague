@@ -8,6 +8,7 @@ public static class MemberTypesEndpointsExtensions
             .MapCreateMemberType()
             .MapGetMemberType()
             .MapGetAllMembersTypes()
-            .MapUpdateMemberType();
+            .MapUpdateMemberType()
+            .MapDeleteMemberType();
     }
 }

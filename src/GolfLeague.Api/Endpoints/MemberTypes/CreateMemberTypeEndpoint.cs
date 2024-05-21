@@ -27,6 +27,7 @@ public static class CreateMemberTypeEndpoint
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.MemberTypes.Tag)
+            .Accepts<CreateMemberTypeRequest>(isOptional: false, contentType: "application/json")
             .Produces<MemberTypeResponse>(StatusCodes.Status201Created)
             .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest);
 

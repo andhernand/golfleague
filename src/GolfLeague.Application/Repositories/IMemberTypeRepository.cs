@@ -10,4 +10,5 @@ public interface IMemberTypeRepository
     Task<MemberType?> GetMemberTypeByNameAsync(string name, CancellationToken token = default);
     Task<bool> UpdateAsync(MemberType memberType, CancellationToken token = default);
     Task<bool> ExistsByIdAsync(int id, CancellationToken token = default);
+    Task<bool> DeleteByIdAsync(int id, CancellationToken token);
 }

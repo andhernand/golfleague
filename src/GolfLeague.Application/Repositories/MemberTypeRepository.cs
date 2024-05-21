@@ -78,4 +78,16 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
                 commandType: CommandType.Text,
                 cancellationToken: token));
     }
+
+    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var result = await connection.ExecuteAsync(
+            new CommandDefinition(
+                "dbo.usp_MemberType_Delete",
+                new { memberTypeId = id },
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+        return result > 0;
+    }
 }
