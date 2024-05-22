@@ -17,19 +17,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GolfLeague.Api.Tests.Integr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "db", "db", "{985CDD1D-7B55-4A5F-8D21-3EE454328101}"
 	ProjectSection(SolutionItems) = preProject
+		db\GolfLeague_Database_Seed_Data.sql = db\GolfLeague_Database_Seed_Data.sql
 		db\init.sql = db\init.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{0760049B-6127-4618-9F18-49C5C174E0D2}"
 	ProjectSection(SolutionItems) = preProject
-		db\migrations\V1_0_0__Create_User.sql = db\migrations\V1_0_0__Create_User.sql
-		db\migrations\V1_0_1__Create_Table.sql = db\migrations\V1_0_1__Create_Table.sql
-		db\migrations\V1_0_2__Create_MemberType_Stored_Procedures.sql = db\migrations\V1_0_2__Create_MemberType_Stored_Procedures.sql
-		db\migrations\V1_0_3__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_3__Create_Member_Stored_Procedures.sql
-		db\migrations\V1_0_4__Create_TournamentType_Stored_Procedures.sql = db\migrations\V1_0_4__Create_TournamentType_Stored_Procedures.sql
-		db\migrations\V1_0_5__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_5__Create_Tournament_Stored_Procedures.sql
-		db\migrations\V1_0_6__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_6__Create_TournamentParticipation_Stored_Procedures.sql
-		db\migrations\V1_0_7__Create_GetMemberTypeByName_Stored_Procedure.sql = db\migrations\V1_0_7__Create_GetMemberTypeByName_Stored_Procedure.sql
+		db\migrations\V1_0_0__Create_Datbase_Api_User.sql = db\migrations\V1_0_0__Create_Datbase_Api_User.sql
+		db\migrations\V1_0_1__Create_Database_Tables.sql = db\migrations\V1_0_1__Create_Database_Tables.sql
+		db\migrations\V1_0_2__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_2__Create_Member_Stored_Procedures.sql
+		db\migrations\V1_0_3__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_3__Create_Tournament_Stored_Procedures.sql
+		db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"
@@ -40,7 +38,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		docker-compose.yml = docker-compose.yml
 		global.json = global.json
 		License = License
-		db\migrations\GolfLeague_Database_Seed_Data.sql = db\migrations\GolfLeague_Database_Seed_Data.sql
 		README.md = README.md
 	EndProjectSection
 EndProject
