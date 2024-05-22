@@ -84,9 +84,9 @@ public class MemberTypeRepository(IDbConnectionFactory connectionFactory) : IMem
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var result = await connection.ExecuteAsync(
             new CommandDefinition(
-                "dbo.usp_MemberType_Delete",
-                new { memberTypeId = id },
-                commandType: CommandType.StoredProcedure,
+                "DELETE FROM dbo.MemberType WHERE MemberTypeId = @Id",
+                new { Id = id },
+                commandType: CommandType.Text,
                 cancellationToken: token));
         return result > 0;
     }

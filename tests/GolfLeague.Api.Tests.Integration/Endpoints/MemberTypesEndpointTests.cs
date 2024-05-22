@@ -1,9 +1,9 @@
 ﻿using System.Net;
 
+using Bogus;
+
 using FluentAssertions;
 
-using GolfLeague.Application.Models;
-using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints;
@@ -12,23 +12,12 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
 {
     private readonly List<int> _createdMemberTypeIds = [];
 
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        using HttpClient httpClient = factory.CreateClient();
-        foreach (int createdId in _createdMemberTypeIds)
-        {
-            await httpClient.DeleteAsync($"/api/membertypes/{createdId}");
-        }
-    }
-
     [Fact]
     public async Task CreateMemberType_CreatesMemberType_WhenDataIsCorrect()
     {
         // Arrange
         using var client = factory.CreateClient();
-        var request = new CreateMemberTypeRequest { Name = "Senior", Fee = 25.00m };
+        var request = Fakers.GenerateCreateMemberTypeRequest();
 
         // Act
         var result = await client.PostAsJsonAsync("/api/membertypes", request);
@@ -47,7 +36,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
     {
         // Arrange
         using var client = factory.CreateClient();
-        var request = new CreateMemberTypeRequest { Name = "", Fee = 0m };
+        var request = Fakers.GenerateCreateMemberTypeRequest(name: "");
 
         // Act
         var result = await client.PostAsJsonAsync("/api/membertypes", request);
@@ -65,7 +54,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
     {
         // Arrange
         using var client = factory.CreateClient();
-        var request = new CreateMemberTypeRequest { Name = "Social", Fee = 200m };
+        var request = Fakers.GenerateCreateMemberTypeRequest();
         var response = await client.PostAsJsonAsync("/api/membertypes", request);
         var createdMemberType = await response.Content.ReadFromJsonAsync<MemberTypeResponse>();
         _createdMemberTypeIds.Add(createdMemberType!.MemberTypeId);
@@ -79,5 +68,180 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         error.PropertyName.Should().Be("Name");
         error.ErrorMessage.Should().Be("This Member Type already exists in the system");
+    }
+
+    [Fact]
+    public async Task GetMemberType_ReturnsMemberType_WhenMemberTypeExists()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var request = Fakers.GenerateCreateMemberTypeRequest();
+        var response = await client.PostAsJsonAsync("/api/membertypes", request);
+        var createdMemberType = await response.Content.ReadFromJsonAsync<MemberTypeResponse>();
+        _createdMemberTypeIds.Add(createdMemberType!.MemberTypeId);
+
+        // Act
+        var result = await client.GetAsync($"/api/membertypes/{createdMemberType.MemberTypeId}");
+        var existingMemberType = await result.Content.ReadFromJsonAsync<MemberTypeResponse>();
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        existingMemberType.Should().BeEquivalentTo(createdMemberType);
+    }
+
+    [Fact]
+    public async Task GetMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExists()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+
+        // Act
+        var result = await client.GetAsync($"/api/membertypes/{900}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetAllMemberTypes_ReturnAllMemberTypes_WhenMemberTypesExist()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var request = Fakers.GenerateCreateMemberTypeRequest();
+        var response = await client.PostAsJsonAsync("/api/membertypes", request);
+        var createdMemberType = await response.Content.ReadFromJsonAsync<MemberTypeResponse>();
+        _createdMemberTypeIds.Add(createdMemberType!.MemberTypeId);
+        var createdMemberTypes = new MemberTypesResponse { MemberTypes = new[] { createdMemberType } };
+
+        // Act
+        var result = await client.GetAsync("/api/membertypes");
+        var existingMemberTypes = await result.Content.ReadFromJsonAsync<MemberTypesResponse>();
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        existingMemberTypes.Should().BeEquivalentTo(createdMemberTypes);
+    }
+
+    [Fact]
+    public async Task GetAllMemberTypes_ReturnsNoMemberTypes_WhenNoMemberTypesExist()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+
+        // Act
+        var result = await client.GetAsync("/api/membertypes");
+        var returnedMemberTypes = await result.Content.ReadFromJsonAsync<MemberTypesResponse>();
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        returnedMemberTypes!.MemberTypes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task UpdateMemberType_UpdatesMemberType_WhenDataIsCorrect()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var createdRequest = Fakers.GenerateCreateMemberTypeRequest();
+        var createdResponse = await client.PostAsJsonAsync("/api/membertypes", createdRequest);
+        var createdMemberType = await createdResponse.Content.ReadFromJsonAsync<MemberTypeResponse>();
+        var createdId = createdMemberType!.MemberTypeId;
+        _createdMemberTypeIds.Add(createdId);
+
+        const string? newName = "NewName";
+        var updateRequest = Fakers.GenerateUpdateMemberTypeRequest(name: newName, fee: createdRequest.Fee);
+
+        // Act
+        var result = await client.PutAsJsonAsync($"/api/membertypes/{createdId}", updateRequest);
+        var updatedMemberType = await result.Content.ReadFromJsonAsync<MemberTypeResponse>();
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        updatedMemberType!.MemberTypeId.Should().Be(createdId);
+        updatedMemberType.Name.Should().Be(newName);
+        updatedMemberType.Fee.Should().Be(updateRequest.Fee);
+    }
+
+    [Fact]
+    public async Task UpdateMemberType_DoesNotUpdateMemberType_WhenDataIsInCorrect()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var createdRequest = Fakers.GenerateCreateMemberTypeRequest();
+        var createdResponse = await client.PostAsJsonAsync("/api/membertypes", createdRequest);
+        var createdMemberType = await createdResponse.Content.ReadFromJsonAsync<MemberTypeResponse>();
+        var createdId = createdMemberType!.MemberTypeId;
+        _createdMemberTypeIds.Add(createdId);
+
+        var updateRequest = Fakers.GenerateUpdateMemberTypeRequest(name: "", fee: createdRequest.Fee);
+
+        // Act
+        var result = await client.PutAsJsonAsync($"/api/membertypes/{createdId}", updateRequest);
+        var errors = await result.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var error = errors!.Errors.Single();
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        error.PropertyName.Should().Be("Name");
+        error.ErrorMessage.Should().Be("'Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task UpdateMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExist()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var updateRequest = Fakers.GenerateUpdateMemberTypeRequest();
+        var badId = new Faker().Random.Int(999999);
+
+        // Act
+        var result = await client.PutAsJsonAsync($"/api/membertypes/{badId}", updateRequest);
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteMemberType_ReturnsNoContent_WhenMemberTypeIsDeleted()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var createdRequest = Fakers.GenerateCreateMemberTypeRequest();
+        var createdResponse = await client.PostAsJsonAsync("/api/membertypes", createdRequest);
+        var createdMemberType = await createdResponse.Content.ReadFromJsonAsync<MemberTypeResponse>();
+        var createdId = createdMemberType!.MemberTypeId;
+        _createdMemberTypeIds.Add(createdId);
+
+        // Act
+        var result = await client.DeleteAsync($"/api/membertypes/{createdId}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task DeleteMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExist()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+        var badId = new Faker().Random.Int(999999);
+
+        // Act
+        // var result = await httpClient.DeleteAsync($"/books/{isbn}");
+        var result = await client.DeleteAsync($"/api/membertypes/{badId}");
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync()
+    {
+        using HttpClient httpClient = factory.CreateClient();
+        foreach (int createdId in _createdMemberTypeIds)
+        {
+            await httpClient.DeleteAsync($"/api/membertypes/{createdId}");
+        }
     }
 }
