@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[usp_TournamentParticipation_Insert](
-	@MemberId INT,
+	@GolferId INT,
 	@TournamentId INT,
 	@Year NCHAR(4)
 )
@@ -7,16 +7,16 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @MemberId IS NULL OR @TournamentId IS NULL OR @Year IS NULL
+	IF @GolferId IS NULL OR @TournamentId IS NULL OR @Year IS NULL
 		BEGIN
-			RAISERROR ('MemberId, TournamentId, and Year must have values.', 16, 1);
+			RAISERROR ('GolferId, TournamentId, and Year must have values.', 16, 1);
 		END;
 
 	BEGIN TRY
 		BEGIN TRANSACTION;
 
-		INSERT INTO [dbo].[TournamentParticipation] ([MemberId], [TournamentId], [Year])
-		VALUES (@MemberId, @TournamentId, @Year);
+		INSERT INTO [dbo].[TournamentParticipation] ([GolferId], [TournamentId], [Year])
+		VALUES (@GolferId, @TournamentId, @Year);
 
 		COMMIT TRANSACTION;
 	END TRY
@@ -33,21 +33,21 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [TournamentId], [Year]
+	SELECT [GolferId], [TournamentId], [Year]
 	FROM [dbo].[TournamentParticipation];
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByMemberId](
-	@MemberId INT
+CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByGolferId](
+	@GolferId INT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [TournamentId], [Year]
+	SELECT [GolferId], [TournamentId], [Year]
 	FROM [dbo].[TournamentParticipation]
-	WHERE [MemberId] = @MemberId;
+	WHERE [GolferId] = @GolferId;
 END;
 GO
 
@@ -58,7 +58,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [TournamentId], [Year]
+	SELECT [GolferId], [TournamentId], [Year]
 	FROM [dbo].[TournamentParticipation]
 	WHERE [TournamentId] = @TournamentId;
 END;
@@ -71,14 +71,14 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [TournamentId], [Year]
+	SELECT [GolferId], [TournamentId], [Year]
 	FROM [dbo].[TournamentParticipation]
 	WHERE [Year] = @Year;
 END;
 GO
 
 CREATE PROCEDURE [dbo].[usp_TournamentParticipation_Delete](
-	@MemberId INT,
+	@GolferId INT,
 	@TournamentId INT,
 	@Year NCHAR(4),
 	@RowCount INT OUTPUT
@@ -89,7 +89,7 @@ BEGIN
 
 	IF EXISTS (SELECT 1
 			   FROM [dbo].[TournamentParticipation]
-			   WHERE [MemberId] = @MemberId
+			   WHERE [GolferId] = @GolferId
 				 AND [TournamentId] = @TournamentId
 				 AND [Year] = @Year)
 		BEGIN
@@ -98,7 +98,7 @@ BEGIN
 
 				DELETE
 				FROM [dbo].[TournamentParticipation]
-				WHERE [MemberId] = @MemberId
+				WHERE [GolferId] = @GolferId
 				  AND [TournamentId] = @TournamentId
 				  AND [Year] = @Year;
 

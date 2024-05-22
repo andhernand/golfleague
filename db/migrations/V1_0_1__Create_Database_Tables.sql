@@ -1,14 +1,14 @@
-CREATE TABLE [dbo].[Member]
+CREATE TABLE [dbo].[Golfer]
 (
-	[MemberId]  INT IDENTITY (1, 1) NOT NULL,
+	[GolferId]  INT IDENTITY (1, 1) NOT NULL,
 	[FirstName] NVARCHAR(256)       NOT NULL,
 	[LastName]  NVARCHAR(256)       NOT NULL,
 	[Email]     NVARCHAR(256)       NOT NULL,
 	[JoinDate]  DATE                NOT NULL,
 	[Handicap]  TINYINT             NULL,
-	CONSTRAINT [PK_Member_MemberId]
-		PRIMARY KEY CLUSTERED ([MemberId] ASC),
-	CONSTRAINT [AK_Member_Email]
+	CONSTRAINT [PK_Golfer_GolferId]
+		PRIMARY KEY CLUSTERED ([GolferId] ASC),
+	CONSTRAINT [AK_Golfer_Email]
 		UNIQUE ([Email])
 );
 GO
@@ -25,22 +25,22 @@ GO
 
 CREATE TABLE [dbo].[TournamentParticipation]
 (
-	[MemberId]     INT      NOT NULL,
+	[GolferId]     INT      NOT NULL,
 	[TournamentId] INT      NOT NULL,
 	[Year]         NCHAR(4) NOT NULL,
-	CONSTRAINT [PK_TournamentParticipation_MemberId_TournamentId_Year]
-		PRIMARY KEY CLUSTERED ([MemberId] ASC, [TournamentId] ASC, [Year] ASC),
-	CONSTRAINT [FK_Member_TournamentParticipation_MemberId]
-		FOREIGN KEY ([MemberId]) REFERENCES [dbo].[Member] ([MemberId]),
+	CONSTRAINT [PK_TournamentParticipation_GolferId_TournamentId_Year]
+		PRIMARY KEY CLUSTERED ([GolferId] ASC, [TournamentId] ASC, [Year] ASC),
+	CONSTRAINT [FK_Member_TournamentParticipation_GolferId]
+		FOREIGN KEY ([GolferId]) REFERENCES [dbo].[Golfer] ([GolferId]),
 	CONSTRAINT [FK_Tournament_TournamentParticipation_TournamentId]
 		FOREIGN KEY ([TournamentId]) REFERENCES [dbo].[Tournament] ([TournamentId])
 );
 GO
 
-ALTER TABLE [dbo].[Member]
-	WITH CHECK ADD CONSTRAINT [CK_Member_Handicap] CHECK (([Handicap] IS NULL OR [Handicap] >= 0));
+ALTER TABLE [dbo].[Golfer]
+	WITH CHECK ADD CONSTRAINT [CK_Golfer_Handicap] CHECK (([Handicap] IS NULL OR [Handicap] >= 0));
 GO
 
-ALTER TABLE [dbo].[Member]
-	CHECK CONSTRAINT [CK_Member_Handicap];
+ALTER TABLE [dbo].[Golfer]
+	CHECK CONSTRAINT [CK_Golfer_Handicap];
 GO

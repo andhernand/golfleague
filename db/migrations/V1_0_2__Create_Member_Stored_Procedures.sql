@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[usp_Member_Insert](
+﻿CREATE PROCEDURE [dbo].[usp_Golfer_Insert](
 	@FirstName NVARCHAR(256),
 	@LastName NVARCHAR(256),
 	@Email NVARCHAR(256),
@@ -14,7 +14,7 @@ BEGIN
 			RAISERROR ('All input parameters must have values.', 16, 1);
 		END;
 
-	IF EXISTS (SELECT 1 FROM [dbo].[Member] WHERE [Email] = @Email)
+	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [Email] = @Email)
 		BEGIN
 			RAISERROR ('Email already exists in the database.', 16, 2);
 		END;
@@ -27,8 +27,8 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION;
 
-		INSERT INTO [dbo].[Member] ([FirstName], [LastName], [Email], [JoinDate], [Handicap])
-		OUTPUT inserted.MemberId
+		INSERT INTO [dbo].[Golfer] ([FirstName], [LastName], [Email], [JoinDate], [Handicap])
+		OUTPUT inserted.GolferId
 		VALUES (@FirstName, @LastName, @Email, @JoinDate, @Handicap);
 
 		COMMIT TRANSACTION;
@@ -41,31 +41,31 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_Member_GetMemberById](
-	@MemberId INT
+CREATE PROCEDURE [dbo].[usp_Golfer_GetGolferById](
+	@GolferId INT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
-	FROM [dbo].[Member]
-	WHERE [MemberId] = @MemberId;
+	SELECT [GOlferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
+	FROM [dbo].[Golfer]
+	WHERE [GolferId] = @GolferId;
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_Member_GetAll]
+CREATE PROCEDURE [dbo].[usp_Golfer_GetAll]
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MemberId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
-	FROM [dbo].[Member];
+	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
+	FROM [dbo].[Golfer];
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_Member_Update](
-	@MemberId INT,
+CREATE PROCEDURE [dbo].[usp_Golfer_Update](
+	@GolferId INT,
 	@FirstName NVARCHAR(256),
 	@LastName NVARCHAR(256),
 	@Email NVARCHAR(256),
@@ -81,9 +81,9 @@ BEGIN
 			RAISERROR ('All input parameters must have values.', 16, 1);
 		END;
 
-	IF EXISTS (SELECT 1 FROM [dbo].[Member] WHERE [MemberId] = @MemberId)
+	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [GolferId] = @GolferId)
 		BEGIN
-			IF EXISTS (SELECT 1 FROM [dbo].[Member] WHERE [Email] = @Email AND [MemberId] != @MemberId)
+			IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [Email] = @Email AND [GolferId] != @GolferId)
 				BEGIN
 					RAISERROR ('Email already exists in the database.', 16, 2);
 				END;
@@ -96,13 +96,13 @@ BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
-				UPDATE [dbo].[Member]
+				UPDATE [dbo].[Golfer]
 				SET [FirstName] = @FirstName,
 					[LastName]  = @LastName,
 					[Email]     = @Email,
 					[JoinDate]  = @JoinDate,
 					[Handicap]  = @Handicap
-				WHERE [MemberId] = @MemberId;
+				WHERE [GolferId] = @GolferId;
 
 				COMMIT TRANSACTION;
 			END TRY
@@ -114,27 +114,27 @@ BEGIN
 		END
 	ELSE
 		BEGIN
-			RAISERROR ('MemberId does not exist in the database.', 16, 4);
+			RAISERROR ('GolferId does not exist in the database.', 16, 4);
 		END;
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_Member_Delete](
-	@MemberId INT,
+CREATE PROCEDURE [dbo].[usp_Golfer_Delete](
+	@GolferId INT,
 	@RowCount INT OUTPUT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF EXISTS (SELECT 1 FROM [dbo].[Member] WHERE [MemberId] = @MemberId)
+	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [GolferId] = @GolferId)
 		BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
 				DELETE
-				FROM [dbo].[Member]
-				WHERE [MemberId] = @MemberId;
+				FROM [dbo].[Golfer]
+				WHERE [GolferId] = @GolferId;
 
 				SET @RowCount = @@ROWCOUNT;
 
