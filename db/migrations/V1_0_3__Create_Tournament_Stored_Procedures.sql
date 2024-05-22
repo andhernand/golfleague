@@ -41,6 +41,19 @@ BEGIN
 END;
 GO
 
+CREATE PROCEDURE [dbo].[usp_Tournament_GetTournamentByName](
+	@Name INT
+)
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT [TournamentId], [Name], [Format]
+	FROM [dbo].[Tournament]
+	WHERE [Name] = @Name;
+END;
+GO
+
 CREATE PROCEDURE [dbo].[usp_Tournament_GetAll]
 AS
 BEGIN
