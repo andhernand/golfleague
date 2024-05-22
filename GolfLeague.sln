@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 	ProjectSection(SolutionItems) = preProject
 		db\migrations\V1_0_0__Create_Datbase_Api_User.sql = db\migrations\V1_0_0__Create_Datbase_Api_User.sql
 		db\migrations\V1_0_1__Create_Database_Tables.sql = db\migrations\V1_0_1__Create_Database_Tables.sql
-		db\migrations\V1_0_2__Create_Member_Stored_Procedures.sql = db\migrations\V1_0_2__Create_Member_Stored_Procedures.sql
+		db\migrations\V1_0_2__Create_Golfer_Stored_Procedures.sql = db\migrations\V1_0_2__Create_Golfer_Stored_Procedures.sql
 		db\migrations\V1_0_3__Create_Tournament_Stored_Procedures.sql = db\migrations\V1_0_3__Create_Tournament_Stored_Procedures.sql
 		db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql
 	EndProjectSection

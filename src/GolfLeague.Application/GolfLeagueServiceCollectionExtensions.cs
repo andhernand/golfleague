@@ -14,8 +14,8 @@ public static class GolfLeagueServiceCollectionExtensions
     {
         services.AddSingleton<IMemberTypeService, MemberTypeService>();
         services.AddSingleton<IMemberTypeRepository, MemberTypeRepository>();
-        services.AddSingleton<IMemberService, MemberService>();
-        services.AddSingleton<IMemberRepository, MemberRepository>();
+        services.AddSingleton<IGolferService, GolferService>();
+        services.AddSingleton<IGolferRepository, GolferRepository>();
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
         return services;
     }

@@ -1,18 +1,17 @@
-﻿using GolfLeague.Api.Mapping;
-using GolfLeague.Application.Services;
+﻿using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
-namespace GolfLeague.Api.Endpoints.Members;
+namespace GolfLeague.Api.Endpoints.Golfers;
 
-public static class GetMemberByIdEndpoint
+public static class GetGolferByIdEndpoint
 {
-    public const string Name = "GetMemberById";
+    public const string Name = "GetGolferById";
 
-    public static IEndpointRouteBuilder MapGetMemberById(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapGetGolferById(this IEndpointRouteBuilder app)
     {
-        app.MapGet(GolfApiEndpoints.Members.Get, async (
+        app.MapGet(GolfApiEndpoints.Golfers.Get, async (
                 int id,
-                IMemberService service,
+                IGolferService service,
                 CancellationToken token) =>
             {
                 // var member = await service.GetMemberByIdAsync(id, token);
@@ -25,8 +24,8 @@ public static class GetMemberByIdEndpoint
                 // return TypedResults.Ok(response);
             })
             .WithName(Name)
-            .WithTags(GolfApiEndpoints.Members.Tag)
-            .Produces<MemberResponse>(contentType: "application/json")
+            .WithTags(GolfApiEndpoints.Golfers.Tag)
+            .Produces<GolferResponse>(contentType: "application/json")
             .Produces(StatusCodes.Status404NotFound);
 
         return app;

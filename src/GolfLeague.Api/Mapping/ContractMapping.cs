@@ -40,27 +40,27 @@ public static class ContractMapping
         };
     }
 
-    public static MemberResponse MapToResponse(this Member member)
+    public static GolferResponse MapToResponse(this Golfer golfer)
     {
-        return new MemberResponse
+        return new GolferResponse
         {
-            MemberId = member.MemberId,
-            FirstName = member.FirstName,
-            LastName = member.LastName,
-            Email = member.Email,
-            JoinDate = member.JoinDate,
-            Handicap = member.Handicap
+            GolferId = golfer.GolferId,
+            FirstName = golfer.FirstName,
+            LastName = golfer.LastName,
+            Email = golfer.Email,
+            JoinDate = golfer.JoinDate,
+            Handicap = golfer.Handicap
         };
     }
 
-    public static MembersResponse MapToResponse(this IEnumerable<Member> members)
+    public static GolfersResponse MapToResponse(this IEnumerable<Golfer> golfers)
     {
-        return new MembersResponse { Members = members.Select(MapToResponse) };
+        return new GolfersResponse { Golfers = golfers.Select(MapToResponse) };
     }
 
-    public static Member MapToMember(this CreateMemberRequest request)
+    public static Golfer MapToGolfer(this CreateGolferRequest request)
     {
-        return new Member
+        return new Golfer
         {
             FirstName = request.FirstName,
             LastName = request.LastName,

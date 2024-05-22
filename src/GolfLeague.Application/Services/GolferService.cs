@@ -5,12 +5,12 @@ using GolfLeague.Application.Repositories;
 
 namespace GolfLeague.Application.Services;
 
-public class MemberService(IMemberRepository memberRepository, IValidator<Member> validator) : IMemberService
+public class GolferService(IGolferRepository golferRepository, IValidator<Golfer> validator) : IGolferService
 {
-    public async Task<int> CreateAsync(Member member, CancellationToken token = default)
+    public async Task<int> CreateAsync(Golfer golfer, CancellationToken token = default)
     {
-        await validator.ValidateAndThrowAsync(member, token);
-        return await memberRepository.Create(member, token);
+        await validator.ValidateAndThrowAsync(golfer, token);
+        return await golferRepository.Create(golfer, token);
     }
     // public async Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default)
     // {

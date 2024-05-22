@@ -7,18 +7,18 @@ using GolfLeague.Application.Models;
 
 namespace GolfLeague.Application.Repositories;
 
-public class MemberRepository(IDbConnectionFactory connectionFactory) : IMemberRepository
+public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferRepository
 {
-    public async Task<int> Create(Member member, CancellationToken token = default)
+    public async Task<int> Create(Golfer golfer, CancellationToken token = default)
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        var insertedMemberTypeId = await connection.QuerySingleAsync<int>(
+        var golferId = await connection.QuerySingleAsync<int>(
             new CommandDefinition(
-                "dbo.usp_Member_Insert",
-                member,
+                "dbo.usp_Golfer_Insert",
+                golfer,
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
-        return insertedMemberTypeId;
+        return golferId;
     }
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken token = default)
@@ -26,7 +26,7 @@ public class MemberRepository(IDbConnectionFactory connectionFactory) : IMemberR
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         return await connection.ExecuteScalarAsync<bool>(
             new CommandDefinition(
-                "SELECT COUNT(1) FROM [dbo].[Member] WHERE Email = @email;",
+                "SELECT COUNT(1) FROM [dbo].[Golfer] WHERE Email = @email;",
                 new { email },
                 commandType: CommandType.Text,
                 cancellationToken: token));

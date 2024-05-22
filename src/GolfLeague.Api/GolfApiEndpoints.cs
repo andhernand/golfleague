@@ -16,15 +16,15 @@ public static class GolfApiEndpoints
         public const string Tag = "MemberTypes";
     }
 
-    public static class Members
+    public static class Golfers
     {
-        private const string Base = $"{ApiBase}/members";
+        private const string Base = $"{ApiBase}/golfers";
 
         public const string Create = Base;
         public const string Get = $"{Base}/{{id:int}}";
         public const string GetAll = Base;
         public const string Update = $"{Base}/{{id:int}}";
         public const string Delete = $"{Base}/{{id:int}}";
-        public const string Tag = "Members";
+        public const string Tag = "Golfers";
     }
 }

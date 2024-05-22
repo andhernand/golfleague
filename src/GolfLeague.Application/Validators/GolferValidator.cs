@@ -5,13 +5,13 @@ using GolfLeague.Application.Repositories;
 
 namespace GolfLeague.Application.Validators;
 
-public class MemberValidator : AbstractValidator<Member>
+public class GolferValidator : AbstractValidator<Golfer>
 {
-    private readonly IMemberRepository _memberRepository;
+    private readonly IGolferRepository _golferRepository;
 
-    public MemberValidator(IMemberRepository memberRepository)
+    public GolferValidator(IGolferRepository golferRepository)
     {
-        _memberRepository = memberRepository;
+        _golferRepository = golferRepository;
 
         RuleFor(m => m.FirstName)
             .NotEmpty();
@@ -26,7 +26,7 @@ public class MemberValidator : AbstractValidator<Member>
                 RuleFor(m => m.Email)
                     .MustAsync(ValidateEmail)
                     .WithMessage("This Email already exists in the system.")
-                    .When(m => m.MemberId != default && m.MemberId > 0);
+                    .When(m => m.GolferId != default && m.GolferId > 0);
             });
 
         RuleFor(m => m.JoinDate)
@@ -37,9 +37,9 @@ public class MemberValidator : AbstractValidator<Member>
             .When(m => m.Handicap is not null);
     }
 
-    private async Task<bool> ValidateEmail(Member member, string email, CancellationToken token = default)
+    private async Task<bool> ValidateEmail(Golfer golfer, string email, CancellationToken token = default)
     {
-        var exists = await _memberRepository.ExistsByEmailAsync(email, token);
+        var exists = await _golferRepository.ExistsByEmailAsync(email, token);
         return !exists;
     }
 }

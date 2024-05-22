@@ -1,8 +1,8 @@
 ﻿namespace GolfLeague.Application.Models;
 
-public class Member
+public class Golfer
 {
-    public int MemberId { get; set; }
+    public int GolferId { get; set; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public required string Email { get; init; }
