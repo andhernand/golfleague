@@ -4,7 +4,9 @@ public static class GolferEndpointsExtensions
 {
     public static IEndpointRouteBuilder MapGolferEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapCreateGolfer();
-        return app;
+        return app
+            .MapCreateGolfer()
+            .MapGetGolferById()
+            .MapGetAllGolfers();
     }
 }

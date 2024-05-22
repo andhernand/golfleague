@@ -12,14 +12,14 @@ public class GolferService(IGolferRepository golferRepository, IValidator<Golfer
         await validator.ValidateAndThrowAsync(golfer, token);
         return await golferRepository.Create(golfer, token);
     }
-    // public async Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default)
-    // {
-    //     return await memberRepository.GetAllMembersAsync(token);
-    // }
-    //
-    // public async Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default)
-    // {
-    //     return await memberRepository.GetMemberByIdAsync(id, token);
-    // }
-    //
+
+    public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token)
+    {
+        return await golferRepository.GetGolferByIdAsync(id, token);
+    }
+
+    public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
+    {
+        return await golferRepository.GetAllGolfersAsync(token);
+    }
 }

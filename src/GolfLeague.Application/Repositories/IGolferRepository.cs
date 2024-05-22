@@ -5,7 +5,7 @@ namespace GolfLeague.Application.Repositories;
 public interface IGolferRepository
 {
     Task<int> Create(Golfer golfer, CancellationToken token = default);
-    Task<bool> ExistsByEmailAsync(string email, CancellationToken token = default);
-    // Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default);
-    // Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default);
+    Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token);
+    Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token);
+    Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default);
 }

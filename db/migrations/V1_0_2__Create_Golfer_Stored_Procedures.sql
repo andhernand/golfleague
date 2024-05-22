@@ -48,9 +48,32 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [GOlferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
+	IF @GolferId IS NULL
+		BEGIN
+			RAISERROR ('The @GolferId input parameter must have a value.', 16, 1);
+		END;
+
+	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
 	FROM [dbo].[Golfer]
 	WHERE [GolferId] = @GolferId;
+END;
+GO
+
+CREATE PROCEDURE [dbo].[usp_Golfer_GetGolferByEmail](
+	@Email NVARCHAR(256)
+)
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	IF @Email IS NULL
+		BEGIN
+			RAISERROR ('The Email input parameter must have a values.', 16, 1);
+		END;
+
+	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
+	FROM [dbo].[Golfer]
+	WHERE [Email] = @Email;
 END;
 GO
 

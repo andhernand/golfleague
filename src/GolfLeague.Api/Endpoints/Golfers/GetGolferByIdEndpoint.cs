@@ -1,4 +1,5 @@
-﻿using GolfLeague.Application.Services;
+﻿using GolfLeague.Api.Mapping;
+using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Endpoints.Golfers;
@@ -14,14 +15,14 @@ public static class GetGolferByIdEndpoint
                 IGolferService service,
                 CancellationToken token) =>
             {
-                // var member = await service.GetMemberByIdAsync(id, token);
-                // if (member is null)
-                // {
-                //     return Results.NotFound();
-                // }
-                //
-                // var response = member.MapToResponse();
-                // return TypedResults.Ok(response);
+                var golfer = await service.GetGolferByIdAsync(id, token);
+                if (golfer is null)
+                {
+                    return Results.NotFound();
+                }
+
+                var response = golfer.MapToResponse();
+                return TypedResults.Ok(response);
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)

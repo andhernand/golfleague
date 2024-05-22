@@ -10,9 +10,7 @@ public static class ContractMapping
     {
         return new MemberTypeResponse
         {
-            MemberTypeId = memberType.MemberTypeId,
-            Name = memberType.Name,
-            Fee = memberType.Fee
+            MemberTypeId = memberType.MemberTypeId, Name = memberType.Name, Fee = memberType.Fee
         };
     }
 
@@ -23,21 +21,12 @@ public static class ContractMapping
 
     public static MemberType MapToMemberType(this CreateMemberTypeRequest request)
     {
-        return new MemberType
-        {
-            Name = request.Name,
-            Fee = request.Fee
-        };
+        return new MemberType { Name = request.Name, Fee = request.Fee };
     }
 
     public static MemberType MapToMemberType(this UpdateMemberTypeRequest request, int id)
     {
-        return new MemberType
-        {
-            MemberTypeId = id,
-            Name = request.Name, 
-            Fee = request.Fee
-        };
+        return new MemberType { MemberTypeId = id, Name = request.Name, Fee = request.Fee };
     }
 
     public static GolferResponse MapToResponse(this Golfer golfer)
@@ -66,7 +55,7 @@ public static class ContractMapping
             LastName = request.LastName,
             Email = request.Email,
             JoinDate = request.JoinDate,
-            Handicap = request.Handicap,
+            Handicap = request.Handicap
         };
     }
 }

@@ -15,42 +15,65 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         var golferId = await connection.QuerySingleAsync<int>(
             new CommandDefinition(
                 "dbo.usp_Golfer_Insert",
-                golfer,
+                new
+                {
+                    golfer.FirstName,
+                    golfer.LastName,
+                    golfer.Email,
+                    golfer.JoinDate,
+                    golfer.Handicap
+                },
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
         return golferId;
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email, CancellationToken token = default)
+    public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token)
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        return await connection.ExecuteScalarAsync<bool>(
+        var golfer = await connection.QueryFirstOrDefaultAsync<Golfer>(
             new CommandDefinition(
-                "SELECT COUNT(1) FROM [dbo].[Golfer] WHERE Email = @email;",
-                new { email },
-                commandType: CommandType.Text,
+                "dbo.usp_Golfer_GetGolferById",
+                new { GolferId = id },
+                commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
+        return golfer;
     }
 
-    // public async Task<IEnumerable<Member>> GetAllMembersAsync(CancellationToken token = default)
-    // {
-    //     using var connection = await connectionFactory.CreateConnectionAsync(token);
-    //     var members = await connection.QueryAsync<Member>(new CommandDefinition(
-    //         "dbo.usp_Member_GetAll",
-    //         commandType: CommandType.StoredProcedure,
-    //         cancellationToken: token));
-    //     return members;
-    // }
-    //
-    // public async Task<Member?> GetMemberByIdAsync(int id, CancellationToken token = default)
-    // {
-    //     using var connection = await connectionFactory.CreateConnectionAsync(token);
-    //     var member = await connection.QuerySingleOrDefaultAsync<Member>(new CommandDefinition(
-    //         "dbo.usp_Member_GetByMemberId",
-    //         new { memberId = id },
-    //         commandType: CommandType.StoredProcedure,
-    //         cancellationToken: token));
-    //     return member;
-    // }
-    //
+    public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var golfers = await connection.QueryAsync<Golfer>(
+            new CommandDefinition(
+                "dbo.usp_Golfer_GetAll",
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+
+        return golfers;
+    }
+
+    public async Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+//         var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(
+//             new CommandDefinition(
+//                 """
+//                 SET NOCOUNT ON;
+//
+//                 SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
+//                 FROM [dbo].[Golfer]
+//                 WHERE [Email] = @Email;
+//                 """,
+//                 new { Email = email },
+//                 commandType: CommandType.Text,
+//                 cancellationToken: token));
+        var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(
+            new CommandDefinition(
+                "dbo.usp_Golfer_GetGolferByEmail",
+                new { Email = email },
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+
+        return golfer;
+    }
 }

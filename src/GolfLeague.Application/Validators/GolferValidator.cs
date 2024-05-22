@@ -25,8 +25,7 @@ public class GolferValidator : AbstractValidator<Golfer>
             {
                 RuleFor(m => m.Email)
                     .MustAsync(ValidateEmail)
-                    .WithMessage("This Email already exists in the system.")
-                    .When(m => m.GolferId != default && m.GolferId > 0);
+                    .WithMessage("This Email already exists in the system.");
             });
 
         RuleFor(m => m.JoinDate)
@@ -39,7 +38,12 @@ public class GolferValidator : AbstractValidator<Golfer>
 
     private async Task<bool> ValidateEmail(Golfer golfer, string email, CancellationToken token = default)
     {
-        var exists = await _golferRepository.ExistsByEmailAsync(email, token);
-        return !exists;
+        var existingGolfer = await _golferRepository.ExistsByEmailAsync(email, token);
+        if (existingGolfer is not null)
+        {
+            return existingGolfer.GolferId == golfer.GolferId;
+        }
+
+        return existingGolfer is null;
     }
 }

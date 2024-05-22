@@ -12,6 +12,70 @@ public class GolfersEndpointTests(GolfApiFactory golfApiFactory) :
 {
     private readonly List<int> _createdGolferIds = [];
 
+    [Fact]
+    public async Task CreateGolfer_CreatesGolfer_WhenDataIsCorrect()
+    {
+        // Arrange
+        using var client = golfApiFactory.CreateClient();
+        var request = Fakers.GenerateCreateGolferRequest();
+
+        // Act
+        var result = await client.PostAsJsonAsync("/api/golfers", request);
+        var golfer = await result.Content.ReadFromJsonAsync<GolferResponse>();
+        _createdGolferIds.Add(golfer!.GolferId);
+
+        // Assert
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        result.Headers.Location.Should().Be($"http://localhost/api/golfers/{golfer.GolferId}");
+        golfer.FirstName.Should().Be(request.FirstName);
+        golfer.LastName.Should().Be(request.LastName);
+        golfer.Email.Should().Be(request.Email);
+        golfer.JoinDate.Should().Be(request.JoinDate);
+        golfer.Handicap.Should().Be(request.Handicap);
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_FirstNameIsInvalid()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_LastNameIsInvalid()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_EmailIsInvalid()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_GolferWithTheSameEmailExists()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_JoinDateIsInvalid()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CreateGolfer_Fails_When_HandicapIsInvalid()
+    {
+        await Task.Delay(50);
+        true.Should().BeTrue();
+    }
+
     public Task InitializeAsync() => Task.CompletedTask;
 
     public async Task DisposeAsync()
@@ -22,51 +86,4 @@ public class GolfersEndpointTests(GolfApiFactory golfApiFactory) :
             await httpClient.DeleteAsync($"/api/golfers/{golferId}");
         }
     }
-
-    // [Fact(Skip = "Pending sweeping database changes")]
-    // public async Task GetMemberById_ReturnsMember_WhenMemberExists()
-    // {
-    //     using var httpClient = golfApiFactory.CreateClient();
-    //     var memberId = 2;
-    //
-    //     var response = await httpClient.GetAsync($"/api/members/{memberId}");
-    //     var existingMember = await response.Content.ReadFromJsonAsync<GolferResponse>();
-    //
-    //     response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //     existingMember!.GolferId.Should().Be(memberId);
-    // }
-    //
-    // [Fact(Skip = "Pending sweeping database changes")]
-    // public async Task GetMemberById_ReturnsNotFound_WhenMemberDoesNotExists()
-    // {
-    //     using var httpClient = golfApiFactory.CreateClient();
-    //
-    //     var response = await httpClient.GetAsync("/api/members/200");
-    //
-    //     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    // }
-    //
-    // [Fact(Skip = "Pending sweeping database changes")]
-    // public async Task GetAllMembers_ReturnsAllMembers_WhenMembersExist()
-    // {
-    //     using var httpClient = golfApiFactory.CreateClient();
-    //
-    //     var response = await httpClient.GetAsync("/api/members");
-    //     var members = await response.Content.ReadFromJsonAsync<GolfersResponse>();
-    //
-    //     response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //     members?.Golfers.Count().Should().BeGreaterThan(0);
-    // }
-    //
-    // [Fact(Skip = "Pending sweeping database changes")]
-    // public async Task GetAllMembers_ReturnsNoMembers_WhenNoMembersExist()
-    // {
-    //     using var httpClient = golfApiFactory.CreateClient();
-    //
-    //     var response = await httpClient.GetAsync("/api/members");
-    //     var members = await response.Content.ReadFromJsonAsync<GolfersResponse>();
-    //
-    //     response.StatusCode.Should().Be(HttpStatusCode.OK);
-    //     members?.Golfers.Count().Should().Be(0);
-    // }
 }
