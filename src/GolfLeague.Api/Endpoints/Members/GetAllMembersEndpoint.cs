@@ -12,9 +12,9 @@ public static class GetAllMembersEndpoint
     {
         app.MapGet(GolfApiEndpoints.Members.GetAll, async (IMemberService service, CancellationToken token) =>
         {
-            var members = await service.GetAllMembersAsync(token);
-            var response = members.MapToResponse();
-            return TypedResults.Ok(response);
+            // var members = await service.GetAllMembersAsync(token);
+            // var response = members.MapToResponse();
+            // return TypedResults.Ok(response);
         })
         .WithName(Name)
         .WithTags(GolfApiEndpoints.Members.Tag)

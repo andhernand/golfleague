@@ -23,7 +23,7 @@ public class MembersEndpointTests(GolfApiFactory golfApiFactory) :
         }
     }
 
-    [Fact(Skip = "Pending MemberType Endpoint Work.")]
+    [Fact(Skip = "Pending sweeping database changes")]
     public async Task GetMemberById_ReturnsMember_WhenMemberExists()
     {
         using var httpClient = golfApiFactory.CreateClient();
@@ -36,7 +36,7 @@ public class MembersEndpointTests(GolfApiFactory golfApiFactory) :
         existingMember!.MemberId.Should().Be(memberId);
     }
 
-    [Fact(Skip = "Pending MemberType Endpoint Work.")]
+    [Fact(Skip = "Pending sweeping database changes")]
     public async Task GetMemberById_ReturnsNotFound_WhenMemberDoesNotExists()
     {
         using var httpClient = golfApiFactory.CreateClient();
@@ -46,7 +46,7 @@ public class MembersEndpointTests(GolfApiFactory golfApiFactory) :
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact(Skip = "Pending MemberType Endpoint Work.")]
+    [Fact(Skip = "Pending sweeping database changes")]
     public async Task GetAllMembers_ReturnsAllMembers_WhenMembersExist()
     {
         using var httpClient = golfApiFactory.CreateClient();
@@ -58,7 +58,7 @@ public class MembersEndpointTests(GolfApiFactory golfApiFactory) :
         members?.Members.Count().Should().BeGreaterThan(0);
     }
 
-    [Fact(Skip = "Pending MemberType Endpoint Work.")]
+    [Fact(Skip = "Pending sweeping database changes")]
     public async Task GetAllMembers_ReturnsNoMembers_WhenNoMembersExist()
     {
         using var httpClient = golfApiFactory.CreateClient();

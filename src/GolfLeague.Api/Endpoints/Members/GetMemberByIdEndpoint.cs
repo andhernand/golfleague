@@ -15,14 +15,14 @@ public static class GetMemberByIdEndpoint
                 IMemberService service,
                 CancellationToken token) =>
             {
-                var member = await service.GetMemberByIdAsync(id, token);
-                if (member is null)
-                {
-                    return Results.NotFound();
-                }
-
-                var response = member.MapToResponse();
-                return TypedResults.Ok(response);
+                // var member = await service.GetMemberByIdAsync(id, token);
+                // if (member is null)
+                // {
+                //     return Results.NotFound();
+                // }
+                //
+                // var response = member.MapToResponse();
+                // return TypedResults.Ok(response);
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Members.Tag)

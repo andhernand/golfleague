@@ -12,7 +12,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
 {
     private readonly List<int> _createdMemberTypeIds = [];
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task CreateMemberType_CreatesMemberType_WhenDataIsCorrect()
     {
         // Arrange
@@ -31,7 +31,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         createdMemberType.Fee.Should().Be(request.Fee);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task CreateMemberType_Fails_When_NameIsInvalid()
     {
         // Arrange
@@ -49,7 +49,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         error.ErrorMessage.Should().Be("'Name' must not be empty.");
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task CreateMemberType_Fails_WhenNameAlreadyExists()
     {
         // Arrange
@@ -70,7 +70,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         error.ErrorMessage.Should().Be("This Member Type already exists in the system");
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task GetMemberType_ReturnsMemberType_WhenMemberTypeExists()
     {
         // Arrange
@@ -89,7 +89,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         existingMemberType.Should().BeEquivalentTo(createdMemberType);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task GetMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExists()
     {
         // Arrange
@@ -102,7 +102,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task GetAllMemberTypes_ReturnAllMemberTypes_WhenMemberTypesExist()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         existingMemberTypes.Should().BeEquivalentTo(createdMemberTypes);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task GetAllMemberTypes_ReturnsNoMemberTypes_WhenNoMemberTypesExist()
     {
         // Arrange
@@ -137,7 +137,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         returnedMemberTypes!.MemberTypes.Should().BeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task UpdateMemberType_UpdatesMemberType_WhenDataIsCorrect()
     {
         // Arrange
@@ -162,7 +162,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         updatedMemberType.Fee.Should().Be(updateRequest.Fee);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task UpdateMemberType_DoesNotUpdateMemberType_WhenDataIsInCorrect()
     {
         // Arrange
@@ -186,7 +186,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         error.ErrorMessage.Should().Be("'Name' must not be empty.");
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task UpdateMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExist()
     {
         // Arrange
@@ -201,7 +201,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task DeleteMemberType_ReturnsNoContent_WhenMemberTypeIsDeleted()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class MemberTypesEndpointTests(GolfApiFactory factory) : IClassFixture<Go
         result.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
-    [Fact]
+    [Fact(Skip = "MemberType Endpoints Removed.")]
     public async Task DeleteMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExist()
     {
         // Arrange

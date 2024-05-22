@@ -47,12 +47,9 @@ public static class ContractMapping
             MemberId = member.MemberId,
             FirstName = member.FirstName,
             LastName = member.LastName,
-            MemberTypeId = member.MemberTypeId,
+            Email = member.Email,
             JoinDate = member.JoinDate,
-            Handicap = member.Handicap,
-            Phone = member.Phone,
-            Coach = member.Coach,
-            Gender = member.Gender
+            Handicap = member.Handicap
         };
     }
 
@@ -67,12 +64,9 @@ public static class ContractMapping
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Gender = request.Gender,
+            Email = request.Email,
             JoinDate = request.JoinDate,
-            MemberTypeId = request.MemberTypeId,
             Handicap = request.Handicap,
-            Phone = request.Phone,
-            Coach = request.Coach
         };
     }
 }
