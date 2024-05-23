@@ -55,18 +55,6 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
     public async Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default)
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-//         var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(
-//             new CommandDefinition(
-//                 """
-//                 SET NOCOUNT ON;
-//
-//                 SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
-//                 FROM [dbo].[Golfer]
-//                 WHERE [Email] = @Email;
-//                 """,
-//                 new { Email = email },
-//                 commandType: CommandType.Text,
-//                 cancellationToken: token));
         var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(
             new CommandDefinition(
                 "dbo.usp_Golfer_GetGolferByEmail",
@@ -75,5 +63,25 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
                 cancellationToken: token));
 
         return golfer;
+    }
+
+    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@GolferId", id, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@RowCount", 0, DbType.Int32, ParameterDirection.Output);
+
+        var commandDefinition = new CommandDefinition(
+            "dbo.usp_Golfer_Delete",
+            parameters,
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: token);
+
+        await connection.ExecuteScalarAsync(commandDefinition);
+
+        var result = parameters.Get<int>("@RowCount") > 0;
+        return result;
     }
 }

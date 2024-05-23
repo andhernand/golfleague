@@ -7,6 +7,7 @@ public static class GolferEndpointsExtensions
         return app
             .MapCreateGolfer()
             .MapGetGolferById()
-            .MapGetAllGolfers();
+            .MapGetAllGolfers()
+            .MapDeleteGolfer();
     }
 }

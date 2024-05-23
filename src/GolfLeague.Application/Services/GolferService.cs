@@ -22,4 +22,9 @@ public class GolferService(IGolferRepository golferRepository, IValidator<Golfer
     {
         return await golferRepository.GetAllGolfersAsync(token);
     }
+
+    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
+    {
+        return await golferRepository.DeleteByIdAsync(id, token);
+    }
 }

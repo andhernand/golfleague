@@ -8,4 +8,5 @@ public interface IGolferRepository
     Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token);
     Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token);
     Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default);
+    Task<bool> DeleteByIdAsync(int id, CancellationToken token);
 }
