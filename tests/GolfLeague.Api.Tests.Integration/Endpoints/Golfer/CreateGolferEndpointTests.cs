@@ -4,9 +4,9 @@ using FluentAssertions;
 
 using GolfLeague.Contracts.Responses;
 
-namespace GolfLeague.Api.Tests.Integration.Endpoints;
+namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
-public class GolfersEndpointTests(GolfApiFactory golfApiFactory) :
+public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) :
     IClassFixture<GolfApiFactory>,
     IAsyncLifetime
 {
@@ -37,42 +37,42 @@ public class GolfersEndpointTests(GolfApiFactory golfApiFactory) :
     [Fact]
     public async Task CreateGolfer_Fails_When_FirstNameIsInvalid()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateGolfer_Fails_When_LastNameIsInvalid()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateGolfer_Fails_When_EmailIsInvalid()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateGolfer_Fails_When_GolferWithTheSameEmailExists()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateGolfer_Fails_When_JoinDateIsInvalid()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateGolfer_Fails_When_HandicapIsInvalid()
     {
-        await Task.Delay(50);
+        await Task.Delay(1);
         true.Should().BeTrue();
     }
 
