@@ -31,8 +31,13 @@ public class GolferValidator : AbstractValidator<Golfer>
         RuleFor(m => m.JoinDate)
             .NotEmpty();
 
+        RuleFor(m => m.JoinDate.Year)
+            .LessThanOrEqualTo(DateTime.UtcNow.Year)
+            .OverridePropertyName("JoinDate")
+            .WithName("Join Date");
+
         RuleFor(m => m.Handicap)
-            .GreaterThanOrEqualTo(0)
+            .InclusiveBetween(0, 54)
             .When(m => m.Handicap is not null);
     }
 
