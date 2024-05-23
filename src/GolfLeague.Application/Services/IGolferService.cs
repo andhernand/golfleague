@@ -7,5 +7,6 @@ public interface IGolferService
     Task<int> CreateAsync(Golfer golfer, CancellationToken token = default);
     Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token);
     Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token);
+    Task<Golfer?> UpdateAsync(Golfer golfer, CancellationToken token);
     Task<bool> DeleteByIdAsync(int id, CancellationToken token);
 }

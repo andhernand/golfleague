@@ -58,4 +58,17 @@ public static class ContractMapping
             Handicap = request.Handicap
         };
     }
+
+    public static Golfer MapToGolfer(this UpdateGolferRequest request, int id)
+    {
+        return new Golfer
+        {
+            GolferId = id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            JoinDate = request.JoinDate,
+            Handicap = request.Handicap
+        };
+    }
 }
