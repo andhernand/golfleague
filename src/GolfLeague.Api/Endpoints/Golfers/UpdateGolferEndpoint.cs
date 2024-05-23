@@ -28,7 +28,7 @@ public static class UpdateGolferEndpoint
                 return TypedResults.Ok(response);
             })
             .WithName(Name)
-            .WithTags(GolfApiEndpoints.MemberTypes.Tag)
+            .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Accepts<UpdateGolferRequest>(false, "application/json")
             .Produces<GolferResponse>(contentType: "application/json")
             .Produces(StatusCodes.Status404NotFound)

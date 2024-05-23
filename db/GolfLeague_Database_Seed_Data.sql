@@ -1,4 +1,4 @@
-INSERT INTO [dbo].[Member]
+INSERT INTO [dbo].[Golfer]
 	(FirstName, LastName, Email, JoinDate, Handicap)
 VALUES
 	(N'Melissa', N'McKenzie', N'Morris45@gmail.com', CAST('2005-05-28' AS DATE), NULL),
@@ -33,7 +33,7 @@ VALUES (N'Leeston', N'Best Ball'),
 GO
 
 INSERT INTO [dbo].[TournamentParticipation]
-	([MemberId], [TournamentId], [Year])
+	([GolferId], [TournamentId], [Year])
 VALUES (1, 1, 2014),
 	   (6, 1, 2015),
 	   (6, 2, 2015),

@@ -30,9 +30,9 @@ CREATE TABLE [dbo].[TournamentParticipation]
 	[Year]         NCHAR(4) NOT NULL,
 	CONSTRAINT [PK_TournamentParticipation_GolferId_TournamentId_Year]
 		PRIMARY KEY CLUSTERED ([GolferId] ASC, [TournamentId] ASC, [Year] ASC),
-	CONSTRAINT [FK_Member_TournamentParticipation_GolferId]
+	CONSTRAINT [FK_TournamentParticipation_GolferId_Golfer_GolferId]
 		FOREIGN KEY ([GolferId]) REFERENCES [dbo].[Golfer] ([GolferId]),
-	CONSTRAINT [FK_Tournament_TournamentParticipation_TournamentId]
+	CONSTRAINT [FK_TournamentParticipation_TournamentId_Tournament_TournamentId]
 		FOREIGN KEY ([TournamentId]) REFERENCES [dbo].[Tournament] ([TournamentId])
 );
 GO
