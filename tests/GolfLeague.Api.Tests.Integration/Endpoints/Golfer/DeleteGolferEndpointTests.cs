@@ -14,10 +14,8 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) :
 {
     private readonly List<int> _createdGolferIds = [];
 
-
-
     [Fact]
-    public async Task DeleteMemberType_ReturnsNoContent_WhenMemberTypeIsDeleted()
+    public async Task DeleteGolfer_ReturnsNoContent_WhenGolferIsDeleted()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
@@ -35,7 +33,7 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) :
     }
 
     [Fact]
-    public async Task DeleteMemberType_ReturnsNotFound_WhenMemberTypeDoesNotExist()
+    public async Task DeleteGolfer_ReturnsNotFound_WhenGolferDoesNotExist()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();

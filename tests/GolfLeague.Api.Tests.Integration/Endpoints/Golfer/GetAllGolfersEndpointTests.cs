@@ -13,7 +13,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
     private readonly List<int> _createdGolferIds = [];
 
     [Fact]
-    public async Task GetAllMemberTypes_ReturnAllMemberTypes_WhenMemberTypesExist()
+    public async Task GetAllGolfers_ReturnGolfers_WhenGolfersExist()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
@@ -34,7 +34,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
     }
 
     [Fact]
-    public async Task GetAllMemberTypes_ReturnsNoMemberTypes_WhenNoMemberTypesExist()
+    public async Task GetAllGolfers_ReturnsNoGolfers_WhenNoGolfersExist()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
