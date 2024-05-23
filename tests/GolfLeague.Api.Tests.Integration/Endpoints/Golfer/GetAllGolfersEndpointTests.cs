@@ -11,8 +11,6 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
     IAsyncLifetime
 {
     private readonly List<int> _createdGolferIds = [];
-    private readonly string _getAllFolfersEndpoint = "/api/golfers";
-    private readonly string _createGolferEndpoint = "/api/golfers";
 
     [Fact]
     public async Task GetAllMemberTypes_ReturnAllMemberTypes_WhenMemberTypesExist()
@@ -21,12 +19,12 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createdGolferResponse = await client.PostAsJsonAsync(_createGolferEndpoint, createGolferRequest);
+        var createdGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
         var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
         _createdGolferIds.Add(createdGolfer!.GolferId);
 
         // Act
-        var response = await client.GetAsync(_getAllFolfersEndpoint);
+        var response = await client.GetAsync("/api/golfers");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -42,7 +40,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         // Act
-        var response = await client.GetAsync(_getAllFolfersEndpoint);
+        var response = await client.GetAsync("/api/golfers");
         var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
 
         // Assert
@@ -57,7 +55,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using HttpClient httpClient = golfApiFactory.CreateClient();
         foreach (int golferId in _createdGolferIds)
         {
-            await httpClient.DeleteAsync($"{_getAllFolfersEndpoint}/{golferId}");
+            await httpClient.DeleteAsync($"/api/golfers/{golferId}");
         }
     }
 }
