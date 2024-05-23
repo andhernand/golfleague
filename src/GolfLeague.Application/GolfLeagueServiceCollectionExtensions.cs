@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using Dapper;
+
+using FluentValidation;
 
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Repositories;
@@ -12,6 +14,7 @@ public static class GolfLeagueServiceCollectionExtensions
 {
     public static IServiceCollection AddGolfLeagueApplication(this IServiceCollection services)
     {
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
         services.AddSingleton<IGolferService, GolferService>();
         services.AddSingleton<IGolferRepository, GolferRepository>();
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);

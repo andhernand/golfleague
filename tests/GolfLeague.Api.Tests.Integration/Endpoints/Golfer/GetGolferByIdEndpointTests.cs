@@ -35,7 +35,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) :
         golfer.LastName.Should().Be(createdGolfer.LastName);
         golfer.Email.Should().Be(createdGolfer.Email);
         golfer.Handicap.Should().Be(createdGolfer.Handicap);
-        golfer.JoinDate.Date.Should().Be(createdGolfer.JoinDate.Date);
+        golfer.JoinDate.Should().Be(createdGolfer.JoinDate);
     }
 
     [Fact]

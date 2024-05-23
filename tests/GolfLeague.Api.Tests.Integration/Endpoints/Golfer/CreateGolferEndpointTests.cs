@@ -122,7 +122,7 @@ public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) :
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        var defaultDate = default(DateTime);
+        var defaultDate = default(DateOnly);
         var request = Fakers.GenerateCreateGolferRequest(joinDate: defaultDate);
 
         // Act
@@ -142,7 +142,7 @@ public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) :
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        var currentDate = DateTime.UtcNow;
+        var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var request = Fakers.GenerateCreateGolferRequest(joinDate: currentDate.AddYears(1));
 
         // Act

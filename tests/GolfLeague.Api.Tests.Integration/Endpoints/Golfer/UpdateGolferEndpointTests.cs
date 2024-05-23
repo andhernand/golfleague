@@ -44,7 +44,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         updatedGolfer.FirstName.Should().Be(createdGolfer.FirstName);
         updatedGolfer.LastName.Should().Be(createdGolfer.LastName);
         updatedGolfer.Email.Should().Be(createdGolfer.Email);
-        updatedGolfer.JoinDate.Date.Should().Be(createdGolfer.JoinDate.Date);
+        updatedGolfer.JoinDate.Should().Be(createdGolfer.JoinDate);
         updatedGolfer.Handicap.Should().Be(changedHandicap);
     }
 
@@ -202,7 +202,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
             createdGolfer.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
-            default(DateTime),
+            default(DateOnly),
             createdGolfer.Handicap);
 
         // Act
@@ -228,7 +228,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
         _createdGolferIds.Add(createdGolfer!.GolferId);
 
-        var currentDate = DateTime.UtcNow;
+        var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
             createdGolfer.FirstName,
             createdGolfer.LastName,
