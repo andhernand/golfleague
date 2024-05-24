@@ -1,15 +1,21 @@
 ﻿CREATE PROCEDURE [dbo].[usp_Tournament_Insert](
 	@Name NVARCHAR(256),
-	@Format NVARCHAR(256)
+	@Format NVARCHAR(256),
+	@TournamentId INT OUTPUT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @Name IS NULL OR @Format IS NULL
+	IF @Name IS NULL OR LEN(@Name) <= 0
 		BEGIN
-			RAISERROR ('Name and Format must have values.', 16, 1);
-		END;
+			THROW 50000, 'The Name parameter must have a value.', 1;
+		END
+
+	IF @Format IS NULL OR LEN(@Format) <= 0
+		BEGIN
+			THROW 50001, 'The Format parameter must have a value.', 1;
+		END
 
 	BEGIN TRY
 		BEGIN TRANSACTION;
@@ -17,6 +23,8 @@ BEGIN
 		INSERT INTO [dbo].[Tournament] ([Name], [Format])
 		OUTPUT inserted.TournamentId
 		VALUES (@Name, @Format);
+
+		SELECT @TournamentId = SCOPE_IDENTITY();
 
 		COMMIT TRANSACTION;
 	END TRY
@@ -35,22 +43,39 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	IF @TournamentId IS NULL OR @TournamentId <= 0
+		BEGIN
+			THROW 50002, 'The TournamentId parameter must have a value.', 1;
+		END
+
 	SELECT [TournamentId], [Name], [Format]
 	FROM [dbo].[Tournament]
 	WHERE [TournamentId] = @TournamentId;
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_Tournament_GetTournamentByName](
-	@Name INT
+CREATE PROCEDURE [dbo].[usp_Tournament_GetTournamentByNameAndFormat](
+	@Name NVARCHAR(256),
+	@Format NVARCHAR(256)
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
+	IF @Name IS NULL OR LEN(@Name) <= 0
+		BEGIN
+			THROW 50003, 'The Name parameter must have a value.', 1;
+		END
+
+	IF @Format IS NULL OR LEN(@Format) <= 0
+		BEGIN
+			THROW 50004, 'The Format parameter must have a value.', 1;
+		END
+
 	SELECT [TournamentId], [Name], [Format]
 	FROM [dbo].[Tournament]
-	WHERE [Name] = @Name;
+	WHERE [Name] = @Name
+	  AND [Format] = @Format;
 END;
 GO
 
@@ -73,10 +98,20 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @Name IS NULL OR @Format IS NULL
+	IF @TournamentId IS NULL OR @TournamentId <= 0
 		BEGIN
-			RAISERROR ('Name and Format must have values.', 16, 1);
-		END;
+			THROW 50005, 'The TournamentId parameter must have a value.', 1;
+		END
+
+	IF @Name IS NULL OR LEN(@Name) <= 0
+		BEGIN
+			THROW 50006, 'The Name parameter must have a value.', 1;
+		END
+
+	IF @Format IS NULL OR LEN(@Format) <= 0
+		BEGIN
+			THROW 50007, 'The Format parameter must have a value.', 1;
+		END
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Tournament] WHERE [TournamentId] = @TournamentId)
 		BEGIN
@@ -98,18 +133,23 @@ BEGIN
 		END
 	ELSE
 		BEGIN
-			RAISERROR ('TournamentId does not exist in the database.', 16, 2);
+			THROW 50008, 'TournamentId does not exist in the database.', 1;
 		END;
 END;
 GO
 
 CREATE PROCEDURE [dbo].[usp_Tournament_Delete](
 	@TournamentId INT,
-	@RowCount INT OUTPUT
+	@RowCount INT = 0 OUTPUT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
+
+	IF @TournamentId IS NULL OR @TournamentId <= 0
+		BEGIN
+			THROW 50009, 'The TournamentId parameter must have a value.', 1;
+		END
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Tournament] WHERE [TournamentId] = @TournamentId)
 		BEGIN

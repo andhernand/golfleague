@@ -19,7 +19,9 @@ CREATE TABLE [dbo].[Tournament]
 	[Name]         NVARCHAR(256)       NOT NULL,
 	[Format]       NVARCHAR(256)       NOT NULL,
 	CONSTRAINT [PK_Tournament_TournamentId]
-		PRIMARY KEY CLUSTERED ([TournamentId] ASC)
+		PRIMARY KEY CLUSTERED ([TournamentId] ASC),
+	CONSTRAINT [AK_Tournament_Name_Format]
+		UNIQUE ([Name], [Format])
 );
 GO
 

@@ -12,14 +12,21 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
     public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        
-        var tournamentId = await connection.QuerySingleAsync<int>(
-            new CommandDefinition(
-                "dbo.usp_Tournament_Insert",
-                new { tournament.Name, tournament.Format },
-                commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
 
+        var parameters = new DynamicParameters();
+        parameters.Add("@Name", tournament.Name, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@Format", tournament.Format, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@TournamentId", 0, DbType.Int32, ParameterDirection.Output);
+
+        var commandDefinition = new CommandDefinition(
+            "dbo.usp_Tournament_Insert",
+            parameters,
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: token);
+
+        await connection.ExecuteScalarAsync(commandDefinition);
+
+        var tournamentId = parameters.Get<int>("@TournamentId");
         return tournamentId;
     }
 
@@ -31,6 +38,20 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
             new CommandDefinition(
                 "dbo.usp_Tournament_GetTournamentById",
                 new { TournamentId = id },
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: token));
+
+        return tournament;
+    }
+
+    public async Task<Tournament?> GetByNameAndFormat(string name, string format, CancellationToken token = default)
+    {
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+
+        var tournament = await connection.QuerySingleOrDefaultAsync<Tournament>(
+            new CommandDefinition(
+                "dbo.usp_Tournament_GetTournamentByNameAndFormat",
+                new { Name = name, Format = format },
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
 

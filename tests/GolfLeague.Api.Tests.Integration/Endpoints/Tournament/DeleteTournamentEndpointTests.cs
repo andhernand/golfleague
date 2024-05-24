@@ -13,6 +13,7 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) :
     IAsyncLifetime
 {
     private readonly List<int> _createdTournamentIds = [];
+    private readonly string _tournamentsApiPath = "/api/tournaments";
 
     [Fact]
     public async Task DeleteTournament_ReturnsNoContent_WhenTournamentIsDeleted()
@@ -21,12 +22,12 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createdTournamentResponse = await client.PostAsJsonAsync("/api/tournaments", createTournamentRequest);
+        var createdTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
         var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
         _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         // Act
-        var response = await client.DeleteAsync($"/api/tournaments/{createdTournament.TournamentId}");
+        var response = await client.DeleteAsync($"{_tournamentsApiPath}/{createdTournament.TournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -40,7 +41,7 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         int tournamentId = new Faker().Random.Int(999_999, 9_999_999);
 
         // Act
-        var response = await client.DeleteAsync($"/api/tournaments/{tournamentId}");
+        var response = await client.DeleteAsync($"{_tournamentsApiPath}/{tournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -53,7 +54,7 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         using var httpClient = golfApiFactory.CreateClient();
         foreach (var tournamentId in _createdTournamentIds)
         {
-            await httpClient.DeleteAsync($"/api/tournaments/{tournamentId}");
+            await httpClient.DeleteAsync($"{_tournamentsApiPath}/{tournamentId}");
         }
     }
 }
