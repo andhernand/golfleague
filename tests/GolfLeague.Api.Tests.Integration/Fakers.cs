@@ -37,4 +37,24 @@ public static class Fakers
             .RuleFor(r => r.Handicap, f => handicap ?? f.Random.Int(0, 54).OrNull(f))
             .Generate();
     }
+
+    public static CreateTournamentRequest GenerateCreateTournamentRequest(
+        string? name = default,
+        string? format = default)
+    {
+        return new Faker<CreateTournamentRequest>()
+            .RuleFor(r => r.Name, f => name ?? f.Company.CompanyName())
+            .RuleFor(r => r.Format, f => format ?? f.Random.Word())
+            .Generate();
+    }
+
+    public static UpdateTournamentRequest GenerateUpdateTournamentRequest(
+        string? name = default,
+        string? format = default)
+    {
+        return new Faker<UpdateTournamentRequest>()
+            .RuleFor(r => r.Name, f => name ?? f.Company.CompanyName())
+            .RuleFor(r => r.Format, f => format ?? f.Random.Word())
+            .Generate();
+    }
 }

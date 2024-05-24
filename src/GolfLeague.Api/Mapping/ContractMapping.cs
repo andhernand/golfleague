@@ -48,4 +48,27 @@ public static class ContractMapping
             Handicap = request.Handicap
         };
     }
+
+    public static TournamentResponse MapToResponse(this Tournament tournament)
+    {
+        return new TournamentResponse
+        {
+            TournamentId = tournament.TournamentId, Name = tournament.Name, Format = tournament.Format
+        };
+    }
+
+    public static TournamentsResponse MapToResponse(this IEnumerable<Tournament> tournaments)
+    {
+        return new TournamentsResponse { Tournaments = tournaments.Select(MapToResponse) };
+    }
+
+    public static Tournament MapToTournament(this CreateTournamentRequest request)
+    {
+        return new Tournament { Name = request.Name, Format = request.Format };
+    }
+
+    public static Tournament MapToTournament(this UpdateTournamentRequest request, int tournamentId)
+    {
+        return new Tournament { TournamentId = tournamentId, Name = request.Name, Format = request.Format };
+    }
 }

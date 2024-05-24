@@ -29,6 +29,7 @@ public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         _createdGolferIds.Add(golfer!.GolferId);
 
         result.Headers.Location.Should().Be($"http://localhost/api/golfers/{golfer.GolferId}");
+        golfer.GolferId.Should().NotBe(default);
         golfer.FirstName.Should().Be(request.FirstName);
         golfer.LastName.Should().Be(request.LastName);
         golfer.Email.Should().Be(request.Email);

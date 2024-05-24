@@ -15,8 +15,13 @@ public static class GolfLeagueServiceCollectionExtensions
     public static IServiceCollection AddGolfLeagueApplication(this IServiceCollection services)
     {
         SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+
         services.AddSingleton<IGolferService, GolferService>();
         services.AddSingleton<IGolferRepository, GolferRepository>();
+
+        services.AddSingleton<ITournamentService, TournamentService>();
+        services.AddSingleton<ITournamentRepository, TournamentRepository>();
+
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
         return services;
     }
