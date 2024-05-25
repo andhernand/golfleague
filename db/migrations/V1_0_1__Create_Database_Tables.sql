@@ -5,12 +5,21 @@ CREATE TABLE [dbo].[Golfer]
 	[LastName]  NVARCHAR(256)       NOT NULL,
 	[Email]     NVARCHAR(256)       NOT NULL,
 	[JoinDate]  DATE                NOT NULL,
-	[Handicap]  TINYINT             NULL,
+	[Handicap]  INT                 NULL,
 	CONSTRAINT [PK_Golfer_GolferId]
 		PRIMARY KEY CLUSTERED ([GolferId] ASC),
 	CONSTRAINT [AK_Golfer_Email]
 		UNIQUE ([Email])
 );
+GO
+
+ALTER TABLE [dbo].[Golfer]
+	WITH CHECK ADD CONSTRAINT [CK_Golfer_Handicap]
+		CHECK (([Handicap] IS NULL OR ([Handicap] >= 0 AND [Handicap] <= 54)));
+GO
+
+ALTER TABLE [dbo].[Golfer]
+	CHECK CONSTRAINT [CK_Golfer_Handicap];
 GO
 
 CREATE TABLE [dbo].[Tournament]
@@ -39,10 +48,6 @@ CREATE TABLE [dbo].[TournamentParticipation]
 );
 GO
 
-ALTER TABLE [dbo].[Golfer]
-	WITH CHECK ADD CONSTRAINT [CK_Golfer_Handicap] CHECK (([Handicap] IS NULL OR [Handicap] >= 0));
-GO
-
-ALTER TABLE [dbo].[Golfer]
-	CHECK CONSTRAINT [CK_Golfer_Handicap];
+CREATE INDEX [IX_TournamentParticipation_GolferId] ON [dbo].[TournamentParticipation] ([GolferId]);
+CREATE INDEX [IX_TournamentParticipation_TournamentId] ON [dbo].[TournamentParticipation] ([TournamentId]);
 GO
