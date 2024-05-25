@@ -2,7 +2,7 @@
 
 using Dapper;
 
-namespace GolfLeague.Application;
+namespace GolfLeague.Application.Database;
 
 public class DateOnlyTypeHandler : SqlMapper.TypeHandler<DateOnly>
 {
