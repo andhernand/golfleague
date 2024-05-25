@@ -48,9 +48,10 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @GolferId IS NULL
+	-- Validate @GolferId
+	IF @GolferId IS NULL OR @GolferId <= 0
 		BEGIN
-			RAISERROR ('The @GolferId input parameter must have a value.', 16, 1);
+			THROW 50006, 'The GolferId parameter must have a positive value.', 1;
 		END;
 
 	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
@@ -66,9 +67,10 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @Email IS NULL
+	-- Validate @Email
+	IF @Email IS NULL OR LEN(@Email) <= 0
 		BEGIN
-			RAISERROR ('The Email input parameter must have a values.', 16, 1);
+			THROW 50007, 'The Email parameter must have a value.', 1;
 		END;
 
 	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
@@ -99,23 +101,49 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @FirstName IS NULL OR @LastName IS NULL OR @Email IS NULL OR @JoinDate IS NULL
+	-- Validate @GolferId
+	IF @GolferId IS NULL OR @GolferId <= 0
 		BEGIN
-			RAISERROR ('All input parameters must have values.', 16, 1);
+			THROW 50008, 'The GolferId parameter must have a positive value.', 1;
+		END;
+
+	-- Validate @FirstName
+	IF @FirstName IS NULL OR LEN(@FirstName) <= 0
+		BEGIN
+			THROW 50009, 'The FirstName parameter must have a value.', 1;
+		END;
+
+	-- Validate @LastName
+	IF @LastName IS NULL OR LEN(@LastName) <= 0
+		BEGIN
+			THROW 50010, 'The LastName parameter must have a value.', 1;
+		END;
+
+	-- Validate @Email
+	IF @Email IS NULL OR LEN(@Email) <= 0
+		BEGIN
+			THROW 50011, 'The Email parameter must have a value.', 1;
+		END;
+
+	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [Email] = @Email AND [GolferId] != @GolferId)
+		BEGIN
+			THROW 50012, 'Email already exists in the database.', 1;
+		END;
+
+	-- Validate @JoinDate
+	IF @JoinDate IS NULL OR @JoinDate <= CONVERT(DATE, '0001-01-01') OR @JoinDate > CONVERT(DATE, GETDATE())
+		BEGIN
+			THROW 50013, 'The JoinDate parameter must not be null and must be greater than January 1, 0001, and less than the current date.', 1;
+		END;
+
+	-- Validate @Handicap
+	IF @Handicap IS NOT NULL AND (@Handicap < 0 OR @Handicap > 54)
+		BEGIN
+			THROW 50014, 'The Handicap parameter must be between 0 and 54.', 1;
 		END;
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [GolferId] = @GolferId)
 		BEGIN
-			IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [Email] = @Email AND [GolferId] != @GolferId)
-				BEGIN
-					RAISERROR ('Email already exists in the database.', 16, 2);
-				END;
-
-			IF @Handicap IS NOT NULL AND @Handicap < 0
-				BEGIN
-					RAISERROR ('Handicap must be a non-negative value.', 16, 3);
-				END;
-
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
@@ -134,10 +162,10 @@ BEGIN
 					ROLLBACK TRANSACTION;
 				THROW;
 			END CATCH;
-		END
+		END;
 	ELSE
 		BEGIN
-			RAISERROR ('GolferId does not exist in the database.', 16, 4);
+			THROW 50015, 'GolferId does not exist in the database.', 1;
 		END;
 END;
 GO
@@ -150,13 +178,18 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @GolferId
+	IF @GolferId IS NULL OR @GolferId <= 0
+		BEGIN
+			THROW 50016, 'The GolferId parameter must have a positive value.', 1;
+		END;
+
 	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [GolferId] = @GolferId)
 		BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
-				DELETE
-				FROM [dbo].[Golfer]
+				DELETE FROM [dbo].[Golfer]
 				WHERE [GolferId] = @GolferId;
 
 				SET @RowCount = @@ROWCOUNT;
