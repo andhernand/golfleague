@@ -7,21 +7,22 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @Name
 	IF @Name IS NULL OR LEN(@Name) <= 0
 		BEGIN
-			THROW 50000, 'The Name parameter must have a value.', 1;
-		END
+			THROW 50017, 'The Name parameter must have a value.', 1;
+		END;
 
+	-- Validate @Format
 	IF @Format IS NULL OR LEN(@Format) <= 0
 		BEGIN
-			THROW 50001, 'The Format parameter must have a value.', 1;
-		END
+			THROW 50018, 'The Format parameter must have a value.', 1;
+		END;
 
 	BEGIN TRY
 		BEGIN TRANSACTION;
 
 		INSERT INTO [dbo].[Tournament] ([Name], [Format])
-		OUTPUT inserted.TournamentId
 		VALUES (@Name, @Format);
 
 		SELECT @TournamentId = SCOPE_IDENTITY();
@@ -43,10 +44,11 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @TournamentId
 	IF @TournamentId IS NULL OR @TournamentId <= 0
 		BEGIN
-			THROW 50002, 'The TournamentId parameter must have a value.', 1;
-		END
+			THROW 50019, 'The TournamentId parameter must have a positive value.', 1;
+		END;
 
 	SELECT [TournamentId], [Name], [Format]
 	FROM [dbo].[Tournament]
@@ -62,15 +64,17 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @Name
 	IF @Name IS NULL OR LEN(@Name) <= 0
 		BEGIN
-			THROW 50003, 'The Name parameter must have a value.', 1;
-		END
+			THROW 50020, 'The Name parameter must have a value.', 1;
+		END;
 
+	-- Validate @Format
 	IF @Format IS NULL OR LEN(@Format) <= 0
 		BEGIN
-			THROW 50004, 'The Format parameter must have a value.', 1;
-		END
+			THROW 50021, 'The Format parameter must have a value.', 1;
+		END;
 
 	SELECT [TournamentId], [Name], [Format]
 	FROM [dbo].[Tournament]
@@ -98,20 +102,23 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @TournamentId
 	IF @TournamentId IS NULL OR @TournamentId <= 0
 		BEGIN
-			THROW 50005, 'The TournamentId parameter must have a value.', 1;
-		END
+			THROW 50022, 'The TournamentId parameter must have a positive value.', 1;
+		END;
 
+	-- Validate @Name
 	IF @Name IS NULL OR LEN(@Name) <= 0
 		BEGIN
-			THROW 50006, 'The Name parameter must have a value.', 1;
-		END
+			THROW 50023, 'The Name parameter must have a value.', 1;
+		END;
 
+	-- Validate @Format
 	IF @Format IS NULL OR LEN(@Format) <= 0
 		BEGIN
-			THROW 50007, 'The Format parameter must have a value.', 1;
-		END
+			THROW 50024, 'The Format parameter must have a value.', 1;
+		END;
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Tournament] WHERE [TournamentId] = @TournamentId)
 		BEGIN
@@ -133,31 +140,31 @@ BEGIN
 		END
 	ELSE
 		BEGIN
-			THROW 50008, 'TournamentId does not exist in the database.', 1;
+			THROW 50025, 'TournamentId does not exist in the database.', 1;
 		END;
 END;
 GO
 
 CREATE PROCEDURE [dbo].[usp_Tournament_Delete](
 	@TournamentId INT,
-	@RowCount INT = 0 OUTPUT
+	@RowCount INT OUTPUT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
+	-- Validate @TournamentId
 	IF @TournamentId IS NULL OR @TournamentId <= 0
 		BEGIN
-			THROW 50009, 'The TournamentId parameter must have a value.', 1;
-		END
+			THROW 50026, 'The TournamentId parameter must have a positive value.', 1;
+		END;
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Tournament] WHERE [TournamentId] = @TournamentId)
 		BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
-				DELETE
-				FROM [dbo].[Tournament]
+				DELETE FROM [dbo].[Tournament]
 				WHERE [TournamentId] = @TournamentId;
 
 				SET @RowCount = @@ROWCOUNT;
