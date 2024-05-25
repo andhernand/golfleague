@@ -3,33 +3,55 @@
 	@LastName NVARCHAR(256),
 	@Email NVARCHAR(256),
 	@JoinDate DATE,
-	@Handicap TINYINT = NULL
+	@Handicap INT = NULL,
+	@GolferId INT OUTPUT
 )
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	IF @FirstName IS NULL OR @LastName IS NULL OR @Email IS NULL OR @JoinDate IS NULL
+	-- Validate @FirstName
+	IF @FirstName IS NULL OR LEN(@FirstName) <= 0
 		BEGIN
-			RAISERROR ('All input parameters must have values.', 16, 1);
+			THROW 50000, 'The FirstName parameter must have a value.', 1;
+		END;
+
+	-- Validate @LastName
+	IF @LastName IS NULL OR LEN(@LastName) <= 0
+		BEGIN
+			THROW 50001, 'The LastName parameter must have a value.', 1;
+		END;
+
+	-- Validate @Email
+	IF @Email IS NULL OR LEN(@Email) <= 0
+		BEGIN
+			THROW 50002, 'The Email parameter must have a value.', 1;
 		END;
 
 	IF EXISTS (SELECT 1 FROM [dbo].[Golfer] WHERE [Email] = @Email)
 		BEGIN
-			RAISERROR ('Email already exists in the database.', 16, 2);
+			THROW 50003, 'Email already exists in the database.', 1;
 		END;
 
-	IF @Handicap IS NOT NULL AND @Handicap < 0
+	-- Validate @JoinDate
+	IF @JoinDate IS NULL OR @JoinDate <= CONVERT(DATE, '0001-01-01') OR @JoinDate > CONVERT(DATE, GETDATE())
 		BEGIN
-			RAISERROR ('Handicap must be a non-negative value.', 16, 3);
+			THROW 50004, 'The JoinDate parameter must not be null and must be greater than January 1, 0001, and less than the current date.', 1;
+		END;
+
+	-- Validate @Handicap
+	IF @Handicap IS NOT NULL AND (@Handicap < 0 OR @Handicap > 54)
+		BEGIN
+			THROW 50005, 'The Handicap parameter must be between 0 and 54.', 1;
 		END;
 
 	BEGIN TRY
 		BEGIN TRANSACTION;
 
 		INSERT INTO [dbo].[Golfer] ([FirstName], [LastName], [Email], [JoinDate], [Handicap])
-		OUTPUT inserted.GolferId
 		VALUES (@FirstName, @LastName, @Email, @JoinDate, @Handicap);
+
+		SELECT @GolferId = SCOPE_IDENTITY();
 
 		COMMIT TRANSACTION;
 	END TRY

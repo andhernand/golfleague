@@ -12,19 +12,24 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
     public async Task<int> CreateAsync(Golfer golfer, CancellationToken token = default)
     {
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        var golferId = await connection.QuerySingleAsync<int>(
-            new CommandDefinition(
-                "dbo.usp_Golfer_Insert",
-                new
-                {
-                    golfer.FirstName,
-                    golfer.LastName,
-                    golfer.Email,
-                    golfer.JoinDate,
-                    golfer.Handicap
-                },
-                commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@FirstName", golfer.FirstName, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@LastName", golfer.LastName, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@Email", golfer.Email, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@JoinDate", golfer.JoinDate, DbType.Date, ParameterDirection.Input);
+        parameters.Add("@Handicap", golfer.Handicap, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@GolferId", 0, DbType.Int32, ParameterDirection.Output);
+
+        var commandDefinition = new CommandDefinition(
+            "dbo.usp_Golfer_Insert",
+            parameters,
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: token);
+
+        await connection.ExecuteScalarAsync(commandDefinition);
+
+        var golferId = parameters.Get<int>("@GolferId");
         return golferId;
     }
 
