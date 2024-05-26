@@ -5,14 +5,14 @@ services:
     container_name: sqlserver
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: ${sapassword}
+      SA_PASSWORD: ${GOLF_API_SA_PASSWORD}
       ACCEPT_EULA: Y
       MSSQL_PID: Developer
     ports:
       - "5433:1433"
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"${sapassword}\" -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"${GOLF_API_SA_PASSWORD}\" -Q 'SELECT 1' || exit 1"]
       interval: 10s
       retries: 10
       start_period: 10s
@@ -29,7 +29,7 @@ services:
     command: >
       bash -c '
       echo "Running the init.sql script.";
-      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "${sapassword}" -v varApiPassword="${apipassword}" -d master -i docker-entrypoint-initdb.d/init.sql;
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P "${GOLF_API_SA_PASSWORD}" -v varApiPassword="${GOLF_API_USER_PASSWORD}" -d master -i docker-entrypoint-initdb.d/init.sql;
       echo "All done!";
       '
 
@@ -46,6 +46,6 @@ services:
     environment:
       FLYWAY_URL: jdbc:sqlserver://sqlserver:1433;databaseName=GolfLeague;TrustServerCertificate=True;
       FLYWAY_USER: sa
-      FLYWAY_PASSWORD: ${sapassword}
+      FLYWAY_PASSWORD: ${GOLF_API_SA_PASSWORD}
       FLYWAY_LOCATIONS: filesystem:./migrations
     command: ["migrate"]
