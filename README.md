@@ -24,6 +24,8 @@ The [.env](.env) file in the root directory of the project contains the environm
 
 ***NOTE:*** In the [appsettings.json](src/GolfLeague.Api/appsettings.json) file, the ConnectionString contains hard-coded values that are not synced with the [.env](.env) file. If you make changes to the [.env](.env) file and don't update the [appsettings.json](src/GolfLeague.Api/appsettings.json) file, you may run into problems.
 
+***NOTE:*** I chose to store the passwords in the .env file, for example only. Please use secrets or a key/value vault.
+
 ## Start MSSQL Server with Docker
 
 Make sure Docker Desktop is running, then execute the following command to start the MSSQL server container:
