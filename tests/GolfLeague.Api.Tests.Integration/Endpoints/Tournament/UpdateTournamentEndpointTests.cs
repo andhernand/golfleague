@@ -8,11 +8,8 @@ using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
-public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
-    IClassFixture<GolfApiFactory>,
-    IAsyncLifetime
+public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly List<int> _createdTournamentIds = [];
     private readonly string _tournamentsApiPath = "/api/tournaments";
 
     [Fact]
@@ -24,11 +21,10 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         var createTournamentRequest = Fakers.GenerateUpdateTournamentRequest();
         var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         const string changedFormat = "Match Play";
         var updateTournamentRequest = Fakers.GenerateUpdateTournamentRequest(
-            createdTournament.Name,
+            createdTournament!.Name,
             changedFormat);
 
         // Act
@@ -69,11 +65,10 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         var updateTournamentRequest = Fakers.GenerateUpdateTournamentRequest(
             name: "",
-            createdTournament.Format);
+            createdTournament!.Format);
 
         // Act
         var response = await client.PutAsJsonAsync(
@@ -98,10 +93,9 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         var updateTournamentRequest = Fakers.GenerateUpdateTournamentRequest(
-            createdTournament.Name,
+            createdTournament!.Name,
             format: "");
 
         // Act
@@ -129,22 +123,20 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
             .PostAsJsonAsync(_tournamentsApiPath, firstCreateTournamentRequest);
         var firstCreatedTournament = await firstCreateTournamentResponse
             .Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(firstCreatedTournament!.TournamentId);
 
         var secondCreateTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var secondCreateTournamentResponse =
             await client.PostAsJsonAsync(_tournamentsApiPath, secondCreateTournamentRequest);
         var secondCreatedTournament = await secondCreateTournamentResponse
             .Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(secondCreatedTournament!.TournamentId);
 
         var updateTournamentRequest = Fakers.GenerateUpdateTournamentRequest(
-            firstCreatedTournament.Name,
+            firstCreatedTournament!.Name,
             firstCreateTournamentRequest.Format);
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{secondCreatedTournament.TournamentId}",
+            $"{_tournamentsApiPath}/{secondCreatedTournament!.TournamentId}",
             updateTournamentRequest);
 
         // Assert
@@ -155,16 +147,5 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) :
         error.PropertyName.Should().Be("Tournament");
         error.ErrorMessage.Should()
             .Be("A Tournament with the Name and Format combination already exists in the system.");
-    }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        using var httpClient = golfApiFactory.CreateClient();
-        foreach (var tournamentId in _createdTournamentIds)
-        {
-            await httpClient.DeleteAsync($"{_tournamentsApiPath}/{tournamentId}");
-        }
     }
 }

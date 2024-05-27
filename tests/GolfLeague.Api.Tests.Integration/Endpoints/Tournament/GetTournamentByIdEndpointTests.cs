@@ -8,11 +8,8 @@ using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
-public class GetTournamentByIdEndpointTests(GolfApiFactory golfApiFactory) :
-    IClassFixture<GolfApiFactory>,
-    IAsyncLifetime
+public class GetTournamentByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly List<int> _createdTournamentIds = [];
     private readonly string _tournamentsApiPath = "/api/tournaments";
 
     [Fact]
@@ -24,10 +21,9 @@ public class GetTournamentByIdEndpointTests(GolfApiFactory golfApiFactory) :
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var createTournament = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
         var createdTournament = await createTournament.Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         // Act
-        var response = await client.GetAsync($"{_tournamentsApiPath}/{createdTournament.TournamentId}");
+        var response = await client.GetAsync($"{_tournamentsApiPath}/{createdTournament!.TournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -50,16 +46,5 @@ public class GetTournamentByIdEndpointTests(GolfApiFactory golfApiFactory) :
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        using var httpClient = golfApiFactory.CreateClient();
-        foreach (int tourmamentId in _createdTournamentIds)
-        {
-            await httpClient.DeleteAsync($"{_tournamentsApiPath}/{tourmamentId}");
-        }
     }
 }

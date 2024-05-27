@@ -8,11 +8,9 @@ using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
-public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
-    IClassFixture<GolfApiFactory>,
-    IAsyncLifetime
+public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly List<int> _createdGolferIds = [];
+    private const string GolfersApiBasePath = "/api/golfers";
 
     [Fact]
     public async Task UpdateGolfer_UpdatesGolfer_WhenDataIsCorrect()
@@ -21,20 +19,20 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         const int changedHandicap = 34;
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             createdGolfer.JoinDate,
             changedHandicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -57,7 +55,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         var badId = new Faker().Random.Int(min: 999999);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{badId}", updateRequest);
+        var response = await client.PutAsJsonAsync($"{GolfersApiBasePath}/{badId}", updateRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -70,19 +68,19 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
             "",
-            createdGolfer.LastName,
+            createdGolfer!.LastName,
             createdGolfer.Email,
             createdGolfer.JoinDate,
             createdGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -100,19 +98,19 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             "",
             createdGolfer.Email,
             createdGolfer.JoinDate,
             createdGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -130,19 +128,19 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             "something",
             createdGolfer.JoinDate,
             createdGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -160,24 +158,23 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var firstGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var firstGolferResponse = await client.PostAsJsonAsync("/api/golfers", firstGolferRequest);
+        var firstGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, firstGolferRequest);
         var firstGolfer = await firstGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(firstGolfer!.GolferId);
 
         var secondGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var secondGolferResponse = await client.PostAsJsonAsync("/api/golfers", secondGolferRequest);
+        var secondGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, secondGolferRequest);
         var secondGolfer = await secondGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(secondGolfer!.GolferId);
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            secondGolfer.FirstName,
+            secondGolfer!.FirstName,
             secondGolfer.LastName,
-            firstGolfer.Email,
+            firstGolfer!.Email,
             secondGolfer.JoinDate,
             secondGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{secondGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{secondGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -194,19 +191,19 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             default(DateOnly),
             createdGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -224,20 +221,20 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             currentDate.AddYears(2),
             createdGolfer.Handicap);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -255,20 +252,20 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         const int lessThanLowerBound = -4;
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             createdGolfer.JoinDate,
             lessThanLowerBound);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -286,20 +283,20 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-        _createdGolferIds.Add(createdGolfer!.GolferId);
 
         const int greaterThanUpperBound = 55;
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
-            createdGolfer.FirstName,
+            createdGolfer!.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             createdGolfer.JoinDate,
             greaterThanUpperBound);
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/golfers/{createdGolfer.GolferId}", updateGolferRequest);
+        var response = await client
+            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -308,16 +305,5 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) :
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         error.PropertyName.Should().Be("Handicap");
         error.ErrorMessage.Should().Be($"'Handicap' must be between 0 and 54. You entered {greaterThanUpperBound}.");
-    }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        using HttpClient httpClient = golfApiFactory.CreateClient();
-        foreach (int golferId in _createdGolferIds)
-        {
-            await httpClient.DeleteAsync($"/api/golfers/{golferId}");
-        }
     }
 }

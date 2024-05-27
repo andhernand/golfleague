@@ -10,8 +10,9 @@ public class GetAllTournamentsEndpointTests(GolfApiFactory golfApiFactory) :
     IClassFixture<GolfApiFactory>,
     IAsyncLifetime
 {
+    private const string TournamentsApiBasePath = "/api/tournaments";
+
     private readonly List<int> _createdTournamentIds = [];
-    private readonly string _tournamentsApiPath = "/api/tournaments";
 
     [Fact]
     public async Task GetAllTournaments_ReturnTournaments_WhenTournamentsExist()
@@ -20,12 +21,12 @@ public class GetAllTournamentsEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
+        var createTournamentResponse = await client.PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
         _createdTournamentIds.Add(createdTournament!.TournamentId);
 
         // Act
-        var response = await client.GetAsync(_tournamentsApiPath);
+        var response = await client.GetAsync(TournamentsApiBasePath);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -41,7 +42,7 @@ public class GetAllTournamentsEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         // Act
-        var response = await client.GetAsync(_tournamentsApiPath);
+        var response = await client.GetAsync(TournamentsApiBasePath);
         var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
 
         // Assert
@@ -56,7 +57,7 @@ public class GetAllTournamentsEndpointTests(GolfApiFactory golfApiFactory) :
         using HttpClient httpClient = golfApiFactory.CreateClient();
         foreach (int tournamentId in _createdTournamentIds)
         {
-            await httpClient.DeleteAsync($"{_tournamentsApiPath}/{tournamentId}");
+            await httpClient.DeleteAsync($"{TournamentsApiBasePath}/{tournamentId}");
         }
     }
 }

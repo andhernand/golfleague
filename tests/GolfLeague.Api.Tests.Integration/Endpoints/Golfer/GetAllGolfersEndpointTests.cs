@@ -10,6 +10,8 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
     IClassFixture<GolfApiFactory>,
     IAsyncLifetime
 {
+    private const string GolfersApiBasePath = "/api/golfers";
+
     private readonly List<int> _createdGolferIds = [];
 
     [Fact]
@@ -19,12 +21,12 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createdGolferResponse = await client.PostAsJsonAsync("/api/golfers", createGolferRequest);
+        var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
         _createdGolferIds.Add(createdGolfer!.GolferId);
 
         // Act
-        var response = await client.GetAsync("/api/golfers");
+        var response = await client.GetAsync(GolfersApiBasePath);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -40,7 +42,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using var client = golfApiFactory.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/api/golfers");
+        var response = await client.GetAsync(GolfersApiBasePath);
         var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
 
         // Assert
@@ -55,7 +57,7 @@ public class GetAllGolfersEndpointTests(GolfApiFactory golfApiFactory) :
         using HttpClient httpClient = golfApiFactory.CreateClient();
         foreach (int golferId in _createdGolferIds)
         {
-            await httpClient.DeleteAsync($"/api/golfers/{golferId}");
+            await httpClient.DeleteAsync($"{GolfersApiBasePath}/{golferId}");
         }
     }
 }
