@@ -71,4 +71,23 @@ public static class ContractMapping
     {
         return new Tournament { TournamentId = tournamentId, Name = request.Name, Format = request.Format };
     }
+
+    public static TournamentParticipationResponse MapToResponse(this TournamentParticipation tournamentParticipation)
+    {
+        return new TournamentParticipationResponse
+        {
+            GolferId = tournamentParticipation.GolferId,
+            TournamentId = tournamentParticipation.TournamentId,
+            Year = tournamentParticipation.Year
+        };
+    }
+
+    public static TournamentParticipation MapToTournamentParticipation(
+        this CreateTournamentParticipationsRequest request)
+    {
+        return new TournamentParticipation
+        {
+            GolferId = request.GolferId, TournamentId = request.TournamentId, Year = request.Year
+        };
+    }
 }

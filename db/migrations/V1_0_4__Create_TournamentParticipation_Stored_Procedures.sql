@@ -55,20 +55,10 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetAll]
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-	SELECT [GolferId], [TournamentId], [Year]
-	FROM [dbo].[TournamentParticipation];
-END;
-GO
-
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByGolferIdTournamentIdYear](
+CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetById](
 	@GolferId INT,
 	@TournamentId INT,
-	@Year NVARCHAR(256)
+	@Year NCHAR(4)
 )
 AS
 BEGIN
@@ -94,66 +84,9 @@ BEGIN
 
 	SELECT [GolferId], [TournamentId], [Year]
 	FROM [dbo].[TournamentParticipation]
-	WHERE GolferId = @GolferId
-	  AND TournamentId = @TournamentId
-	  AND Year = @Year;
-END;
-GO
-
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByGolferId](
-	@GolferId INT
-)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-	-- Validate @GolferId
-	IF @GolferId IS NULL OR @GolferId <= 0
-		BEGIN
-			THROW 50035, 'The GolferId parameter must have a positive value.', 1;
-		END
-
-	SELECT [GolferId], [TournamentId], [Year]
-	FROM [dbo].[TournamentParticipation]
-	WHERE [GolferId] = @GolferId;
-END;
-GO
-
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByTournamentId](
-	@TournamentId INT
-)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-	-- Validate @TournamentId
-	IF @TournamentId IS NULL OR @TournamentId <= 0
-		BEGIN
-			THROW 50036, 'The TournamentId parameter must have a positive value.', 1;
-		END
-
-	SELECT [GolferId], [TournamentId], [Year]
-	FROM [dbo].[TournamentParticipation]
-	WHERE [TournamentId] = @TournamentId;
-END;
-GO
-
-CREATE PROCEDURE [dbo].[usp_TournamentParticipation_GetByYear](
-	@Year NCHAR(4)
-)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-	-- Validate @Year
-	IF @Year IS NULL OR LEN(@Year) != 4
-		BEGIN
-			THROW 50037, 'The Year parameter must be a 4-character string.', 1;
-		END
-
-	SELECT [GolferId], [TournamentId], [Year]
-	FROM [dbo].[TournamentParticipation]
-	WHERE [Year] = @Year;
+	WHERE [GolferId] = @GolferId
+	  AND [TournamentId] = @TournamentId
+	  AND [Year] = @Year;
 END;
 GO
 
@@ -170,19 +103,19 @@ BEGIN
 	-- Validate @GolferId
 	IF @GolferId IS NULL OR @GolferId <= 0
 		BEGIN
-			THROW 50038, 'The GolferId parameter must have a positive value.', 1;
+			THROW 50035, 'The GolferId parameter must have a positive value.', 1;
 		END
 
 	-- Validate @TournamentId
 	IF @TournamentId IS NULL OR @TournamentId <= 0
 		BEGIN
-			THROW 50039, 'The TournamentId parameter must have a positive value.', 1;
+			THROW 50036, 'The TournamentId parameter must have a positive value.', 1;
 		END
 
 	-- Validate @Year
 	IF @Year IS NULL OR LEN(@Year) != 4
 		BEGIN
-			THROW 50040, 'The Year parameter must be a 4-character string.', 1;
+			THROW 50037, 'The Year parameter must be a 4-character string.', 1;
 		END
 
 	-- Check if the record exists before attempting to delete

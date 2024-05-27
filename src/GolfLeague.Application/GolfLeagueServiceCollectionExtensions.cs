@@ -22,14 +22,16 @@ public static class GolfLeagueServiceCollectionExtensions
         services.AddSingleton<ITournamentService, TournamentService>();
         services.AddSingleton<ITournamentRepository, TournamentRepository>();
 
+        services.AddSingleton<ITournamentParticipationService, TournamentParticipationService>();
+        services.AddSingleton<ITournamentParticipationRepository, TournamentParticipationRepository>();
+
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
         return services;
     }
 
     public static IServiceCollection AddGolfLeagueDatabase(this IServiceCollection services, string connectionString)
     {
-        services.AddSingleton<IDbConnectionFactory>(_ =>
-            new SqlServerDbConnectionFactory(connectionString));
+        services.AddSingleton<IDbConnectionFactory>(_ => new SqlServerDbConnectionFactory(connectionString));
         return services;
     }
 }

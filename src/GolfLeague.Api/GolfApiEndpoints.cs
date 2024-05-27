@@ -26,4 +26,13 @@ public static class GolfApiEndpoints
         public const string Delete = $"{Base}/{{id:int}}";
         public const string Tag = "Tournaments";
     }
+
+    public static class TournamentParticipation
+    {
+        private const string Base = $"{ApiBase}/tournamentparticipations";
+        public const string Create = Base;
+        public const string GetById = Base;
+        public const string Delete = Base;
+        public const string Tag = "TournamentParticipations";
+    }
 }
