@@ -1,13 +1,19 @@
 using GolfLeague.Api.Endpoints;
 using GolfLeague.Api.Health;
 using GolfLeague.Api.Mapping;
+using GolfLeague.Api.OpenApi;
 using GolfLeague.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 using var config = builder.Configuration;
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SchemaFilter<CreateTournamentRequestSchemaFilter>();
+    options.SchemaFilter<UpdateTournamentRequestSchemaFilter>();
+    options.SchemaFilter<TournamentResponseSchemaFilter>();
+});
 
 builder.Services
     .AddHealthChecks()

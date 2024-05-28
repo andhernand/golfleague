@@ -13,8 +13,12 @@ public class TournamentValidator : AbstractValidator<Tournament>
     {
         _repository = repository;
 
-        RuleFor(t => t.Name).NotEmpty();
-        RuleFor(t => t.Format).NotEmpty();
+        RuleFor(t => t.Name)
+            .NotEmpty();
+
+        RuleFor(t => t.Format)
+            .NotEmpty()
+            .Must(t => TournamentFormat.Values.Any(v => v.Equals(t)));
 
         RuleFor(t => t)
             .MustAsync(ValidateTournament)
