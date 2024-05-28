@@ -1,4 +1,5 @@
 using GolfLeague.Api.Endpoints;
+using GolfLeague.Api.Health;
 using GolfLeague.Api.Mapping;
 using GolfLeague.Application;
 
@@ -7,7 +8,10 @@ using var config = builder.Configuration;
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHealthChecks();
+
+builder.Services
+    .AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
 
 builder.Services.AddGolfLeagueApplication();
 builder.Services.AddGolfLeagueDatabase(config["Database:ConnectionString"]!);
@@ -19,6 +23,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseHealthChecks(new PathString("/_health"));
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapApiEndpoints();
