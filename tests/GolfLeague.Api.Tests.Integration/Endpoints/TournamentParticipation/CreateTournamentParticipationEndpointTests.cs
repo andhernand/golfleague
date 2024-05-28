@@ -31,7 +31,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
             .PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
         var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
-        var expectedYear = new Faker().Date.Past(20).Year;
+        var expectedYear = Fakers.GenerateYear();
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -144,7 +144,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
             .PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
         var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
-        var expectedYear = new Faker().Date.Past(20).Year;
+        var expectedYear = Fakers.GenerateYear();
 
         var createParticipationRequest = new CreateTournamentParticipationsRequest
         {

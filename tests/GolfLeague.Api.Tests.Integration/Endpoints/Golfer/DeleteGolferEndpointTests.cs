@@ -34,7 +34,7 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        int golferId = new Faker().Random.Int(1);
+        int golferId = Fakers.GeneratePositiveInteger();
 
         // Act
         var response = await client.DeleteAsync($"{GolfersApiBasePath}/{golferId}");

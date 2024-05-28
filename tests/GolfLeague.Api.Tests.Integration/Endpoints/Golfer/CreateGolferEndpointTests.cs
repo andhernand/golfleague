@@ -119,8 +119,7 @@ public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        var defaultDate = default(DateOnly);
-        var request = Fakers.GenerateCreateGolferRequest(joinDate: defaultDate);
+        var request = Fakers.GenerateCreateGolferRequest(joinDate: default(DateOnly));
 
         // Act
         var response = await client.PostAsJsonAsync(GolfersApiBasePath, request);

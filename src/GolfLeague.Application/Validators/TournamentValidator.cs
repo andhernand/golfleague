@@ -18,7 +18,12 @@ public class TournamentValidator : AbstractValidator<Tournament>
 
         RuleFor(t => t.Format)
             .NotEmpty()
-            .Must(t => TournamentFormat.Values.Any(v => v.Equals(t)));
+            .DependentRules(() =>
+            {
+                RuleFor(t => t.Format)
+                    .Must(t => TournamentFormat.Values.Any(v => v.Equals(t)))
+                    .WithMessage($"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}");
+            });
 
         RuleFor(t => t)
             .MustAsync(ValidateTournament)

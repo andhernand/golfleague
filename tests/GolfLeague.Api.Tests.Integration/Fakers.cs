@@ -1,5 +1,6 @@
 ﻿using Bogus;
 
+using GolfLeague.Application.Models;
 using GolfLeague.Contracts.Requests;
 
 namespace GolfLeague.Api.Tests.Integration;
@@ -44,7 +45,7 @@ public static class Fakers
     {
         return new Faker<CreateTournamentRequest>()
             .RuleFor(r => r.Name, f => name ?? f.Company.CompanyName())
-            .RuleFor(r => r.Format, f => format ?? f.Random.Word())
+            .RuleFor(r => r.Format, f => format ?? f.PickRandom(TournamentFormat.Values))
             .Generate();
     }
 
@@ -54,7 +55,17 @@ public static class Fakers
     {
         return new Faker<UpdateTournamentRequest>()
             .RuleFor(r => r.Name, f => name ?? f.Company.CompanyName())
-            .RuleFor(r => r.Format, f => format ?? f.Random.Word())
+            .RuleFor(r => r.Format, f => format ?? f.PickRandom(TournamentFormat.Values))
             .Generate();
+    }
+
+    public static int GeneratePositiveInteger(int min = 1, int max = int.MaxValue)
+    {
+        return new Faker().Random.Int(min, max);
+    }
+
+    public static int GenerateYear(int yearsBack = 20)
+    {
+        return new Faker().Date.Past(yearsBack).Year;
     }
 }

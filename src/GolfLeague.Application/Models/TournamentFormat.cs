@@ -2,7 +2,7 @@
 
 public static class TournamentFormat
 {
-    public static readonly IEnumerable<string> Values =
+    public static readonly string[] Values =
     [
         "Match Play",
         "Stroke Play",

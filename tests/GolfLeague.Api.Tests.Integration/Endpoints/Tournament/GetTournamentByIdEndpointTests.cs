@@ -39,7 +39,7 @@ public class GetTournamentByIdEndpointTests(GolfApiFactory golfApiFactory) : ICl
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        int tournamentId = new Faker().Random.Int(999_999, 9_999_999);
+        int tournamentId = Fakers.GeneratePositiveInteger(999_999, 9_999_999);
 
         // Act
         var result = await client.GetAsync($"{_tournamentsApiPath}/{tournamentId}");

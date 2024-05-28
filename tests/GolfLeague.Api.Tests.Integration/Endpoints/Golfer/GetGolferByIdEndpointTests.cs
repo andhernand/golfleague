@@ -43,7 +43,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         // Arrange
         using var client = golfApiFactory.CreateClient();
 
-        var id = new Faker().Random.Int(1);
+        var id = Fakers.GeneratePositiveInteger();
 
         // Act
         var result = await client.GetAsync($"{GolfersApiBasePath}/{id}");

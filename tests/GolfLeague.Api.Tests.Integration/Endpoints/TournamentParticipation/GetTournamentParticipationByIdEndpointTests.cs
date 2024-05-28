@@ -31,7 +31,7 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
             .PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
         var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
-        var expectedYear = new Faker().Date.Past(20).Year;
+        var expectedYear = Fakers.GenerateYear();
 
         var createParticipationRequest = new CreateTournamentParticipationsRequest
         {
@@ -66,10 +66,9 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
         // Arrange
         using var httpClient = golfApiFactory.CreateClient();
 
-        var faker = new Faker();
-        var golferId = faker.Random.Int(1);
-        var tournamentId = faker.Random.Int(1);
-        var year = faker.Date.Past(20).Year;
+        var golferId = Fakers.GeneratePositiveInteger();
+        var tournamentId = Fakers.GeneratePositiveInteger();
+        var year = Fakers.GenerateYear();
 
         // Act
         var response = await httpClient.GetAsync(

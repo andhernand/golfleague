@@ -2,6 +2,7 @@
 
 using FluentAssertions;
 
+using GolfLeague.Application.Models;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
@@ -93,5 +94,24 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         error.PropertyName.Should().Be("Tournament");
         error.ErrorMessage.Should()
             .Be("A Tournament with the Name and Format combination already exists in the system.");
+    }
+
+    [Fact]
+    public async Task CreateTournament_Fails_WhenTournamentFormatIsNotAnAcceptableValue()
+    {
+        // Arrange
+        using var client = golfApiFactory.CreateClient();
+        var request = Fakers.GenerateCreateTournamentRequest(format: "Yo Momma");
+
+        // Act
+        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+
+        // Assert
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var error = errors!.Errors.Single();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        error.PropertyName.Should().Be("Format");
+        error.ErrorMessage.Should().Be($"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}");
     }
 }
