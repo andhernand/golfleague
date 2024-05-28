@@ -30,7 +30,7 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
         _golfApiUserPassword = Environment.GetEnvironmentVariable("GOLF_API_USER_PASSWORD");
         _golfApiUserName = Environment.GetEnvironmentVariable("GOLF_API_USER_NAME");
 
-        _solutionFolder = SolutionDirectoryFinder.GetSolutionDirectory("GolfLeague.sln");
+        _solutionFolder = DirectoryFinder.GetDirectoryContaining("GolfLeague.sln");
 
         _sqlContainer = new MsSqlBuilder()
             .WithPassword(_saPassword)
