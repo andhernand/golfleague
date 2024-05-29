@@ -5,15 +5,20 @@ using Dapper;
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
 
+using Microsoft.Extensions.Logging;
+
 namespace GolfLeague.Application.Repositories;
 
-public class TournamentParticipationRepository(IDbConnectionFactory connectionFactory)
-    : ITournamentParticipationRepository
+public class TournamentParticipationRepository(
+    IDbConnectionFactory connectionFactory,
+    ILogger<TournamentParticipationRepository> logger) : ITournamentParticipationRepository
 {
     public async Task<bool> CreateAsync(
         TournamentParticipation tournamentParticipation,
         CancellationToken token = default)
     {
+        logger.LogInformation("Creating {@TournamentParticipation}", tournamentParticipation);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var parameters = new DynamicParameters();
@@ -36,6 +41,8 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
         TournamentParticipation id,
         CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Retrieving TournamentParticipation by Id: {@TournamentParticipation}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
 
         var tournamentParticipation = await connection.QuerySingleOrDefaultAsync<TournamentParticipation>(
@@ -50,6 +57,8 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
 
     public async Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Deleting TournamentParticipation by Id: {@TournamentParticipation}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
 
         var parameters = new DynamicParameters();
@@ -70,6 +79,10 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
 
     public async Task<bool> ExistsByIdAsync(TournamentParticipation id, CancellationToken token = default)
     {
+        logger.LogInformation(
+            "Checking for existence of TournamentParticipation by Id: {@TournamentParticipation}",
+            id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         return await connection.ExecuteScalarAsync<bool>(

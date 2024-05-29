@@ -3,6 +3,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using SerilogTimings;
+
 namespace GolfLeague.Api.Endpoints.TournamentParticipations;
 
 public static class CreateTournamentParticipationEndpoint
@@ -16,10 +18,13 @@ public static class CreateTournamentParticipationEndpoint
                 ITournamentParticipationService service,
                 CancellationToken token = default) =>
             {
+                using var timedOperation = Operation.Begin("Create TournamentParticipation");
+
                 var tournamentParticipation = request.MapToTournamentParticipation();
                 await service.CreateAsync(tournamentParticipation, token);
                 var response = tournamentParticipation.MapToResponse();
 
+                timedOperation.Complete();
                 return TypedResults.CreatedAtRoute(
                     response,
                     GetTournamentParticipationByIdEndpoint.Name,

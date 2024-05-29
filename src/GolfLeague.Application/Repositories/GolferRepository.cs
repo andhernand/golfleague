@@ -5,12 +5,18 @@ using Dapper;
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
 
+using Microsoft.Extensions.Logging;
+
 namespace GolfLeague.Application.Repositories;
 
-public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferRepository
+public class GolferRepository(
+    IDbConnectionFactory connectionFactory,
+    ILogger<GolferRepository> logger) : IGolferRepository
 {
     public async Task<int> CreateAsync(Golfer golfer, CancellationToken token = default)
     {
+        logger.LogInformation("Creating {@Golfer}", golfer);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var parameters = new DynamicParameters();
@@ -35,6 +41,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token)
     {
+        logger.LogInformation("Retrieving Golfer by Id: {GolferId}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golfer = await connection.QueryFirstOrDefaultAsync<Golfer>(
             new CommandDefinition(
@@ -47,6 +55,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
     {
+        logger.LogInformation("Retrieving All Golfers");
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golfers = await connection.QueryAsync<Golfer>(
             new CommandDefinition(
@@ -59,6 +69,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token)
     {
+        logger.LogInformation("Updating {@Golfer}", golfer);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var result = await connection.ExecuteAsync(
             new CommandDefinition(
@@ -71,6 +83,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
     {
+        logger.LogInformation("Deleting Golfer by Id: {GolferId}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var parameters = new DynamicParameters();
@@ -91,6 +105,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<bool> ExistsByIdAsync(int id, CancellationToken token)
     {
+        logger.LogInformation("Checking for existence of Golfer by Id: {GolferId}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         return await connection.ExecuteScalarAsync<bool>(
             new CommandDefinition(
@@ -102,6 +118,8 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 
     public async Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default)
     {
+        logger.LogInformation("Checking for existence of Golfer by Email: {Email}", email);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(
             new CommandDefinition(

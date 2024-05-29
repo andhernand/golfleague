@@ -4,7 +4,7 @@ using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Mapping;
 
-public class ValidationMappingMiddleware(RequestDelegate next)
+public class ValidationMappingMiddleware(RequestDelegate next, ILogger<ValidationMappingMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -22,6 +22,8 @@ public class ValidationMappingMiddleware(RequestDelegate next)
                     PropertyName = x.PropertyName, ErrorMessage = x.ErrorMessage
                 })
             };
+
+            logger.LogWarning("Validation failure: {@ValidationFailureResponse}", validationFailureResponse);
 
             await context.Response.WriteAsJsonAsync(validationFailureResponse);
         }

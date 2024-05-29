@@ -2,6 +2,8 @@
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
+using SerilogTimings;
+
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class GetGolferByIdEndpoint
@@ -15,13 +17,18 @@ public static class GetGolferByIdEndpoint
                 IGolferService service,
                 CancellationToken token) =>
             {
+                using var timedOperation = Operation.Begin("Get Golfer By Id");
+
                 var golfer = await service.GetGolferByIdAsync(id, token);
                 if (golfer is null)
                 {
+                    timedOperation.Complete();
                     return Results.NotFound();
                 }
 
                 var response = golfer.MapToResponse();
+
+                timedOperation.Complete();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

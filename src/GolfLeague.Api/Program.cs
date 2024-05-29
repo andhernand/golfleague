@@ -4,8 +4,16 @@ using GolfLeague.Api.Mapping;
 using GolfLeague.Api.OpenApi;
 using GolfLeague.Application;
 
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 using var config = builder.Configuration;
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

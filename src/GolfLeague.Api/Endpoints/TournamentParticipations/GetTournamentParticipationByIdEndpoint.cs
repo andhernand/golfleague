@@ -5,6 +5,8 @@ using GolfLeague.Contracts.Responses;
 
 using Microsoft.AspNetCore.Mvc;
 
+using SerilogTimings;
+
 namespace GolfLeague.Api.Endpoints.TournamentParticipations;
 
 public static class GetTournamentParticipationByIdEndpoint
@@ -20,6 +22,8 @@ public static class GetTournamentParticipationByIdEndpoint
                 ITournamentParticipationService service,
                 CancellationToken cancellationToken = default) =>
             {
+                using var timedOperation = Operation.Begin("Get TournamentParticipation By Id");
+
                 var request = new TournamentParticipation
                 {
                     GolferId = golferId, TournamentId = tournamentId, Year = year
@@ -30,10 +34,13 @@ public static class GetTournamentParticipationByIdEndpoint
                     cancellationToken);
                 if (tournamentParticipation is null)
                 {
+                    timedOperation.Complete();
                     return Results.NotFound();
                 }
 
                 var response = tournamentParticipation.MapToResponse();
+
+                timedOperation.Complete();
                 return Results.Ok(response);
             })
             .WithName(Name)

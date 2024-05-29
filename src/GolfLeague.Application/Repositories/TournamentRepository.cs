@@ -5,12 +5,18 @@ using Dapper;
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
 
+using Microsoft.Extensions.Logging;
+
 namespace GolfLeague.Application.Repositories;
 
-public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITournamentRepository
+public class TournamentRepository(
+    IDbConnectionFactory connectionFactory,
+    ILogger<TournamentRepository> logger) : ITournamentRepository
 {
     public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
     {
+        logger.LogInformation("Creating Tournament: {@Tournament}", tournament);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var parameters = new DynamicParameters();
@@ -32,6 +38,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<Tournament?> GetTournamentByIdAsync(int id, CancellationToken token = default)
     {
+        logger.LogInformation("Retrieving Tournament by Id: {TournamentId}", id);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var tournament = await connection.QueryFirstOrDefaultAsync<Tournament>(
@@ -46,6 +54,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<Tournament?> GetByNameAndFormat(string name, string format, CancellationToken token = default)
     {
+        logger.LogInformation("Retrieving Tournament by {Name} and {Format}", name, format);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var tournament = await connection.QuerySingleOrDefaultAsync<Tournament>(
@@ -60,6 +70,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<IEnumerable<Tournament>> GetAllTournamentsAsync(CancellationToken token = default)
     {
+        logger.LogInformation("Retrieving all Tournaments");
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var tournaments = await connection.QueryAsync<Tournament>(
@@ -73,6 +85,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<bool> UpdateAsync(Tournament tournament, CancellationToken token = default)
     {
+        logger.LogInformation("Updating {@Tournament}", tournament);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var result = await connection.ExecuteAsync(
@@ -87,6 +101,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<bool> DeleteByIdAsync(int tournamentId, CancellationToken token = default)
     {
+        logger.LogInformation("Deleting Tournament by Id: {TournamentId}", tournamentId);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         var parameters = new DynamicParameters();
@@ -107,6 +123,8 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 
     public async Task<bool> ExistsByIdAsync(int tournamentId, CancellationToken token = default)
     {
+        logger.LogInformation("Checking for existence of Tournament by Id: {TournamentId}", tournamentId);
+
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
         return await connection.ExecuteScalarAsync<bool>(

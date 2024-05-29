@@ -3,6 +3,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using SerilogTimings;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class UpdateTournamentEndpoint
@@ -17,14 +19,19 @@ public static class UpdateTournamentEndpoint
                 ITournamentService service,
                 CancellationToken token = default) =>
             {
+                using var timedOperation = Operation.Begin("Update Tournament");
+
                 var tournament = request.MapToTournament(id);
                 var updatedTournament = await service.UpdateAsync(tournament, token);
                 if (updatedTournament is null)
                 {
+                    timedOperation.Complete();
                     return Results.NotFound();
                 }
 
                 var response = updatedTournament.MapToResponse();
+
+                timedOperation.Complete();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

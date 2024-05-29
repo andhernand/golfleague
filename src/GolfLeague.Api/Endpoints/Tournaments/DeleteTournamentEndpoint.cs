@@ -1,5 +1,7 @@
 ﻿using GolfLeague.Application.Services;
 
+using SerilogTimings;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class DeleteTournamentEndpoint
@@ -13,7 +15,11 @@ public static class DeleteTournamentEndpoint
                 ITournamentService service,
                 CancellationToken token = default) =>
             {
+                using var timedOperation = Operation.Begin("Delete Tournament");
+
                 var deleted = await service.DeleteByIdAsync(id, token);
+
+                timedOperation.Complete();
                 return deleted ? Results.NoContent() : Results.NotFound();
             })
             .WithName(Name)

@@ -4,7 +4,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace GolfLeague.Api.Health;
 
-public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory) : IHealthCheck
+public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory, ILogger<DatabaseHealthCheck> logger)
+    : IHealthCheck
 {
     public const string Name = "Database";
 
@@ -19,7 +20,7 @@ public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory) : IHe
         }
         catch (Exception e)
         {
-            // TODO: Log Error
+            logger.LogWarning(e, "Database HealthCheck has Failed");
             return HealthCheckResult.Unhealthy("Database is unhealthy", e);
         }
     }
