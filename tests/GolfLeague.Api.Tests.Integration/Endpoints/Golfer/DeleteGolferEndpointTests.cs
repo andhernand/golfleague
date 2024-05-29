@@ -10,8 +10,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
 public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private const string GolfersApiBasePath = "/api/golfers";
-
     [Fact]
     public async Task DeleteGolfer_ReturnsNoContent_WhenGolferIsDeleted()
     {
@@ -19,11 +17,12 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+        var createdGolferResponse = await client
+            .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         // Act
-        var response = await client.DeleteAsync($"{GolfersApiBasePath}/{createdGolfer!.GolferId}");
+        var response = await client.DeleteAsync($"{golfApiFactory.GolfersApiBasePath}/{createdGolfer!.GolferId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -37,7 +36,7 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         int golferId = Fakers.GeneratePositiveInteger();
 
         // Act
-        var response = await client.DeleteAsync($"{GolfersApiBasePath}/{golferId}");
+        var response = await client.DeleteAsync($"{golfApiFactory.GolfersApiBasePath}/{golferId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

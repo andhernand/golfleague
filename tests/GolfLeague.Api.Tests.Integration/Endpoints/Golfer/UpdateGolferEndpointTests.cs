@@ -10,8 +10,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
 public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private const string GolfersApiBasePath = "/api/golfers";
-
     [Fact]
     public async Task UpdateGolfer_UpdatesGolfer_WhenDataIsCorrect()
     {
@@ -19,7 +17,8 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+        var existingGolferResponse =
+            await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         const int changedHandicap = 34;
@@ -32,7 +31,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
+            .PutAsJsonAsync($"{golfApiFactory.GolfersApiBasePath}/{createdGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -55,7 +54,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         var badId = Fakers.GeneratePositiveInteger(999_999);
 
         // Act
-        var response = await client.PutAsJsonAsync($"{GolfersApiBasePath}/{badId}", updateRequest);
+        var response = await client.PutAsJsonAsync($"{golfApiFactory.GolfersApiBasePath}/{badId}", updateRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -71,7 +70,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -92,7 +93,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -113,7 +116,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -131,11 +136,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         using var client = golfApiFactory.CreateClient();
 
         var firstGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var firstGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, firstGolferRequest);
+        var firstGolferResponse = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, firstGolferRequest);
         var firstGolfer = await firstGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         var secondGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var secondGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, secondGolferRequest);
+        var secondGolferResponse = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, secondGolferRequest);
         var secondGolfer = await secondGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         var updateGolferRequest = Fakers.GenerateUpdateGolferRequest(
@@ -147,7 +152,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{secondGolfer.GolferId}", updateGolferRequest);
+            .PutAsJsonAsync($"{golfApiFactory.GolfersApiBasePath}/{secondGolfer.GolferId}", updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -167,7 +172,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -189,7 +196,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -211,7 +220,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -233,7 +244,9 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         // Act
         var response = await client
-            .PutAsJsonAsync($"{GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}", updateGolferRequest);
+            .PutAsJsonAsync(
+                $"{golfApiFactory.GolfersApiBasePath}/{Fakers.GeneratePositiveInteger()}",
+                updateGolferRequest);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();

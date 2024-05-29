@@ -24,13 +24,11 @@ public class TournamentRepository(
         parameters.Add("@Format", tournament.Format, DbType.String, ParameterDirection.Input, 256);
         parameters.Add("@TournamentId", 0, DbType.Int32, ParameterDirection.Output);
 
-        var commandDefinition = new CommandDefinition(
+        _ = await connection.ExecuteAsync(new CommandDefinition(
             "dbo.usp_Tournament_Insert",
             parameters,
             commandType: CommandType.StoredProcedure,
-            cancellationToken: token);
-
-        await connection.ExecuteScalarAsync(commandDefinition);
+            cancellationToken: token));
 
         var tournamentId = parameters.Get<int>("@TournamentId");
         return tournamentId;
@@ -41,15 +39,33 @@ public class TournamentRepository(
         logger.LogInformation("Retrieving Tournament by Id: {TournamentId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var tournamentDictionary = new Dictionary<int, Tournament>();
 
-        var tournament = await connection.QueryFirstOrDefaultAsync<Tournament>(
+        _ = await connection.QueryAsync<Tournament, ParticipationDetail?, Tournament>(
             new CommandDefinition(
                 "dbo.usp_Tournament_GetTournamentById",
                 new { TournamentId = id },
                 commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
+                cancellationToken: token),
+            (tournament, detail) =>
+            {
+                if (!tournamentDictionary.TryGetValue(tournament.TournamentId, out var tournamentEntry))
+                {
+                    tournamentEntry = tournament;
+                    tournamentDictionary.Add(tournament.TournamentId, tournamentEntry);
+                }
 
-        return tournament;
+                if (detail is not null)
+                {
+                    tournamentEntry.Participants.Add(detail);
+                }
+
+                return tournamentEntry;
+            },
+            splitOn: "GolferId"
+        );
+
+        return tournamentDictionary.Values.SingleOrDefault();
     }
 
     public async Task<Tournament?> GetByNameAndFormat(string name, string format, CancellationToken token = default)
@@ -73,14 +89,32 @@ public class TournamentRepository(
         logger.LogInformation("Retrieving all Tournaments");
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
+        var tournamentDictionary = new Dictionary<int, Tournament>();
 
-        var tournaments = await connection.QueryAsync<Tournament>(
+        _ = await connection.QueryAsync<Tournament, ParticipationDetail?, Tournament>(
             new CommandDefinition(
                 "dbo.usp_Tournament_GetAll",
                 commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
+                cancellationToken: token),
+            (tournament, detail) =>
+            {
+                if (!tournamentDictionary.TryGetValue(tournament.TournamentId, out var tournamentEntry))
+                {
+                    tournamentEntry = tournament;
+                    tournamentDictionary.Add(tournament.TournamentId, tournamentEntry);
+                }
 
-        return tournaments;
+                if (detail is not null)
+                {
+                    tournamentEntry.Participants.Add(detail);
+                }
+
+                return tournamentEntry;
+            },
+            splitOn: "GolferId"
+        );
+
+        return tournamentDictionary.Values;
     }
 
     public async Task<bool> UpdateAsync(Tournament tournament, CancellationToken token = default)
@@ -92,7 +126,7 @@ public class TournamentRepository(
         var result = await connection.ExecuteAsync(
             new CommandDefinition(
                 "dbo.usp_Tournament_Update",
-                tournament,
+                new { tournament.TournamentId, tournament.Name, tournament.Format },
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
 
@@ -109,13 +143,11 @@ public class TournamentRepository(
         parameters.Add("@TournamentId", tournamentId, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@RowCount", 0, DbType.Int32, ParameterDirection.Output);
 
-        var commandDefinition = new CommandDefinition(
+        _ = await connection.ExecuteAsync(new CommandDefinition(
             "dbo.usp_Tournament_Delete",
             parameters,
             commandType: CommandType.StoredProcedure,
-            cancellationToken: token);
-
-        await connection.ExecuteScalarAsync(commandDefinition);
+            cancellationToken: token));
 
         var result = parameters.Get<int>("@RowCount") > 0;
         return result;

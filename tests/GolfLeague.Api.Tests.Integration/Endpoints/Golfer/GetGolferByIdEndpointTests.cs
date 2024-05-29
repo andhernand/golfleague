@@ -11,10 +11,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
 public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private const string GolfersApiBasePath = "/api/golfers";
-    private const string TournamentsApiBasePath = "/api/tournaments";
-    private const string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
-
     [Fact]
     public async Task GetGolferById_ReturnsGolfer_WhenGolferExists()
     {
@@ -22,7 +18,8 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+        var createdGolferResponse =
+            await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         var expected = new GolferResponse
@@ -37,7 +34,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         };
 
         // Act
-        var response = await client.GetAsync($"{GolfersApiBasePath}/{createdGolfer!.GolferId}");
+        var response = await client.GetAsync($"{golfApiFactory.GolfersApiBasePath}/{createdGolfer!.GolferId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -55,7 +52,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         var id = Fakers.GeneratePositiveInteger();
 
         // Act
-        var result = await client.GetAsync($"{GolfersApiBasePath}/{id}");
+        var result = await client.GetAsync($"{golfApiFactory.GolfersApiBasePath}/{id}");
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -68,11 +65,13 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         using var client = golfApiFactory.CreateClient();
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+        var createdGolferResponse =
+            await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
         var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createdTournamentResponse = await client.PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
+        var createdTournamentResponse =
+            await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
         var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
         var createTournamentParticipationRequest = new CreateTournamentParticipationsRequest
@@ -82,7 +81,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
             Year = Fakers.GenerateYear()
         };
         var createTournamentParticipationResponse = await client
-            .PostAsJsonAsync(TournamentParticipationsApiBasePath, createTournamentParticipationRequest);
+            .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, createTournamentParticipationRequest);
         var createdTournamentParticipation = await createTournamentParticipationResponse.Content
             .ReadFromJsonAsync<TournamentParticipationResponse>();
 
@@ -107,7 +106,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         };
 
         // Act
-        var response = await client.GetAsync($"{GolfersApiBasePath}/{createdGolfer.GolferId}");
+        var response = await client.GetAsync($"{golfApiFactory.GolfersApiBasePath}/{createdGolfer.GolferId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

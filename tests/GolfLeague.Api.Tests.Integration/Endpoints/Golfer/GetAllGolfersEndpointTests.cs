@@ -9,10 +9,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
 public class GetAllGolfersEndpointTests
 {
-    private const string GolfersApiBasePath = "/api/golfers";
-    private const string TournamentsApiBasePath = "/api/tournaments";
-    private const string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
-
     public class GetAllGolfersWithTournaments(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
     {
         [Fact]
@@ -22,12 +18,13 @@ public class GetAllGolfersEndpointTests
             using var client = golfApiFactory.CreateClient();
 
             var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-            var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+            var createdGolferResponse =
+                await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
             var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
             var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
             var createdTournamentResponse =
-                await client.PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
+                await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
             var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
             var createTournamentParticipationRequest = new CreateTournamentParticipationsRequest
@@ -37,7 +34,8 @@ public class GetAllGolfersEndpointTests
                 Year = Fakers.GenerateYear()
             };
             var createTournamentParticipationResponse = await client
-                .PostAsJsonAsync(TournamentParticipationsApiBasePath, createTournamentParticipationRequest);
+                .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath,
+                    createTournamentParticipationRequest);
             var createdTournamentParticipation = await createTournamentParticipationResponse.Content
                 .ReadFromJsonAsync<TournamentParticipationResponse>();
 
@@ -68,7 +66,7 @@ public class GetAllGolfersEndpointTests
             };
 
             // Act
-            var response = await client.GetAsync(GolfersApiBasePath);
+            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -87,7 +85,8 @@ public class GetAllGolfersEndpointTests
             using var client = golfApiFactory.CreateClient();
 
             var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-            var createdGolferResponse = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+            var createdGolferResponse =
+                await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
             var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
             var expected = new GolfersResponse
@@ -108,7 +107,7 @@ public class GetAllGolfersEndpointTests
             };
 
             // Act
-            var response = await client.GetAsync(GolfersApiBasePath);
+            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -127,7 +126,7 @@ public class GetAllGolfersEndpointTests
             using var client = golfApiFactory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(GolfersApiBasePath);
+            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
             var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
 
             // Assert

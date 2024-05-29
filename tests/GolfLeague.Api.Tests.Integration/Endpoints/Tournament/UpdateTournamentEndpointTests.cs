@@ -9,8 +9,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
 public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly string _tournamentsApiPath = "/api/tournaments";
-
     [Fact]
     public async Task UpdateTournament_UpdatesTournament_WhenDataIsCorrect()
     {
@@ -18,7 +16,8 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = golfApiFactory.CreateClient();
 
         var createTournamentRequest = Fakers.GenerateUpdateTournamentRequest();
-        var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
+        var createTournamentResponse =
+            await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
         const string changedFormat = "Match Play";
@@ -28,7 +27,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{createdTournament.TournamentId}",
+            $"{golfApiFactory.TournamentsApiBasePath}/{createdTournament.TournamentId}",
             updateTournamentRequest);
 
         // Assert
@@ -49,7 +48,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         var badId = Fakers.GeneratePositiveInteger(min: 999_999, max: 9_999_999);
 
         // Act
-        var response = await client.PutAsJsonAsync($"{_tournamentsApiPath}/{badId}", updateRequest);
+        var response = await client.PutAsJsonAsync($"{golfApiFactory.TournamentsApiBasePath}/{badId}", updateRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -65,7 +64,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{Fakers.GeneratePositiveInteger()}",
+            $"{golfApiFactory.TournamentsApiBasePath}/{Fakers.GeneratePositiveInteger()}",
             updateTournamentRequest);
 
         // Assert
@@ -87,7 +86,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{Fakers.GeneratePositiveInteger()}",
+            $"{golfApiFactory.TournamentsApiBasePath}/{Fakers.GeneratePositiveInteger()}",
             updateTournamentRequest);
 
         // Assert
@@ -107,13 +106,13 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         var firstCreateTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var firstCreateTournamentResponse = await client
-            .PostAsJsonAsync(_tournamentsApiPath, firstCreateTournamentRequest);
+            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, firstCreateTournamentRequest);
         var firstCreatedTournament = await firstCreateTournamentResponse
             .Content.ReadFromJsonAsync<TournamentResponse>();
 
         var secondCreateTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var secondCreateTournamentResponse =
-            await client.PostAsJsonAsync(_tournamentsApiPath, secondCreateTournamentRequest);
+            await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, secondCreateTournamentRequest);
         var secondCreatedTournament = await secondCreateTournamentResponse
             .Content.ReadFromJsonAsync<TournamentResponse>();
 
@@ -123,7 +122,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{secondCreatedTournament!.TournamentId}",
+            $"{golfApiFactory.TournamentsApiBasePath}/{secondCreatedTournament!.TournamentId}",
             updateTournamentRequest);
 
         // Assert
@@ -146,7 +145,7 @@ public class UpdateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.PutAsJsonAsync(
-            $"{_tournamentsApiPath}/{Fakers.GeneratePositiveInteger()}",
+            $"{golfApiFactory.TournamentsApiBasePath}/{Fakers.GeneratePositiveInteger()}",
             updateTournamentRequest);
 
         // Assert

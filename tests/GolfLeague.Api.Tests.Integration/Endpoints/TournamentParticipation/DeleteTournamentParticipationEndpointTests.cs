@@ -11,10 +11,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.TournamentParticipation;
 
 public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private const string GolfersApiBasePath = "/api/golfers";
-    private const string TournamentsApiBasePath = "/api/tournaments";
-    private const string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
-
     [Fact]
     public async Task DeleteTournamentParticipation_ReturnsNoContent_WhenTournamentParticipationIsDeleted()
     {
@@ -23,12 +19,12 @@ public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
 
         var createGolferRequest = Fakers.GenerateCreateGolferRequest();
         var createGolferResponse = await httpClient
-            .PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
+            .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
         var expectedGolfer = await createGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
         var createTournamentResponse = await httpClient
-            .PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
+            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
         var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
         var expectedYear = Fakers.GenerateYear();
@@ -41,13 +37,13 @@ public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         };
 
         var createdTournamentParticipationResponse = await httpClient
-            .PostAsJsonAsync(TournamentParticipationsApiBasePath, createParticipationRequest);
+            .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, createParticipationRequest);
         var createdTournamentParticipation = await createdTournamentParticipationResponse.Content
             .ReadFromJsonAsync<TournamentParticipationResponse>();
 
         // Act
         var response = await httpClient.DeleteAsync(
-            $"{TournamentParticipationsApiBasePath}"
+            $"{golfApiFactory.TournamentParticipationsApiBasePath}"
             + $"?golferId={createdTournamentParticipation!.GolferId}"
             + $"&tournamentId={createdTournamentParticipation.TournamentId}"
             + $"&year={createdTournamentParticipation.Year}");
@@ -68,7 +64,7 @@ public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
 
         // Act
         var response = await httpClient.DeleteAsync(
-            $"{TournamentParticipationsApiBasePath}"
+            $"{golfApiFactory.TournamentParticipationsApiBasePath}"
             + $"?golferId={golferId}"
             + $"&tournamentId={tournamentId}"
             + $"&year={year}");

@@ -9,8 +9,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
 public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly string _tournamentsApiPath = "/api/tournaments";
-
     [Fact]
     public async Task CreateTournament_CreatesTournament_WhenDataIsCorrect()
     {
@@ -19,14 +17,15 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         var request = Fakers.GenerateCreateTournamentRequest();
 
         // Act
-        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var tournament = await response.Content.ReadFromJsonAsync<TournamentResponse>();
 
-        response.Headers.Location.Should().Be($"http://localhost{_tournamentsApiPath}/{tournament!.TournamentId}");
+        response.Headers.Location.Should()
+            .Be($"http://localhost{golfApiFactory.TournamentsApiBasePath}/{tournament!.TournamentId}");
         tournament.TournamentId.Should().NotBe(default);
         tournament.Name.Should().Be(request.Name);
         tournament.Format.Should().Be(request.Format);
@@ -40,7 +39,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         var request = Fakers.GenerateCreateTournamentRequest(name: "");
 
         // Act
-        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -59,7 +58,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         var request = Fakers.GenerateCreateTournamentRequest(format: "");
 
         // Act
-        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
@@ -77,13 +76,14 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = golfApiFactory.CreateClient();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
+        var createTournamentResponse =
+            await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
         var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
         var request = Fakers.GenerateCreateTournamentRequest(createdTournament!.Name, createdTournament.Format);
 
         // Act
-        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -104,7 +104,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         var request = Fakers.GenerateCreateTournamentRequest(format: "Yo Momma");
 
         // Act
-        var response = await client.PostAsJsonAsync(_tournamentsApiPath, request);
+        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
 
         // Assert
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();

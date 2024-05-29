@@ -2,62 +2,133 @@
 
 using FluentAssertions;
 
+using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
-public class GetAllTournamentsEndpointTests(GolfApiFactory golfApiFactory) :
-    IClassFixture<GolfApiFactory>,
-    IAsyncLifetime
+public class GetAllTournamentsEndpointTests
 {
-    private const string TournamentsApiBasePath = "/api/tournaments";
-
-    private readonly List<int> _createdTournamentIds = [];
-
-    [Fact]
-    public async Task GetAllTournaments_ReturnTournaments_WhenTournamentsExist()
+    public class GetAllGolfersWithTournaments(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
     {
-        // Arrange
-        using var client = golfApiFactory.CreateClient();
-
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await client.PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
-        var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-        _createdTournamentIds.Add(createdTournament!.TournamentId);
-
-        // Act
-        var response = await client.GetAsync(TournamentsApiBasePath);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
-        tournaments!.Tournaments.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public async Task GetAllTournaments_ReturnsNoTournaments_WhenNoTournamentsExist()
-    {
-        // Arrange
-        using var client = golfApiFactory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync(TournamentsApiBasePath);
-        var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        tournaments!.Tournaments.Should().BeEmpty();
-    }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
-    {
-        using HttpClient httpClient = golfApiFactory.CreateClient();
-        foreach (int tournamentId in _createdTournamentIds)
+        [Fact]
+        public async Task GetAllTournaments_ReturnTournaments_WhenTournamentsExist()
         {
-            await httpClient.DeleteAsync($"{TournamentsApiBasePath}/{tournamentId}");
+            // Arrange
+            using var client = golfApiFactory.CreateClient();
+
+            var createGolferRequest = Fakers.GenerateCreateGolferRequest();
+            var createdGolferResponse = await client
+                .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
+            var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
+
+            var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
+            var createdTournamentResponse = await client
+                .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
+            var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
+
+            var createTournamentParticipationRequest = new CreateTournamentParticipationsRequest
+            {
+                GolferId = createdGolfer!.GolferId,
+                TournamentId = createdTournament!.TournamentId,
+                Year = Fakers.GenerateYear()
+            };
+            var createTournamentParticipationResponse = await client
+                .PostAsJsonAsync(
+                    golfApiFactory.TournamentParticipationsApiBasePath,
+                    createTournamentParticipationRequest);
+            var createdTournamentParticipation = await createTournamentParticipationResponse.Content
+                .ReadFromJsonAsync<TournamentParticipationResponse>();
+
+            var expected = new TournamentsResponse
+            {
+                Tournaments = new[]
+                {
+                    new TournamentResponse
+                    {
+                        TournamentId = createdTournament.TournamentId,
+                        Name = createdTournament.Name,
+                        Format = createdTournament.Format,
+                        Participants = new[]
+                        {
+                            new ParticipationDetailResponse
+                            {
+                                GolferId = createdGolfer.GolferId,
+                                FirstName = createdGolfer.FirstName,
+                                LastName = createdGolfer.LastName,
+                                Year = createdTournamentParticipation!.Year
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var response = await client.GetAsync(golfApiFactory.TournamentsApiBasePath);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+            tournaments.Should().BeEquivalentTo(expected);
+        }
+    }
+
+    public class GetAllTournamentsWithNoParticipants(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
+    {
+        [Fact]
+        public async Task GetAllTournaments_ReturnTournamentsWithNoParticipants_WhenTournamentsWithNoParticipantsExist()
+        {
+            // Arrange
+            using var client = golfApiFactory.CreateClient();
+
+            var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
+            var createTournamentResponse =
+                await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
+            var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
+
+            var expectedTournaments = new TournamentsResponse
+            {
+                Tournaments = new[]
+                {
+                    new TournamentResponse
+                    {
+                        TournamentId = createdTournament!.TournamentId,
+                        Name = createdTournament.Name,
+                        Format = createdTournament.Format,
+                        Participants = []
+                    }
+                }
+            };
+
+            // Act
+            var response = await client.GetAsync(golfApiFactory.TournamentsApiBasePath);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+            tournaments.Should().BeEquivalentTo(expectedTournaments);
+        }
+    }
+
+    public class GetTournamentsNoTournaments(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
+    {
+        [Fact]
+        public async Task GetAllTournaments_ReturnsNoTournaments_WhenNoTournamentsExist()
+        {
+            // Arrange
+            using var client = golfApiFactory.CreateClient();
+
+            var expectedTournaments = new TournamentsResponse { Tournaments = [] };
+
+            // Act
+            var response = await client.GetAsync(golfApiFactory.TournamentsApiBasePath);
+            var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            tournaments.Should().BeEquivalentTo(expectedTournaments);
         }
     }
 }

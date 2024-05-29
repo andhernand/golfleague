@@ -50,9 +50,14 @@ BEGIN
 			THROW 50019, 'The TournamentId parameter must have a positive value.', 1;
 		END;
 
-	SELECT [TournamentId], [Name], [Format]
-	FROM [dbo].[Tournament]
-	WHERE [TournamentId] = @TournamentId;
+	SELECT T.[TournamentId], T.[Name], T.[Format], G.[GolferId], G.[FirstName], G.[LastName], TP.[Year]
+	FROM [dbo].[Tournament] T
+			 LEFT JOIN [dbo].[TournamentParticipation] TP ON T.[TournamentId] = TP.[TournamentId]
+			 LEFT JOIN [dbo].[Golfer] G ON TP.[GolferId] = G.[GolferId]
+	WHERE T.[TournamentId] = @TournamentId
+	ORDER BY T.[TournamentId],
+			 TP.[Year],
+			 G.[GolferId];
 END;
 GO
 
@@ -88,8 +93,13 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [TournamentId], [Name], [Format]
-	FROM [dbo].[Tournament];
+	SELECT T.[TournamentId], T.[Name], T.[Format], G.[GolferId], G.[FirstName], G.[LastName], TP.[Year]
+	FROM [dbo].[Tournament] T
+			 LEFT JOIN [dbo].[TournamentParticipation] TP ON T.[TournamentId] = TP.[TournamentId]
+			 LEFT JOIN [dbo].[Golfer] G ON TP.[GolferId] = G.[GolferId]
+	ORDER BY T.[TournamentId],
+			 TP.[Year],
+			 G.[GolferId];
 END;
 GO
 
@@ -164,7 +174,8 @@ BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
-				DELETE FROM [dbo].[Tournament]
+				DELETE
+				FROM [dbo].[Tournament]
 				WHERE [TournamentId] = @TournamentId;
 
 				SET @RowCount = @@ROWCOUNT;

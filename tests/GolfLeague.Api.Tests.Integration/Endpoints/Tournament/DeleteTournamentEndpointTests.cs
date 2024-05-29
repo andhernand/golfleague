@@ -10,8 +10,6 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
 public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
-    private readonly string _tournamentsApiPath = "/api/tournaments";
-
     [Fact]
     public async Task DeleteTournament_ReturnsNoContent_WhenTournamentIsDeleted()
     {
@@ -19,11 +17,13 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = golfApiFactory.CreateClient();
 
         var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createdTournamentResponse = await client.PostAsJsonAsync(_tournamentsApiPath, createTournamentRequest);
+        var createdTournamentResponse = await client
+            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
         var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
 
         // Act
-        var response = await client.DeleteAsync($"{_tournamentsApiPath}/{createdTournament!.TournamentId}");
+        var response = await client
+            .DeleteAsync($"{golfApiFactory.TournamentsApiBasePath}/{createdTournament!.TournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -37,7 +37,7 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         int tournamentId = Fakers.GeneratePositiveInteger(999_999, 9_999_999);
 
         // Act
-        var response = await client.DeleteAsync($"{_tournamentsApiPath}/{tournamentId}");
+        var response = await client.DeleteAsync($"{golfApiFactory.TournamentsApiBasePath}/{tournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);

@@ -33,7 +33,8 @@ public static class ContractMapping
             LastName = request.LastName,
             Email = request.Email,
             JoinDate = request.JoinDate,
-            Handicap = request.Handicap
+            Handicap = request.Handicap,
+            Tournaments = []
         };
     }
 
@@ -47,6 +48,7 @@ public static class ContractMapping
             Email = request.Email,
             JoinDate = request.JoinDate,
             Handicap = request.Handicap,
+            Tournaments = []
         };
     }
 
@@ -54,7 +56,10 @@ public static class ContractMapping
     {
         return new TournamentResponse
         {
-            TournamentId = tournament.TournamentId, Name = tournament.Name, Format = tournament.Format
+            TournamentId = tournament.TournamentId,
+            Name = tournament.Name,
+            Format = tournament.Format,
+            Participants = tournament.Participants.Select(MapToResponse)
         };
     }
 
@@ -65,12 +70,15 @@ public static class ContractMapping
 
     public static Tournament MapToTournament(this CreateTournamentRequest request)
     {
-        return new Tournament { Name = request.Name, Format = request.Format };
+        return new Tournament { Name = request.Name, Format = request.Format, Participants = [] };
     }
 
     public static Tournament MapToTournament(this UpdateTournamentRequest request, int tournamentId)
     {
-        return new Tournament { TournamentId = tournamentId, Name = request.Name, Format = request.Format };
+        return new Tournament
+        {
+            TournamentId = tournamentId, Name = request.Name, Format = request.Format, Participants = []
+        };
     }
 
     public static TournamentParticipationResponse MapToResponse(this TournamentParticipation tournamentParticipation)
@@ -92,6 +100,7 @@ public static class ContractMapping
         };
     }
 
+    // ReSharper disable once MemberCanBePrivate.Global
     public static TournamentDetailResponse MapToResponse(this TournamentDetail tournamentDetail)
     {
         return new TournamentDetailResponse
@@ -100,6 +109,18 @@ public static class ContractMapping
             Name = tournamentDetail.Name,
             Format = tournamentDetail.Format,
             Year = tournamentDetail.Year
+        };
+    }
+
+    // ReSharper disable once MemberCanBePrivate.Global
+    public static ParticipationDetailResponse MapToResponse(this ParticipationDetail participationDetail)
+    {
+        return new ParticipationDetailResponse
+        {
+            GolferId = participationDetail.GolferId,
+            FirstName = participationDetail.FirstName,
+            LastName = participationDetail.LastName,
+            Year = participationDetail.Year
         };
     }
 }

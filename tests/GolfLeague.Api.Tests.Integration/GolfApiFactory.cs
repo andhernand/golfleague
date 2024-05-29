@@ -23,6 +23,10 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
     private readonly string _solutionFolder;
     private readonly MsSqlContainer _sqlContainer;
 
+    public string GolfersApiBasePath = "/api/golfers";
+    public string TournamentsApiBasePath = "/api/tournaments";
+    public string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
+
     public GolfApiFactory()
     {
         Env.TraversePath().Load();

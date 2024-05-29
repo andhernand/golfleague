@@ -19,8 +19,8 @@ public static class GetAllTournamentsEndpoint
             {
                 using var timedOperation = Operation.Begin("Get ALl Tournaments");
 
-                IEnumerable<Tournament> tournament = await service.GetAllTournamentsAsync(token);
-                var response = tournament.MapToResponse();
+                var tournaments = await service.GetAllTournamentsAsync(token);
+                var response = tournaments.MapToResponse();
 
                 timedOperation.Complete();
                 return TypedResults.Ok(response);
