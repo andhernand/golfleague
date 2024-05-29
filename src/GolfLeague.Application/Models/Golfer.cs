@@ -8,4 +8,5 @@ public class Golfer
     public required string Email { get; init; }
     public required DateOnly JoinDate { get; init; }
     public int? Handicap { get; init; }
+    public List<TournamentDetail> Tournaments { get; init; } = [];
 }

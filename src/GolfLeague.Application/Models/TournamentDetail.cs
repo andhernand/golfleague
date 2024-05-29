@@ -1,0 +1,9 @@
+﻿namespace GolfLeague.Application.Models;
+
+public class TournamentDetail
+{
+    public required int TournamentId { get; init; }
+    public required string Name { get; init; }
+    public required string Format { get; init; }
+    public required int Year { get; init; }
+}

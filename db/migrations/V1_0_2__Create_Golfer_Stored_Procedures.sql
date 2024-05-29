@@ -76,9 +76,23 @@ BEGIN
 			THROW 50006, 'The GolferId parameter must have a positive value.', 1;
 		END;
 
-	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
-	FROM [dbo].[Golfer]
-	WHERE [GolferId] = @GolferId;
+	SELECT G.[GolferId],
+		   G.[FirstName],
+		   G.[LastName],
+		   G.[Email],
+		   G.[JoinDate],
+		   G.[Handicap],
+		   T.[TournamentId],
+		   T.[Name],
+		   T.[Format],
+		   TP.[Year]
+	FROM [dbo].[Golfer] G
+			 LEFT JOIN [dbo].[TournamentParticipation] TP ON G.[GolferId] = TP.[GolferId]
+			 LEFT JOIN [dbo].[Tournament] T ON TP.[TournamentId] = T.[TournamentId]
+	WHERE G.[GolferId] = @GolferId
+	ORDER BY G.[GolferId],
+			 TP.[Year],
+			 T.[TournamentId];
 END;
 GO
 
@@ -106,8 +120,22 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [GolferId], [FirstName], [LastName], [Email], [JoinDate], [Handicap]
-	FROM [dbo].[Golfer];
+	SELECT G.[GolferId],
+		   G.[FirstName],
+		   G.[LastName],
+		   G.[Email],
+		   G.[JoinDate],
+		   G.[Handicap],
+		   T.[TournamentId],
+		   T.[Name],
+		   T.[Format],
+		   TP.[Year]
+	FROM [dbo].[Golfer] G
+			 LEFT JOIN [dbo].[TournamentParticipation] TP ON G.[GolferId] = TP.[GolferId]
+			 LEFT JOIN [dbo].[Tournament] T ON TP.[TournamentId] = T.[TournamentId]
+	ORDER BY G.[GolferId],
+			 TP.[Year],
+			 T.[TournamentId];
 END;
 GO
 
@@ -211,7 +239,8 @@ BEGIN
 			BEGIN TRY
 				BEGIN TRANSACTION;
 
-				DELETE FROM [dbo].[Golfer]
+				DELETE
+				FROM [dbo].[Golfer]
 				WHERE [GolferId] = @GolferId;
 
 				SET @RowCount = @@ROWCOUNT;

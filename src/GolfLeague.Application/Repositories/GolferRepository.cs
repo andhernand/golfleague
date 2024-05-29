@@ -33,7 +33,7 @@ public class GolferRepository(
             commandType: CommandType.StoredProcedure,
             cancellationToken: token);
 
-        await connection.ExecuteScalarAsync(commandDefinition);
+        _ = await connection.ExecuteScalarAsync(commandDefinition);
 
         var golferId = parameters.Get<int>("@GolferId");
         return golferId;
@@ -44,13 +44,33 @@ public class GolferRepository(
         logger.LogInformation("Retrieving Golfer by Id: {GolferId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        var golfer = await connection.QueryFirstOrDefaultAsync<Golfer>(
+        var golferDictionary = new Dictionary<int, Golfer>();
+
+        _ = await connection.QueryAsync<Golfer, TournamentDetail?, Golfer>(
             new CommandDefinition(
                 "dbo.usp_Golfer_GetGolferById",
                 new { GolferId = id },
                 commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
-        return golfer;
+                cancellationToken: token),
+            (golfer, tournamentDetail) =>
+            {
+                if (!golferDictionary.TryGetValue(golfer.GolferId, out var golferEntry))
+                {
+                    golferEntry = golfer;
+                    golferDictionary.Add(golfer.GolferId, golferEntry);
+                }
+
+                if (tournamentDetail is not null)
+                {
+                    golferEntry.Tournaments.Add(tournamentDetail);
+                }
+
+                return golferEntry;
+            },
+            splitOn: "TournamentId"
+        );
+
+        return golferDictionary.Values.SingleOrDefault();
     }
 
     public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
@@ -58,13 +78,32 @@ public class GolferRepository(
         logger.LogInformation("Retrieving All Golfers");
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        var golfers = await connection.QueryAsync<Golfer>(
+        var golferDictionary = new Dictionary<int, Golfer>();
+
+        _ = await connection.QueryAsync<Golfer, TournamentDetail?, Golfer>(
             new CommandDefinition(
                 "dbo.usp_Golfer_GetAll",
                 commandType: CommandType.StoredProcedure,
-                cancellationToken: token));
+                cancellationToken: token),
+            (golfer, tournamentDetail) =>
+            {
+                if (!golferDictionary.TryGetValue(golfer.GolferId, out var golferEntry))
+                {
+                    golferEntry = golfer;
+                    golferDictionary.Add(golfer.GolferId, golferEntry);
+                }
 
-        return golfers;
+                if (tournamentDetail is not null)
+                {
+                    golferEntry.Tournaments.Add(tournamentDetail);
+                }
+
+                return golferEntry;
+            },
+            splitOn: "TournamentId"
+        );
+
+        return golferDictionary.Values;
     }
 
     public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token)
@@ -75,7 +114,15 @@ public class GolferRepository(
         var result = await connection.ExecuteAsync(
             new CommandDefinition(
                 "dbo.usp_Golfer_Update",
-                golfer,
+                new
+                {
+                    golfer.GolferId,
+                    golfer.FirstName,
+                    golfer.LastName,
+                    golfer.Email,
+                    golfer.JoinDate,
+                    golfer.Handicap
+                },
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
         return result > 0;
@@ -97,7 +144,7 @@ public class GolferRepository(
             commandType: CommandType.StoredProcedure,
             cancellationToken: token);
 
-        await connection.ExecuteScalarAsync(commandDefinition);
+        _ = await connection.ExecuteScalarAsync(commandDefinition);
 
         var result = parameters.Get<int>("@RowCount") > 0;
         return result;

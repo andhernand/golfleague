@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SchemaFilter<CreateTournamentRequestSchemaFilter>();
     options.SchemaFilter<UpdateTournamentRequestSchemaFilter>();
     options.SchemaFilter<TournamentResponseSchemaFilter>();
+    options.SchemaFilter<TournamentDetailResponseSchemaFilter>();
 });
 
 builder.Services

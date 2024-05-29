@@ -15,7 +15,8 @@ public static class ContractMapping
             LastName = golfer.LastName,
             Email = golfer.Email,
             JoinDate = golfer.JoinDate,
-            Handicap = golfer.Handicap
+            Handicap = golfer.Handicap,
+            Tournaments = golfer.Tournaments.Select(MapToResponse)
         };
     }
 
@@ -45,7 +46,7 @@ public static class ContractMapping
             LastName = request.LastName,
             Email = request.Email,
             JoinDate = request.JoinDate,
-            Handicap = request.Handicap
+            Handicap = request.Handicap,
         };
     }
 
@@ -88,6 +89,17 @@ public static class ContractMapping
         return new TournamentParticipation
         {
             GolferId = request.GolferId, TournamentId = request.TournamentId, Year = request.Year
+        };
+    }
+
+    public static TournamentDetailResponse MapToResponse(this TournamentDetail tournamentDetail)
+    {
+        return new TournamentDetailResponse
+        {
+            TournamentId = tournamentDetail.TournamentId,
+            Name = tournamentDetail.Name,
+            Format = tournamentDetail.Format,
+            Year = tournamentDetail.Year
         };
     }
 }
