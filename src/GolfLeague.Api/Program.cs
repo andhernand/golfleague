@@ -1,10 +1,16 @@
+using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints;
 using GolfLeague.Api.Health;
 using GolfLeague.Api.Mapping;
-using GolfLeague.Api.OpenApi;
+using GolfLeague.Api.Swagger;
 using GolfLeague.Application;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+
 using Serilog;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 using var config = builder.Configuration;
@@ -15,14 +21,26 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(5);
+    });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(AuthConstants.AdminPolicyName, p => p.RequireClaim(AuthConstants.AdminClaimName, "true"))
+    .AddPolicy(AuthConstants.TrustedPolicyName, p => p.RequireAssertion(c =>
+        c.User.HasClaim(m => m is { Type: AuthConstants.AdminClaimName, Value: "true" })
+        || c.User.HasClaim(m => m is { Type: AuthConstants.TrustedMemberClaimName, Value: "true" })));
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SchemaFilter<CreateTournamentRequestSchemaFilter>();
-    options.SchemaFilter<UpdateTournamentRequestSchemaFilter>();
-    options.SchemaFilter<TournamentResponseSchemaFilter>();
-    options.SchemaFilter<TournamentDetailResponseSchemaFilter>();
-});
+builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services
     .AddHealthChecks()
@@ -40,8 +58,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseHealthChecks(new PathString("/_health"));
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapApiEndpoints();

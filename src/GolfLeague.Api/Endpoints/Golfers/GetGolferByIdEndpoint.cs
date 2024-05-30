@@ -34,7 +34,8 @@ public static class GetGolferByIdEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Produces<GolferResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
 
         return app;
     }

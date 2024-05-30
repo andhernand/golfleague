@@ -1,4 +1,5 @@
-﻿using GolfLeague.Api.Mapping;
+﻿using GolfLeague.Api.Auth;
+using GolfLeague.Api.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
@@ -39,7 +40,8 @@ public static class UpdateGolferEndpoint
             .Accepts<UpdateGolferRequest>(false, "application/json")
             .Produces<GolferResponse>(contentType: "application/json")
             .Produces(StatusCodes.Status404NotFound)
-            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest);
+            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(AuthConstants.TrustedPolicyName);
 
         return app;
     }

@@ -1,4 +1,5 @@
-﻿using GolfLeague.Application.Models;
+﻿using GolfLeague.Api.Auth;
+using GolfLeague.Application.Models;
 using GolfLeague.Application.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,8 @@ public static class DeleteTournamentParticipationEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(AuthConstants.AdminPolicyName);
 
         return app;
     }

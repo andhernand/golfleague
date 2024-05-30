@@ -34,7 +34,8 @@ public static class GetTournamentByIdEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Produces<TournamentResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
 
         return app;
     }

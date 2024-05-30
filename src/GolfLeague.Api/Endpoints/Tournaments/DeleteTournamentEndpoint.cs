@@ -1,4 +1,5 @@
-﻿using GolfLeague.Application.Services;
+﻿using GolfLeague.Api.Auth;
+using GolfLeague.Application.Services;
 
 using SerilogTimings;
 
@@ -25,7 +26,8 @@ public static class DeleteTournamentEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(AuthConstants.AdminPolicyName);
 
         return app;
     }

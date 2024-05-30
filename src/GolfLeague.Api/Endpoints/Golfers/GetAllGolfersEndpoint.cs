@@ -26,7 +26,8 @@ public static class GetAllGolfersEndpoint
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
-            .Produces<GolfersResponse>(contentType: "application/json");
+            .Produces<GolfersResponse>(contentType: "application/json")
+            .RequireAuthorization();
 
         return app;
     }
