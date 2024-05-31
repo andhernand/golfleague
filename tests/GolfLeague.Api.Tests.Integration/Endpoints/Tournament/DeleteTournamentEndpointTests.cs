@@ -1,45 +1,65 @@
 ﻿using System.Net;
 
-using Bogus;
-
 using FluentAssertions;
-
-using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
 public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task DeleteTournament_ReturnsNoContent_WhenTournamentIsDeleted()
+    public async Task DeleteTournament_WhenTournamentIsDeleted_ShouldReturnNoContent()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createdTournamentResponse = await client
-            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-        var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
 
         // Act
-        var response = await client
-            .DeleteAsync($"{golfApiFactory.TournamentsApiBasePath}/{createdTournament!.TournamentId}");
+        var response = await client.DeleteAsync(
+            $"{Mother.TournamentsApiBasePath}/{createdTournament!.TournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task DeleteTournament_ReturnsNotFound_WhenTournamentDoesNotExist()
+    public async Task DeleteTournament_WhenTournamentDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        int tournamentId = Fakers.GeneratePositiveInteger(999_999, 9_999_999);
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        int tournamentId = Mother.GeneratePositiveInteger(999_999, 9_999_999);
 
         // Act
-        var response = await client.DeleteAsync($"{golfApiFactory.TournamentsApiBasePath}/{tournamentId}");
+        var response = await client.DeleteAsync($"{Mother.TournamentsApiBasePath}/{tournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteTournament_WhenUnauthorized_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        using var client = golfApiFactory.CreateClient();
+        int tournamentId = Mother.GeneratePositiveInteger();
+
+        // Act
+        var response = await client.DeleteAsync($"{Mother.TournamentsApiBasePath}/{tournamentId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task DeleteTournament_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+        int tournamentId = Mother.GeneratePositiveInteger();
+
+        // Act
+        var response = await client.DeleteAsync($"{Mother.TournamentsApiBasePath}/{tournamentId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

@@ -5,17 +5,17 @@ using Dapper;
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
 
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace GolfLeague.Application.Repositories;
 
-public class GolferRepository(
-    IDbConnectionFactory connectionFactory,
-    ILogger<GolferRepository> logger) : IGolferRepository
+public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferRepository
 {
+    private readonly ILogger _logger = Log.ForContext<GolferRepository>();
+
     public async Task<int> CreateAsync(Golfer golfer, CancellationToken token = default)
     {
-        logger.LogInformation("Creating {@Golfer}", golfer);
+        _logger.Information("Creating {@Golfer}", golfer);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -41,7 +41,7 @@ public class GolferRepository(
 
     public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token)
     {
-        logger.LogInformation("Retrieving Golfer by Id: {GolferId}", id);
+        _logger.Information("Retrieving Golfer by {GolferId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golferDictionary = new Dictionary<int, Golfer>();
@@ -75,7 +75,7 @@ public class GolferRepository(
 
     public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
     {
-        logger.LogInformation("Retrieving All Golfers");
+        _logger.Information("Retrieving All Golfers");
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golferDictionary = new Dictionary<int, Golfer>();
@@ -108,7 +108,7 @@ public class GolferRepository(
 
     public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token)
     {
-        logger.LogInformation("Updating {@Golfer}", golfer);
+        _logger.Information("Updating {@Golfer}", golfer);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var result = await connection.ExecuteAsync(
@@ -130,7 +130,7 @@ public class GolferRepository(
 
     public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
     {
-        logger.LogInformation("Deleting Golfer by Id: {GolferId}", id);
+        _logger.Information("Deleting {GolferId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -152,7 +152,7 @@ public class GolferRepository(
 
     public async Task<bool> ExistsByIdAsync(int id, CancellationToken token)
     {
-        logger.LogInformation("Checking for existence of Golfer by Id: {GolferId}", id);
+        _logger.Information("Checking for the existence of a Golfer with {GolferId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         return await connection.ExecuteScalarAsync<bool>(
@@ -165,7 +165,7 @@ public class GolferRepository(
 
     public async Task<Golfer?> ExistsByEmailAsync(string email, CancellationToken token = default)
     {
-        logger.LogInformation("Checking for existence of Golfer by Email: {Email}", email);
+        _logger.Information("Checking for the existence of a Golfer with {Email}", email);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var golfer = await connection.QuerySingleOrDefaultAsync<Golfer>(

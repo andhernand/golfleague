@@ -2,6 +2,8 @@
 using GolfLeague.Api.Endpoints.TournamentParticipations;
 using GolfLeague.Api.Endpoints.Tournaments;
 
+// ReSharper disable UnusedMethodReturnValue.Global
+
 namespace GolfLeague.Api.Endpoints;
 
 public static class EndpointsExtensions

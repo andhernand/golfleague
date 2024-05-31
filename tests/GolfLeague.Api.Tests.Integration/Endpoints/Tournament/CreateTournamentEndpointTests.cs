@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 
 using FluentAssertions;
 
@@ -10,108 +11,166 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task CreateTournament_CreatesTournament_WhenDataIsCorrect()
+    public async Task CreateTournament_WhenDataIsCorrect_ShouldCreateTournament()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateTournamentRequest();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var request = Mother.GenerateCreateTournamentRequest();
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var tournament = await response.Content.ReadFromJsonAsync<TournamentResponse>();
-
         response.Headers.Location.Should()
-            .Be($"http://localhost{golfApiFactory.TournamentsApiBasePath}/{tournament!.TournamentId}");
+            .Be($"http://localhost{Mother.TournamentsApiBasePath}/{tournament!.TournamentId}");
         tournament.TournamentId.Should().NotBe(default);
         tournament.Name.Should().Be(request.Name);
         tournament.Format.Should().Be(request.Format);
     }
 
     [Fact]
-    public async Task CreateTournament_Fails_WhenNameIsInvalid()
+    public async Task CreateTournament_WhenNameIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateTournamentRequest(name: "");
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var request = Mother.GenerateCreateTournamentRequest(name: "");
+
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse { PropertyName = "Name", ErrorMessage = "'Name' must not be empty." }
+            }
+        };
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Name");
-        error.ErrorMessage.Should().Be("'Name' must not be empty.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournament_Fails_WhenFormatIsInvalid()
+    public async Task CreateTournament_WhenFormatIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateTournamentRequest(format: "");
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var request = Mother.GenerateCreateTournamentRequest(format: "");
+
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse { PropertyName = "Format", ErrorMessage = "'Format' must not be empty." }
+            }
+        };
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Format");
-        error.ErrorMessage.Should().Be("'Format' must not be empty.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournament_Fails_WhenTournamentWithNameAndFormatAlreadyExists()
+    public async Task CreateTournament_WhenTournamentWithNameAndFormatAlreadyExists_ShouldReturnBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
 
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse =
-            await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-        var createdTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse
+                {
+                    PropertyName = "Tournament",
+                    ErrorMessage =
+                        "A Tournament with the Name and Format combination already exists in the system."
+                }
+            }
+        };
 
-        var request = Fakers.GenerateCreateTournamentRequest(createdTournament!.Name, createdTournament.Format);
+        var request = Mother.GenerateCreateTournamentRequest(createdTournament!.Name, createdTournament.Format);
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
-        error.PropertyName.Should().Be("Tournament");
-        error.ErrorMessage.Should()
-            .Be("A Tournament with the Name and Format combination already exists in the system.");
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournament_Fails_WhenTournamentFormatIsNotAnAcceptableValue()
+    public async Task CreateTournament_WhenTournamentFormatIsNotAnAcceptableValue_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse
+                {
+                    PropertyName = "Format",
+                    ErrorMessage =
+                        $"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}"
+                }
+            }
+        };
+
+        var request = Mother.GenerateCreateTournamentRequest(format: "Yo Momma");
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournament_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateTournamentRequest(format: "Yo Momma");
+        var request = Mother.GenerateCreateTournamentRequest();
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Format");
-        error.ErrorMessage.Should().Be($"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}");
+    [Fact]
+    public async Task CreateGolfer_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+        var request = Mother.GenerateCreateTournamentRequest();
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

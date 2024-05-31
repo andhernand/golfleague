@@ -6,18 +6,19 @@ using Microsoft.OpenApi.Models;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace GolfLeague.Api.OpenApi;
+namespace GolfLeague.Api.Swagger;
 
-public class UpdateTournamentRequestSchemaFilter : ISchemaFilter
+// ReSharper disable once ClassNeverInstantiated.Global
+public class CreateTournamentRequestSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type != typeof(UpdateTournamentRequest))
+        if (context.Type != typeof(CreateTournamentRequest))
         {
             return;
         }
 
-        var propertyName = nameof(UpdateTournamentRequest.Format).ToLowerInvariant();
+        var propertyName = nameof(CreateTournamentRequest.Format).ToLowerInvariant();
         if (schema.Properties.TryGetValue(propertyName, out OpenApiSchema? schemaProperty))
         {
             schemaProperty.Enum = TournamentFormat.Values

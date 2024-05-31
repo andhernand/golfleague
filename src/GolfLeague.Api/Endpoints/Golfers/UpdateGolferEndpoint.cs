@@ -4,13 +4,11 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-using SerilogTimings;
-
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class UpdateGolferEndpoint
 {
-    public const string Name = "UpdateGolfer";
+    private const string Name = "UpdateGolfer";
 
     public static IEndpointRouteBuilder MapUpdateGolfer(this IEndpointRouteBuilder app)
     {
@@ -20,19 +18,14 @@ public static class UpdateGolferEndpoint
                 IGolferService service,
                 CancellationToken token = default) =>
             {
-                using var timedOperation = Operation.Begin("Update Golfer");
-
                 var golfer = request.MapToGolfer(id);
                 var updatedGolfer = await service.UpdateAsync(golfer, token);
                 if (updatedGolfer is null)
                 {
-                    timedOperation.Complete();
                     return Results.NotFound();
                 }
 
                 var response = updatedGolfer.MapToResponse();
-
-                timedOperation.Complete();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

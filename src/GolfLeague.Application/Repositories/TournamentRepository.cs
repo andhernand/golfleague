@@ -5,17 +5,17 @@ using Dapper;
 using GolfLeague.Application.Database;
 using GolfLeague.Application.Models;
 
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace GolfLeague.Application.Repositories;
 
-public class TournamentRepository(
-    IDbConnectionFactory connectionFactory,
-    ILogger<TournamentRepository> logger) : ITournamentRepository
+public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITournamentRepository
 {
+    private readonly ILogger _logger = Log.ForContext<TournamentRepository>();
+
     public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
     {
-        logger.LogInformation("Creating Tournament: {@Tournament}", tournament);
+        _logger.Information("Creating {@Tournament}", tournament);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -36,7 +36,7 @@ public class TournamentRepository(
 
     public async Task<Tournament?> GetTournamentByIdAsync(int id, CancellationToken token = default)
     {
-        logger.LogInformation("Retrieving Tournament by Id: {TournamentId}", id);
+        _logger.Information("Retrieving {TournamentId}", id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var tournamentDictionary = new Dictionary<int, Tournament>();
@@ -70,7 +70,7 @@ public class TournamentRepository(
 
     public async Task<Tournament?> GetByNameAndFormat(string name, string format, CancellationToken token = default)
     {
-        logger.LogInformation("Retrieving Tournament by {Name} and {Format}", name, format);
+        _logger.Information("Retrieving Tournament by {Name} and {Format}", name, format);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -86,7 +86,7 @@ public class TournamentRepository(
 
     public async Task<IEnumerable<Tournament>> GetAllTournamentsAsync(CancellationToken token = default)
     {
-        logger.LogInformation("Retrieving all Tournaments");
+        _logger.Information("Retrieving all Tournaments");
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
         var tournamentDictionary = new Dictionary<int, Tournament>();
@@ -119,7 +119,7 @@ public class TournamentRepository(
 
     public async Task<bool> UpdateAsync(Tournament tournament, CancellationToken token = default)
     {
-        logger.LogInformation("Updating {@Tournament}", tournament);
+        _logger.Information("Updating {@Tournament}", tournament);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -135,7 +135,7 @@ public class TournamentRepository(
 
     public async Task<bool> DeleteByIdAsync(int tournamentId, CancellationToken token = default)
     {
-        logger.LogInformation("Deleting Tournament by Id: {TournamentId}", tournamentId);
+        _logger.Information("Deleting {TournamentId}", tournamentId);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
@@ -155,7 +155,7 @@ public class TournamentRepository(
 
     public async Task<bool> ExistsByIdAsync(int tournamentId, CancellationToken token = default)
     {
-        logger.LogInformation("Checking for existence of Tournament by Id: {TournamentId}", tournamentId);
+        _logger.Information("Checking for the existence of a Tournament with {TournamentId}", tournamentId);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 

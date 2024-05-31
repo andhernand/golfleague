@@ -1,6 +1,5 @@
 ﻿using System.Net;
-
-using Bogus;
+using System.Net.Http.Headers;
 
 using FluentAssertions;
 
@@ -12,23 +11,13 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.TournamentParticipation;
 public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task CreateTournamentParticipation_CreatesTournamentParticipation_WhenDataIsCorrect()
+    public async Task CreateTournamentParticipation_WhenDataIsCorrect_ShouldCreateTournamentParticipation()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
-
-        var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createGolferResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
-        var expectedGolfer = await createGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-        var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-
-        var expectedYear = Fakers.GenerateYear();
-
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var expectedGolfer = await Mother.CreateGolferAsync(client);
+        var expectedTournament = await Mother.CreateTournamentAsync(client);
+        var expectedYear = Mother.GenerateYear();
         var request = new CreateTournamentParticipationsRequest
         {
             GolferId = expectedGolfer!.GolferId,
@@ -36,8 +25,11 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
             Year = expectedYear
         };
 
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
+
         // Act
-        var response = await httpClient.PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -45,7 +37,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         var actual = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
 
         response.Headers.Location.Should().Be(
-            $"http://localhost{golfApiFactory.TournamentParticipationsApiBasePath}"
+            $"http://localhost{Mother.TournamentParticipationsApiBasePath}"
             + $"?golferId={actual!.GolferId}"
             + $"&tournamentId={actual.TournamentId}"
             + $"&year={actual.Year}");
@@ -56,10 +48,21 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_Fails_WhenGolferIdIsInvalid()
+    public async Task CreateTournamentParticipation_WhenGolferIdIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse
+                {
+                    PropertyName = "GolferId", ErrorMessage = "'Golfer Id' must not be empty."
+                }
+            }
+        };
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -67,22 +70,31 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-        error.PropertyName.Should().Be("GolferId");
-        error.ErrorMessage.Should().Be("'Golfer Id' must not be empty.");
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_Fails_WhenTournamentIdInvalid()
+    public async Task CreateTournamentParticipation_WhenTournamentIdInvalid_ShouldReturnBadRequest()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse
+                {
+                    PropertyName = "TournamentId", ErrorMessage = "'Tournament Id' must not be empty."
+                }
+            }
+        };
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -90,22 +102,28 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-        error.PropertyName.Should().Be("TournamentId");
-        error.ErrorMessage.Should().Be("'Tournament Id' must not be empty.");
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_Fails_WhenYearIsInvalid()
+    public async Task CreateTournamentParticipation_WhenYearIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+
+        var expected = new ValidationFailureResponse
+        {
+            Errors = new[]
+            {
+                new ValidationResponse { PropertyName = "Year", ErrorMessage = "'Year' must not be empty." }
+            }
+        };
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -113,46 +131,41 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-        error.PropertyName.Should().Be("Year");
-        error.ErrorMessage.Should().Be("'Year' must not be empty.");
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_Fails_WhenTournamentParticipationAlreadyExists()
+    public async Task CreateTournamentParticipation_WhenTournamentParticipationAlreadyExists_ShouldReturnBadRequest()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var createdGolfer = await Mother.CreateGolferAsync(client);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
+        var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+            client,
+            createdGolfer!.GolferId,
+            createdTournament!.TournamentId);
 
-        var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createGolferResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
-        var expectedGolfer = await createGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-        var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-
-        var expectedYear = Fakers.GenerateYear();
-
-        var createParticipationRequest = new CreateTournamentParticipationsRequest
+        var expected = new ValidationFailureResponse
         {
-            GolferId = expectedGolfer!.GolferId,
-            TournamentId = expectedTournament!.TournamentId,
-            Year = expectedYear
+            Errors = new[]
+            {
+                new ValidationResponse
+                {
+                    PropertyName = "TournamentParticipation",
+                    ErrorMessage = "TournamentParticipation already exists in the system."
+                }
+            }
         };
 
-        var createdTournamentParticipationResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, createParticipationRequest);
-        var createdTournamentParticipation = await createdTournamentParticipationResponse.Content
-            .ReadFromJsonAsync<TournamentParticipationResponse>();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -162,14 +175,51 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-        error.PropertyName.Should().Be("TournamentParticipation");
-        error.ErrorMessage.Should().Be("TournamentParticipation already exists in the system.");
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournamentParticipation_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
+    {
+        // Arrange
+        using var client = golfApiFactory.CreateClient();
+
+        var request = new CreateTournamentParticipationsRequest
+        {
+            GolferId = Mother.GeneratePositiveInteger(),
+            TournamentId = Mother.GeneratePositiveInteger(),
+            Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task CreateTournamentParticipation_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+        var request = new CreateTournamentParticipationsRequest
+        {
+            GolferId = Mother.GeneratePositiveInteger(),
+            TournamentId = Mother.GeneratePositiveInteger(),
+            Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

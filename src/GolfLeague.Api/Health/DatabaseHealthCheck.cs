@@ -2,12 +2,15 @@
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
+using Serilog;
+
 namespace GolfLeague.Api.Health;
 
-public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory, ILogger<DatabaseHealthCheck> logger)
+public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory)
     : IHealthCheck
 {
     public const string Name = "Database";
+    private readonly Serilog.ILogger _logger = Log.ForContext<DatabaseHealthCheck>();
 
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
@@ -15,13 +18,14 @@ public class DatabaseHealthCheck(IDbConnectionFactory dbConnectionFactory, ILogg
     {
         try
         {
+            _logger.Verbose("Checking Application Health");
             _ = await dbConnectionFactory.CreateConnectionAsync(cancellationToken);
             return HealthCheckResult.Healthy();
         }
         catch (Exception e)
         {
-            logger.LogWarning(e, "Database HealthCheck has Failed");
-            return HealthCheckResult.Unhealthy("Database is unhealthy", e);
+            _logger.Error(e, "Database HealthCheck has Failed");
+            return HealthCheckResult.Unhealthy("Database is unhealthy");
         }
     }
 }

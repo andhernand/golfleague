@@ -14,39 +14,32 @@ namespace GolfLeague.Api.Tests.Integration;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifetime
 {
-    private const string GolfApiDatabaseName = "GolfLeague";
-    private const string GolfLeagueApiApplicationName = "GolfLeagueApiTests";
+    private static readonly string ApiUserName;
+    private static readonly string ApiUserPassword;
+    private static readonly string SaPassword;
+    private static readonly string SolutionFolder;
 
-    private readonly string? _golfApiUserName;
-    private readonly string? _golfApiUserPassword;
-    private readonly string? _saPassword;
-    private readonly string _solutionFolder;
-    private readonly MsSqlContainer _sqlContainer;
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
+        .WithPassword(SaPassword)
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithEnvironment("MSSQL_PID", "Developer")
+        .Build();
 
-    public string GolfersApiBasePath = "/api/golfers";
-    public string TournamentsApiBasePath = "/api/tournaments";
-    public string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
-
-    public GolfApiFactory()
+    static GolfApiFactory()
     {
         Env.TraversePath().Load();
-        _saPassword = Environment.GetEnvironmentVariable("GOLF_API_SA_PASSWORD");
-        _golfApiUserPassword = Environment.GetEnvironmentVariable("GOLF_API_USER_PASSWORD");
-        _golfApiUserName = Environment.GetEnvironmentVariable("GOLF_API_USER_NAME");
 
-        _solutionFolder = DirectoryFinder.GetDirectoryContaining("GolfLeague.sln");
-
-        _sqlContainer = new MsSqlBuilder()
-            .WithPassword(_saPassword)
-            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-            .WithEnvironment("MSSQL_PID", "Developer")
-            .Build();
+        ApiUserName = GetEnvironmentVariableOrThrow(VariableNames.GolfApiUserName);
+        ApiUserPassword = GetEnvironmentVariableOrThrow(VariableNames.GolfApiUserPassword);
+        SaPassword = GetEnvironmentVariableOrThrow(VariableNames.GolfApiSaPassword);
+        SolutionFolder = DirectoryFinder.GetDirectoryContaining(VariableNames.SolutionFileName)
+                         ?? throw new DirectoryNotFoundException("Solution folder not found");
     }
 
     public async Task InitializeAsync()
     {
         await _sqlContainer.StartAsync().ConfigureAwait(false);
-        await InitializeDatabaseAync().ConfigureAwait(false);
+        await InitializeDatabaseAsync().ConfigureAwait(false);
         await RunDatabaseMigrationScriptsAsync().ConfigureAwait(false);
     }
 
@@ -63,53 +56,45 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
         base.ConfigureWebHost(builder);
     }
 
-    private async Task InitializeDatabaseAync()
+    private async Task InitializeDatabaseAsync()
     {
-        var initScriptPath = Path.Combine(_solutionFolder, "db", "init.sql");
+        var initScriptPath = Path.Combine(SolutionFolder, "db", "init.sql");
 
-        if (!Path.Exists(initScriptPath))
+        if (!File.Exists(initScriptPath))
         {
             throw new FileNotFoundException($"{initScriptPath} file not found");
         }
 
         var initScript = await File.ReadAllTextAsync(initScriptPath).ConfigureAwait(false);
-        var script = initScript.Replace("$(varApiPassword)", _golfApiUserPassword);
+        var script = initScript.Replace("$(varApiPassword)", ApiUserPassword);
         await _sqlContainer.ExecScriptAsync(script).ConfigureAwait(false);
     }
 
     private async Task RunDatabaseMigrationScriptsAsync()
     {
-        var scriptFiles = LoadMigrationScriptsFromFileSystem();
-        await using var connection = new SqlConnection(BuildDatabaseUserConnectionString("sa", _saPassword));
+        var migrationScripts = LoadMigrationScriptsFromFileSystem();
+        await using var connection = new SqlConnection(BuildDatabaseUserConnectionString("sa", SaPassword));
         await connection.OpenAsync().ConfigureAwait(false);
 
-        foreach (var scriptFile in scriptFiles)
+        foreach (var migrationScript in migrationScripts)
         {
-            var script = await File.ReadAllTextAsync(scriptFile).ConfigureAwait(false);
-            var commands = script.Split(["GO"], StringSplitOptions.RemoveEmptyEntries);
+            var script = await File.ReadAllTextAsync(migrationScript).ConfigureAwait(false);
+            var migrations = script.Split(["GO"], StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (var command in commands)
+            foreach (var migration in migrations)
             {
-                try
-                {
-                    await connection.ExecuteAsync(
-                            new CommandDefinition(
-                                command,
-                                commandType: CommandType.Text))
-                        .ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error executing command: {command}. Exception: {ex}");
-                    throw;
-                }
+                await connection.ExecuteAsync(
+                        new CommandDefinition(
+                            migration,
+                            commandType: CommandType.Text))
+                    .ConfigureAwait(false);
             }
         }
     }
 
-    private IOrderedEnumerable<string> LoadMigrationScriptsFromFileSystem()
+    private static IOrderedEnumerable<string> LoadMigrationScriptsFromFileSystem()
     {
-        var migrationScriptsFolder = Path.Combine(_solutionFolder, "db", "migrations");
+        var migrationScriptsFolder = Path.Combine(SolutionFolder, "db", "migrations");
 
         if (!Directory.Exists(migrationScriptsFolder))
         {
@@ -124,12 +109,28 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
         return new SqlConnectionStringBuilder
         {
             DataSource = $"{_sqlContainer.Hostname},{_sqlContainer.GetMappedPublicPort(MsSqlBuilder.MsSqlPort)}",
-            InitialCatalog = GolfApiDatabaseName,
-            UserID = userName ?? _golfApiUserName,
-            Password = password ?? _golfApiUserPassword,
-            ApplicationName = GolfLeagueApiApplicationName,
+            InitialCatalog = VariableNames.GolfApiDatabaseName,
+            UserID = userName ?? ApiUserName,
+            Password = password ?? ApiUserPassword,
+            ApplicationName = VariableNames.GolfLeagueApiApplicationName,
             ApplicationIntent = ApplicationIntent.ReadWrite,
             TrustServerCertificate = true
         }.ConnectionString;
+    }
+
+    private static string GetEnvironmentVariableOrThrow(string variableName)
+    {
+        return Environment.GetEnvironmentVariable(variableName)
+               ?? throw new InvalidOperationException($"Environment variable not set: {variableName}");
+    }
+
+    private static class VariableNames
+    {
+        public const string GolfApiUserPassword = "GOLF_API_USER_PASSWORD";
+        public const string GolfApiUserName = "GOLF_API_USER_NAME";
+        public const string GolfApiSaPassword = "GOLF_API_SA_PASSWORD";
+        public const string SolutionFileName = "GolfLeague.sln";
+        public const string GolfApiDatabaseName = "GolfLeague";
+        public const string GolfLeagueApiApplicationName = "GolfLeagueApiTests";
     }
 }

@@ -2,10 +2,14 @@
 
 using GolfLeague.Contracts.Responses;
 
+using Serilog;
+
 namespace GolfLeague.Api.Mapping;
 
-public class ValidationMappingMiddleware(RequestDelegate next, ILogger<ValidationMappingMiddleware> logger)
+public class ValidationMappingMiddleware(RequestDelegate next)
 {
+    private readonly Serilog.ILogger _logger = Log.ForContext<ValidationMappingMiddleware>();
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -23,7 +27,7 @@ public class ValidationMappingMiddleware(RequestDelegate next, ILogger<Validatio
                 })
             };
 
-            logger.LogWarning("Validation failure: {@ValidationFailureResponse}", validationFailureResponse);
+            _logger.Warning("Validation failure: {@ValidationFailureResponse}", validationFailureResponse);
 
             await context.Response.WriteAsJsonAsync(validationFailureResponse);
         }

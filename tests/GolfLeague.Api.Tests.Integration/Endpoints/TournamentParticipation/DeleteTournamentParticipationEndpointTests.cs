@@ -1,49 +1,26 @@
 ﻿using System.Net;
 
-using Bogus;
-
 using FluentAssertions;
-
-using GolfLeague.Contracts.Requests;
-using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.TournamentParticipation;
 
 public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task DeleteTournamentParticipation_ReturnsNoContent_WhenTournamentParticipationIsDeleted()
+    public async Task DeleteTournamentParticipation_WhenTournamentParticipationIsDeleted_ShouldReturnNoContent()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
-
-        var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var createGolferResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
-        var expectedGolfer = await createGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-
-        var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-        var createTournamentResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-        var expectedTournament = await createTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-
-        var expectedYear = Fakers.GenerateYear();
-
-        var createParticipationRequest = new CreateTournamentParticipationsRequest
-        {
-            GolferId = expectedGolfer!.GolferId,
-            TournamentId = expectedTournament!.TournamentId,
-            Year = expectedYear
-        };
-
-        var createdTournamentParticipationResponse = await httpClient
-            .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath, createParticipationRequest);
-        var createdTournamentParticipation = await createdTournamentParticipationResponse.Content
-            .ReadFromJsonAsync<TournamentParticipationResponse>();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var createdGolfer = await Mother.CreateGolferAsync(client);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
+        var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+            client,
+            createdGolfer!.GolferId,
+            createdTournament!.TournamentId);
 
         // Act
-        var response = await httpClient.DeleteAsync(
-            $"{golfApiFactory.TournamentParticipationsApiBasePath}"
+        var response = await client.DeleteAsync(
+            $"{Mother.TournamentParticipationsApiBasePath}"
             + $"?golferId={createdTournamentParticipation!.GolferId}"
             + $"&tournamentId={createdTournamentParticipation.TournamentId}"
             + $"&year={createdTournamentParticipation.Year}");
@@ -53,23 +30,62 @@ public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task DeleteTournamentParticipation_ReturnsNotFound_WhenTournamentParticipationDoesNotExist()
+    public async Task DeleteTournamentParticipation_WhenTournamentParticipationDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        using var httpClient = golfApiFactory.CreateClient();
-
-        var golferId = Fakers.GeneratePositiveInteger();
-        var tournamentId = Fakers.GeneratePositiveInteger();
-        var year = Fakers.GenerateYear();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var golferId = Mother.GeneratePositiveInteger();
+        var tournamentId = Mother.GeneratePositiveInteger();
+        var year = Mother.GenerateYear();
 
         // Act
-        var response = await httpClient.DeleteAsync(
-            $"{golfApiFactory.TournamentParticipationsApiBasePath}"
+        var response = await client.DeleteAsync(
+            $"{Mother.TournamentParticipationsApiBasePath}"
             + $"?golferId={golferId}"
             + $"&tournamentId={tournamentId}"
             + $"&year={year}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteTournamentParticipation_WhenUnauthorized_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        using var client = golfApiFactory.CreateClient();
+        var golferId = Mother.GeneratePositiveInteger();
+        var tournamentId = Mother.GeneratePositiveInteger();
+        var year = Mother.GenerateYear();
+
+        // Act
+        var response = await client.DeleteAsync(
+            $"{Mother.TournamentParticipationsApiBasePath}"
+            + $"?golferId={golferId}"
+            + $"&tournamentId={tournamentId}"
+            + $"&year={year}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task DeleteTournamentParticipation_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golferId = Mother.GeneratePositiveInteger();
+        var tournamentId = Mother.GeneratePositiveInteger();
+        var year = Mother.GenerateYear();
+
+        // Act
+        var response = await client.DeleteAsync(
+            $"{Mother.TournamentParticipationsApiBasePath}"
+            + $"?golferId={golferId}"
+            + $"&tournamentId={tournamentId}"
+            + $"&year={year}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

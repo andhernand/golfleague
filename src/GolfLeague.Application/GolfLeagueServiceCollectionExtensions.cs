@@ -8,6 +8,8 @@ using GolfLeague.Application.Services;
 
 using Microsoft.Extensions.DependencyInjection;
 
+// ReSharper disable UnusedMethodReturnValue.Global
+
 namespace GolfLeague.Application;
 
 public static class GolfLeagueServiceCollectionExtensions

@@ -1,3 +1,3 @@
 ﻿namespace GolfLeague.Application;
 
-public interface IGolfLeagueApplicationMarker {}
+public interface IGolfLeagueApplicationMarker;

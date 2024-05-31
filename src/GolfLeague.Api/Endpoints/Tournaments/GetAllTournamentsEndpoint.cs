@@ -1,15 +1,12 @@
 ﻿using GolfLeague.Api.Mapping;
-using GolfLeague.Application.Models;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
-
-using SerilogTimings;
 
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class GetAllTournamentsEndpoint
 {
-    public const string Name = "GetAllTournaments";
+    private const string Name = "GetAllTournaments";
 
     public static IEndpointRouteBuilder MapGetAllTournaments(this IEndpointRouteBuilder app)
     {
@@ -17,12 +14,9 @@ public static class GetAllTournamentsEndpoint
                 ITournamentService service,
                 CancellationToken token = default) =>
             {
-                using var timedOperation = Operation.Begin("Get ALl Tournaments");
-
                 var tournaments = await service.GetAllTournamentsAsync(token);
                 var response = tournaments.MapToResponse();
 
-                timedOperation.Complete();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

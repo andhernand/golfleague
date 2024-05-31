@@ -1,43 +1,27 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 
 using FluentAssertions;
 
-using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
-public class GetAllGolfersEndpointTests
+public abstract class GetAllGolfersEndpointTests
 {
     public class GetAllGolfersWithTournaments(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
     {
         [Fact]
-        public async Task GetAllGolfers_ReturnGolfers_WhenGolfersExist()
+        public async Task GetAllGolfers_WhenGolfersExist_ShouldReturnGolfers()
         {
             // Arrange
-            using var client = golfApiFactory.CreateClient();
-
-            var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-            var createdGolferResponse =
-                await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
-            var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-
-            var createTournamentRequest = Fakers.GenerateCreateTournamentRequest();
-            var createdTournamentResponse =
-                await client.PostAsJsonAsync(golfApiFactory.TournamentsApiBasePath, createTournamentRequest);
-            var createdTournament = await createdTournamentResponse.Content.ReadFromJsonAsync<TournamentResponse>();
-
-            var createTournamentParticipationRequest = new CreateTournamentParticipationsRequest
-            {
-                GolferId = createdGolfer!.GolferId,
-                TournamentId = createdTournament!.TournamentId,
-                Year = Fakers.GenerateYear()
-            };
-            var createTournamentParticipationResponse = await client
-                .PostAsJsonAsync(golfApiFactory.TournamentParticipationsApiBasePath,
-                    createTournamentParticipationRequest);
-            var createdTournamentParticipation = await createTournamentParticipationResponse.Content
-                .ReadFromJsonAsync<TournamentParticipationResponse>();
+            using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+            var createdGolfer = await Mother.CreateGolferAsync(client);
+            var createdTournament = await Mother.CreateTournamentAsync(client);
+            var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+                client,
+                createdGolfer!.GolferId,
+                createdTournament!.TournamentId);
 
             var expected = new GolfersResponse
             {
@@ -65,8 +49,11 @@ public class GetAllGolfersEndpointTests
                 }
             };
 
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", JwtGenerator.GenerateToken());
+
             // Act
-            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
+            var response = await client.GetAsync(Mother.GolfersApiBasePath);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -79,15 +66,11 @@ public class GetAllGolfersEndpointTests
     public class GetAllGolfersWithNoTournaments(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
     {
         [Fact]
-        public async Task GetAllGolfers_ReturnGolfersWithoutTournaments_WhenGolfersWithNoTournamentsExist()
+        public async Task GetAllGolfers_WhenGolfersWithNoTournamentsExist_ShouldReturnGolfersWithoutTournaments()
         {
             // Arrange
-            using var client = golfApiFactory.CreateClient();
-
-            var createGolferRequest = Fakers.GenerateCreateGolferRequest();
-            var createdGolferResponse =
-                await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, createGolferRequest);
-            var createdGolfer = await createdGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
+            using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+            var createdGolfer = await Mother.CreateGolferAsync(client);
 
             var expected = new GolfersResponse
             {
@@ -101,13 +84,16 @@ public class GetAllGolfersEndpointTests
                         Email = createdGolfer.Email,
                         Handicap = createdGolfer.Handicap,
                         JoinDate = createdGolfer.JoinDate,
-                        Tournaments = []
+                        Tournaments = Array.Empty<TournamentDetailResponse>()
                     }
                 }
             };
 
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", JwtGenerator.GenerateToken());
+
             // Act
-            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
+            var response = await client.GetAsync(Mother.GolfersApiBasePath);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -120,18 +106,32 @@ public class GetAllGolfersEndpointTests
     public class GetAllGolfersNoGolfers(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
     {
         [Fact]
-        public async Task GetAllGolfers_ReturnsNoGolfers_WhenNoGolfersExist()
+        public async Task GetAllGolfers_WhenNoGolfersExist_ShouldReturnNoGolfers()
+        {
+            // Arrange
+            using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+
+            // Act
+            var response = await client.GetAsync(Mother.GolfersApiBasePath);
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
+            returnedGolfers!.Golfers.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetAllGolfers_WhenClientIsUnauthorized_ShouldReturnUnauthorized()
         {
             // Arrange
             using var client = golfApiFactory.CreateClient();
 
             // Act
-            var response = await client.GetAsync(golfApiFactory.GolfersApiBasePath);
-            var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
+            var response = await client.GetAsync(Mother.GolfersApiBasePath);
 
             // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            returnedGolfers!.Golfers.Should().BeEmpty();
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }
 }

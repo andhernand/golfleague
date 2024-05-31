@@ -2,8 +2,6 @@
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
-using SerilogTimings;
-
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class GetTournamentByIdEndpoint
@@ -17,18 +15,13 @@ public static class GetTournamentByIdEndpoint
                 ITournamentService service,
                 CancellationToken token = default) =>
             {
-                using var timedOperation = Operation.Begin("Get Tournament By Id");
-
                 var tournament = await service.GetTournamentByIdAsync(id, token);
                 if (tournament is null)
                 {
-                    timedOperation.Complete();
                     return Results.NotFound();
                 }
 
                 var response = tournament.MapToResponse();
-
-                timedOperation.Complete();
                 return TypedResults.Ok(response);
             })
             .WithName(Name)

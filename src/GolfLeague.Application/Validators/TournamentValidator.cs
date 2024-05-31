@@ -5,6 +5,7 @@ using GolfLeague.Application.Repositories;
 
 namespace GolfLeague.Application.Validators;
 
+// ReSharper disable once UnusedType.Global
 public class TournamentValidator : AbstractValidator<Tournament>
 {
     private readonly ITournamentRepository _repository;

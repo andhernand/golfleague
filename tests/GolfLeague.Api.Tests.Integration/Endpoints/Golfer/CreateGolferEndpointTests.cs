@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 
 using FluentAssertions;
 
@@ -9,21 +10,21 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task CreateGolfer_CreatesGolfer_WhenDataIsCorrect()
+    public async Task CreateGolfer_WhenDataIsCorrect_ShouldCreateGolfer()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateGolferRequest();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest();
 
         // Act
-        var result = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        result.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var golfer = await result.Content.ReadFromJsonAsync<GolferResponse>();
-
-        result.Headers.Location.Should().Be($"http://localhost{golfApiFactory.GolfersApiBasePath}/{golfer!.GolferId}");
+        var golfer = await response.Content.ReadFromJsonAsync<GolferResponse>();
+        response.Headers.Location.Should()
+            .Be($"http://localhost{Mother.GolfersApiBasePath}/{golfer!.GolferId}");
         golfer.GolferId.Should().NotBe(default);
         golfer.FirstName.Should().Be(request.FirstName);
         golfer.LastName.Should().Be(request.LastName);
@@ -33,162 +34,184 @@ public class CreateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_FirstNameIsInvalid()
+    public async Task CreateGolfer_WhenFirstNameIsInvalid_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateGolferRequest(firstName: "");
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest(firstName: "");
+        var expected = Mother.CreateValidationFailureResponse("FirstName", "'First Name' must not be empty.");
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("FirstName");
-        error.ErrorMessage.Should().Be("'First Name' must not be empty.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_LastNameIsInvalid()
+    public async Task CreateGolfer_WhenLastNameIsInvalid_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateGolferRequest(lastName: "");
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest(lastName: "");
+        var expected = Mother.CreateValidationFailureResponse("LastName", "'Last Name' must not be empty.");
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("LastName");
-        error.ErrorMessage.Should().Be("'Last Name' must not be empty.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_EmailIsInvalid()
+    public async Task CreateGolfer_WhenEmailIsInvalid_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateGolferRequest(email: "badEmail");
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest(email: "badEmail");
+        var expected = Mother.CreateValidationFailureResponse("Email", "'Email' is not in the correct format.");
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Email");
-        error.ErrorMessage.Should().Be("'Email' is not in the correct format.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_EmailAlreadyExists()
+    public async Task CreateGolfer_WhenEmailAlreadyExists_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: false, isAdmin: true);
+        var existingGolfer = await Mother.CreateGolferAsync(client);
+        var expected = Mother.CreateValidationFailureResponse("Email", "This Email already exists in the system.");
+        var request = Mother.GenerateCreateGolferRequest(email: existingGolfer!.Email);
 
-        var existingGolferRequest = Fakers.GenerateCreateGolferRequest();
-        var existingGolferResponse =
-            await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, existingGolferRequest);
-        var existingGolfer = await existingGolferResponse.Content.ReadFromJsonAsync<GolferResponse>();
-
-        var request = Fakers.GenerateCreateGolferRequest(email: existingGolfer!.Email);
-
-        // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
-
-        // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
-        error.PropertyName.Should().Be("Email");
-        error.ErrorMessage.Should().Be("This Email already exists in the system.");
-    }
-
-    [Fact]
-    public async Task CreateGolfer_Fails_When_JoinDateIsInvalid()
-    {
-        // Arrange
-        using var client = golfApiFactory.CreateClient();
-        var request = Fakers.GenerateCreateGolferRequest(joinDate: default(DateOnly));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true, isAdmin: false));
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("JoinDate");
-        error.ErrorMessage.Should().Be("'Join Date' must not be empty.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_JoinDateIsInTheFuture()
+    public async Task CreateGolfer_WhenJoinDateIsInvalid_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest(joinDate: default(DateOnly));
+        var expected = Mother.CreateValidationFailureResponse("JoinDate", "'Join Date' must not be empty.");
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolfer_WhenJoinDateIsInTheFuture_ShouldFailWithBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
         var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        var request = Fakers.GenerateCreateGolferRequest(joinDate: currentDate.AddYears(1));
+        var request = Mother.GenerateCreateGolferRequest(joinDate: currentDate.AddYears(1));
+        var expected = Mother.CreateValidationFailureResponse(
+            "JoinDate", $"'Join Date' must be less than or equal to '{currentDate.Year}'.");
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("JoinDate");
-        error.ErrorMessage.Should().Be($"'Join Date' must be less than or equal to '{currentDate.Year}'.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_HandicapIsLessThanZero()
+    public async Task CreateGolfer_WhenHandicapIsLessThanZero_ShouldFailWithBadRequest()
     {
         // Arrange
-        using var client = golfApiFactory.CreateClient();
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
         const int lessThanLowerBound = -2;
-        var request = Fakers.GenerateCreateGolferRequest(handicap: lessThanLowerBound);
+        var request = Mother.GenerateCreateGolferRequest(handicap: lessThanLowerBound);
+        var expected = Mother.CreateValidationFailureResponse(
+            "Handicap", $"'Handicap' must be between 0 and 54. You entered {lessThanLowerBound}.");
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
-
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Handicap");
-        error.ErrorMessage.Should().Be($"'Handicap' must be between 0 and 54. You entered {lessThanLowerBound}.");
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task CreateGolfer_Fails_When_HandicapIsGreaterThanFiftyFour()
+    public async Task CreateGolfer_WhenHandicapIsGreaterThanFiftyFour_ShouldFailWithBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true, isAdmin: false);
+        const int greaterThanUpperBound = 67;
+        var request = Mother.GenerateCreateGolferRequest(handicap: greaterThanUpperBound);
+        var expected = Mother.CreateValidationFailureResponse("Handicap",
+            $"'Handicap' must be between 0 and 54. You entered {greaterThanUpperBound}.");
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolfer_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
-        const int greaterThanUpperBound = 67;
-        var request = Fakers.GenerateCreateGolferRequest(handicap: greaterThanUpperBound);
+        var request = Mother.GenerateCreateGolferRequest();
 
         // Act
-        var response = await client.PostAsJsonAsync(golfApiFactory.GolfersApiBasePath, request);
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
 
         // Assert
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
-        var error = errors!.Errors.Single();
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        error.PropertyName.Should().Be("Handicap");
-        error.ErrorMessage.Should().Be($"'Handicap' must be between 0 and 54. You entered {greaterThanUpperBound}.");
+    [Fact]
+    public async Task CreateGolfer_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: false, isAdmin: false);
+        var request = Mother.GenerateCreateGolferRequest();
+
+        // Act
+        var response = await client.PostAsJsonAsync(Mother.GolfersApiBasePath, request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

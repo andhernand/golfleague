@@ -1,3 +1,5 @@
+using System.Text;
+
 using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints;
 using GolfLeague.Api.Health;
@@ -7,13 +9,14 @@ using GolfLeague.Application;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 using Serilog;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
-using var config = builder.Configuration;
+var config = builder.Configuration;
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
@@ -29,7 +32,15 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
+        options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
+        options.TokenValidationParameters.ValidIssuer = config["JwtSettings:Issuer"];
+        options.TokenValidationParameters.ValidAudience = config["JwtSettings:Audience"];
         options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(5);
+        options.TokenValidationParameters.ValidateIssuerSigningKey = true;
+        options.TokenValidationParameters.ValidateLifetime = true;
+        options.TokenValidationParameters.ValidateIssuer = true;
+        options.TokenValidationParameters.ValidateAudience = true;
     });
 
 builder.Services.AddAuthorizationBuilder()
@@ -63,6 +74,7 @@ app.UseHealthChecks(new PathString("/_health"));
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSerilogRequestLogging();
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapApiEndpoints();
 
