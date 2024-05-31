@@ -45,6 +45,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{BAC6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "Helpers\Identity.Api\Identity.Api.csproj", "{D8AFDC09-2E05-4C0B-9263-8218922449C6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6718A5C6-9A56-473D-B509-4CCF8B823782}"
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{138F68C8-A980-40E4-A660-BB2C57254DB3}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-and-test-application.yml = .github\workflows\build-and-test-application.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +137,7 @@ Global
 		{B3540A44-9193-4D45-965E-E17E0220B773} = {30AE1C55-6F5A-4A28-928E-722491032BAD}
 		{0760049B-6127-4618-9F18-49C5C174E0D2} = {985CDD1D-7B55-4A5F-8D21-3EE454328101}
 		{D8AFDC09-2E05-4C0B-9263-8218922449C6} = {BAC695F1-B249-4015-8478-649E17B02516}
+		{138F68C8-A980-40E4-A660-BB2C57254DB3} = {6718A5C6-9A56-473D-B509-4CCF8B823782}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A0B9D493-709D-4A19-BFCC-681B7B7E73EB}
