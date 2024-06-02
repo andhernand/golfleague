@@ -6,6 +6,8 @@ using FluentAssertions;
 using GolfLeague.Application.Models;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Tournament;
 
 public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
@@ -38,13 +40,10 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         var request = Mother.GenerateCreateTournamentRequest(name: "");
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse { PropertyName = "Name", ErrorMessage = "'Name' must not be empty." }
-            }
-        };
+            { "Name", ["'Name' must not be empty."] }
+        });
 
         // Act
         var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
@@ -52,7 +51,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -63,13 +62,10 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         var request = Mother.GenerateCreateTournamentRequest(format: "");
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse { PropertyName = "Format", ErrorMessage = "'Format' must not be empty." }
-            }
-        };
+            { "Format", ["'Format' must not be empty."] }
+        });
 
         // Act
         var response = await client.PostAsJsonAsync(Mother.TournamentsApiBasePath, request);
@@ -77,7 +73,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -88,20 +84,12 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
         var createdTournament = await Mother.CreateTournamentAsync(client);
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse
-                {
-                    PropertyName = "Tournament",
-                    ErrorMessage =
-                        "A Tournament with the Name and Format combination already exists in the system."
-                }
-            }
-        };
+            { "Tournament", ["A Tournament with the Name and Format combination already exists in the system."] }
+        });
 
-        var request = Mother.GenerateCreateTournamentRequest(createdTournament!.Name, createdTournament.Format);
+        var request = Mother.GenerateCreateTournamentRequest(createdTournament.Name, createdTournament.Format);
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
@@ -112,7 +100,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -121,18 +109,10 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse
-                {
-                    PropertyName = "Format",
-                    ErrorMessage =
-                        $"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}"
-                }
-            }
-        };
+            { "Format", [$"'Format' must be one of any: {string.Join(", ", TournamentFormat.Values)}"] }
+        });
 
         var request = Mother.GenerateCreateTournamentRequest(format: "Yo Momma");
 
@@ -142,7 +122,7 @@ public class CreateTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 

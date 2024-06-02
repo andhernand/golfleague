@@ -1,6 +1,8 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Application.Services;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class DeleteTournamentEndpoint
@@ -15,12 +17,12 @@ public static class DeleteTournamentEndpoint
                 CancellationToken token = default) =>
             {
                 var deleted = await service.DeleteByIdAsync(id, token);
-                return deleted ? Results.NoContent() : Results.NotFound();
+                return deleted ? Results.NoContent() : Results.Problem(statusCode: StatusCodes.Status404NotFound);
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.AdminPolicyName);
 
         return app;

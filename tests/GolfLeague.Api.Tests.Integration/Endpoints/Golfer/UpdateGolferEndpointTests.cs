@@ -5,6 +5,8 @@ using FluentAssertions;
 
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Golfer;
 
 public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
@@ -18,7 +20,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
 
         const int changedHandicap = 34;
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(
-            createdGolfer!.FirstName,
+            createdGolfer.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
             createdGolfer.JoinDate,
@@ -66,7 +68,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
-        var expected = Mother.CreateValidationFailureResponse("FirstName", "'First Name' must not be empty.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "FirstName", ["'First Name' must not be empty."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(firstName: "");
 
         // Act
@@ -77,7 +83,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -86,7 +92,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
-        var expected = Mother.CreateValidationFailureResponse("LastName", "'Last Name' must not be empty.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "LastName", ["'Last Name' must not be empty."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(lastName: "");
 
         // Act
@@ -97,7 +107,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -106,7 +116,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
-        var expected = Mother.CreateValidationFailureResponse("Email", "'Email' is not in the correct format.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Email", ["'Email' is not in the correct format."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(email: "something");
 
         // Act
@@ -117,7 +131,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -128,12 +142,16 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         var firstGolfer = await Mother.CreateGolferAsync(client);
         var secondGolfer = await Mother.CreateGolferAsync(client);
-        var expected = Mother.CreateValidationFailureResponse("Email", "This Email already exists in the system.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Email", ["This Email already exists in the system."] }
+        });
+
 
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(
-            secondGolfer!.FirstName,
+            secondGolfer.FirstName,
             secondGolfer.LastName,
-            firstGolfer!.Email,
+            firstGolfer.Email,
             secondGolfer.JoinDate,
             secondGolfer.Handicap);
 
@@ -145,7 +163,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -154,7 +172,10 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
-        var expected = Mother.CreateValidationFailureResponse("JoinDate", "'Join Date' must not be empty.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "JoinDate", ["'Join Date' must not be empty."] }
+        });
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(joinDate: default(DateOnly));
 
         // Act
@@ -165,7 +186,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -175,8 +196,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        var expected = Mother.CreateValidationFailureResponse(
-            "JoinDate", $"'Join Date' must be less than or equal to '{currentDate.Year}'.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "JoinDate", [$"'Join Date' must be less than or equal to '{currentDate.Year}'."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(joinDate: currentDate.AddYears(2));
 
         // Act
@@ -187,7 +211,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -197,8 +221,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         const int lessThanLowerBound = -4;
-        var expected = Mother.CreateValidationFailureResponse(
-            "Handicap", $"'Handicap' must be between 0 and 54. You entered {lessThanLowerBound}.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Handicap", [$"'Handicap' must be between 0 and 54. You entered {lessThanLowerBound}."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(handicap: lessThanLowerBound);
 
         // Act
@@ -209,7 +236,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -219,8 +246,11 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
         const int greaterThanUpperBound = 55;
-        var expected = Mother.CreateValidationFailureResponse(
-            "Handicap", $"'Handicap' must be between 0 and 54. You entered {greaterThanUpperBound}.");
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Handicap", [$"'Handicap' must be between 0 and 54. You entered {greaterThanUpperBound}."] }
+        });
+
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(handicap: greaterThanUpperBound);
 
         // Act
@@ -231,7 +261,7 @@ public class UpdateGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 

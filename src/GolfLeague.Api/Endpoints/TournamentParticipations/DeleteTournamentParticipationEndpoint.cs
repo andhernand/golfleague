@@ -21,12 +21,12 @@ public static class DeleteTournamentParticipationEndpoint
             {
                 var id = new TournamentParticipation { GolferId = golferId, TournamentId = tournamentId, Year = year };
                 var deleted = await service.DeleteAsync(id, cancellationToken);
-                return deleted ? Results.NoContent() : Results.NotFound();
+                return deleted ? Results.NoContent() : Results.Problem(statusCode: StatusCodes.Status404NotFound);
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.AdminPolicyName);
 
         return app;

@@ -2,6 +2,8 @@
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class GetGolferByIdEndpoint
@@ -18,7 +20,7 @@ public static class GetGolferByIdEndpoint
                 var golfer = await service.GetGolferByIdAsync(id, token);
                 if (golfer is null)
                 {
-                    return Results.NotFound();
+                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
                 }
 
                 var response = golfer.MapToResponse();
@@ -27,7 +29,7 @@ public static class GetGolferByIdEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Produces<GolferResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization();
 
         return app;

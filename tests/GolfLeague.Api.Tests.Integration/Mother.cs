@@ -6,6 +6,8 @@ using GolfLeague.Application.Models;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Tests.Integration;
 
 public static class Mother
@@ -25,33 +27,37 @@ public static class Mother
         return client;
     }
 
-    public static async Task<GolferResponse?> CreateGolferAsync(HttpClient client)
+    public static async Task<GolferResponse> CreateGolferAsync(HttpClient client)
     {
-        var createGolferRequest = GenerateCreateGolferRequest();
-        var response = await client.PostAsJsonAsync(GolfersApiBasePath, createGolferRequest);
-        return await response.Content.ReadFromJsonAsync<GolferResponse>();
+        var golferRequest = GenerateCreateGolferRequest();
+        var response = await client.PostAsJsonAsync(GolfersApiBasePath, golferRequest);
+        var golfer = await response.Content.ReadFromJsonAsync<GolferResponse>();
+        return golfer!;
     }
 
-    public static async Task<TournamentResponse?> CreateTournamentAsync(HttpClient client)
+    public static async Task<TournamentResponse> CreateTournamentAsync(HttpClient client)
     {
-        var createTournamentRequest = GenerateCreateTournamentRequest();
-        var response = await client.PostAsJsonAsync(TournamentsApiBasePath, createTournamentRequest);
-        return await response.Content.ReadFromJsonAsync<TournamentResponse>();
+        var tournamentRequest = GenerateCreateTournamentRequest();
+        var response = await client.PostAsJsonAsync(TournamentsApiBasePath, tournamentRequest);
+        var tournament = await response.Content.ReadFromJsonAsync<TournamentResponse>();
+        return tournament!;
     }
 
-    public static async Task<TournamentParticipationResponse?> CreateTournamentParticipationAsync(
+    public static async Task<TournamentParticipationResponse> CreateTournamentParticipationAsync(
         HttpClient client,
         int golferId,
         int tournamentId)
     {
-        var createTournamentParticipationRequest = new CreateTournamentParticipationsRequest
+        var tournamentParticipationsRequest = new CreateTournamentParticipationsRequest
         {
             GolferId = golferId, TournamentId = tournamentId, Year = GenerateYear()
         };
 
         var response = await client.PostAsJsonAsync(
-            TournamentParticipationsApiBasePath, createTournamentParticipationRequest);
-        return await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
+            TournamentParticipationsApiBasePath, tournamentParticipationsRequest);
+
+        var tournamentParticipation = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
+        return tournamentParticipation!;
     }
 
     public static CreateGolferRequest GenerateCreateGolferRequest(
@@ -116,11 +122,8 @@ public static class Mother
         return new Faker().Date.Past(yearsBack).Year;
     }
 
-    public static ValidationFailureResponse CreateValidationFailureResponse(string propertyName, string errorMessage)
+    public static ValidationProblemDetails CreateValidationProblemDetails(Dictionary<string, string[]> errors)
     {
-        return new ValidationFailureResponse
-        {
-            Errors = new[] { new ValidationResponse { PropertyName = propertyName, ErrorMessage = errorMessage } }
-        };
+        return new ValidationProblemDetails { Status = StatusCodes.Status400BadRequest, Errors = errors };
     }
 }

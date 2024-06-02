@@ -6,6 +6,8 @@ using FluentAssertions;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Tests.Integration.Endpoints.TournamentParticipation;
 
 public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
@@ -20,9 +22,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         var expectedYear = Mother.GenerateYear();
         var request = new CreateTournamentParticipationsRequest
         {
-            GolferId = expectedGolfer!.GolferId,
-            TournamentId = expectedTournament!.TournamentId,
-            Year = expectedYear
+            GolferId = expectedGolfer.GolferId, TournamentId = expectedTournament.TournamentId, Year = expectedYear
         };
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -53,16 +53,10 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse
-                {
-                    PropertyName = "GolferId", ErrorMessage = "'Golfer Id' must not be empty."
-                }
-            }
-        };
+            { "GolferId", ["'Golfer Id' must not be empty."] }
+        });
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -75,7 +69,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -85,16 +79,10 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse
-                {
-                    PropertyName = "TournamentId", ErrorMessage = "'Tournament Id' must not be empty."
-                }
-            }
-        };
+            { "TournamentId", ["'Tournament Id' must not be empty."] }
+        });
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -107,7 +95,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -117,13 +105,10 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse { PropertyName = "Year", ErrorMessage = "'Year' must not be empty." }
-            }
-        };
+            { "Year", ["'Year' must not be empty."] }
+        });
 
         var request = new CreateTournamentParticipationsRequest
         {
@@ -136,7 +121,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 
@@ -149,27 +134,20 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         var createdTournament = await Mother.CreateTournamentAsync(client);
         var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
             client,
-            createdGolfer!.GolferId,
-            createdTournament!.TournamentId);
+            createdGolfer.GolferId,
+            createdTournament.TournamentId);
 
-        var expected = new ValidationFailureResponse
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
-            Errors = new[]
-            {
-                new ValidationResponse
-                {
-                    PropertyName = "TournamentParticipation",
-                    ErrorMessage = "TournamentParticipation already exists in the system."
-                }
-            }
-        };
+            { "TournamentParticipation", ["TournamentParticipation already exists in the system."] }
+        });
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
 
         var request = new CreateTournamentParticipationsRequest
         {
-            GolferId = createdTournamentParticipation!.GolferId,
+            GolferId = createdTournamentParticipation.GolferId,
             TournamentId = createdTournamentParticipation.TournamentId,
             Year = createdTournamentParticipation.Year
         };
@@ -180,7 +158,7 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var errors = await response.Content.ReadFromJsonAsync<ValidationFailureResponse>();
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         errors.Should().BeEquivalentTo(expected);
     }
 

@@ -20,8 +20,8 @@ public abstract class GetAllTournamentsEndpointTests
             var createdTournament = await Mother.CreateTournamentAsync(client);
             var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
                 client,
-                createdGolfer!.GolferId,
-                createdTournament!.TournamentId);
+                createdGolfer.GolferId,
+                createdTournament.TournamentId);
 
             var expected = new TournamentsResponse
             {
@@ -39,7 +39,7 @@ public abstract class GetAllTournamentsEndpointTests
                                 GolferId = createdGolfer.GolferId,
                                 FirstName = createdGolfer.FirstName,
                                 LastName = createdGolfer.LastName,
-                                Year = createdTournamentParticipation!.Year
+                                Year = createdTournamentParticipation.Year
                             }
                         }
                     }
@@ -76,7 +76,7 @@ public abstract class GetAllTournamentsEndpointTests
                 {
                     new TournamentResponse
                     {
-                        TournamentId = createdTournament!.TournamentId,
+                        TournamentId = createdTournament.TournamentId,
                         Name = createdTournament.Name,
                         Format = createdTournament.Format,
                         Participants = []

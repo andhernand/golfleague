@@ -19,8 +19,8 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
         var createdTournament = await Mother.CreateTournamentAsync(client);
         var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
             client,
-            createdGolfer!.GolferId,
-            createdTournament!.TournamentId);
+            createdGolfer.GolferId,
+            createdTournament.TournamentId);
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken());
@@ -28,7 +28,7 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
         // Act
         var response = await client.GetAsync(
             $"{Mother.TournamentParticipationsApiBasePath}"
-            + $"?golferId={createdTournamentParticipation!.GolferId}"
+            + $"?golferId={createdTournamentParticipation.GolferId}"
             + $"&tournamentId={createdTournamentParticipation.TournamentId}"
             + $"&year={createdTournamentParticipation.Year}");
 

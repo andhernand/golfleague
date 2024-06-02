@@ -30,7 +30,7 @@ public static class GetTournamentParticipationByIdEndpoint
                     cancellationToken);
                 if (tournamentParticipation is null)
                 {
-                    return Results.NotFound();
+                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
                 }
 
                 var response = tournamentParticipation.MapToResponse();
@@ -39,7 +39,7 @@ public static class GetTournamentParticipationByIdEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
             .Produces<TournamentParticipationResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization();
 
         return app;

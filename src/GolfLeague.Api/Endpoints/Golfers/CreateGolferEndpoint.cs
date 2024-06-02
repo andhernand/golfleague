@@ -4,6 +4,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class CreateGolferEndpoint
@@ -31,7 +33,9 @@ public static class CreateGolferEndpoint
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Accepts<CreateGolferRequest>(isOptional: false, contentType: "application/json")
             .Produces<GolferResponse>(StatusCodes.Status201Created)
-            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ValidationProblemDetails>(
+                StatusCodes.Status400BadRequest,
+                contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
 
         return app;
