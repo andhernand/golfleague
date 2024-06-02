@@ -4,6 +4,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class UpdateTournamentEndpoint
@@ -22,7 +24,7 @@ public static class UpdateTournamentEndpoint
                 var updatedTournament = await service.UpdateAsync(tournament, token);
                 if (updatedTournament is null)
                 {
-                    return Results.NotFound();
+                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
                 }
 
                 var response = updatedTournament.MapToResponse();
@@ -32,8 +34,10 @@ public static class UpdateTournamentEndpoint
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<UpdateTournamentRequest>(false, "application/json")
             .Produces<TournamentResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
+            .Produces<ValidationProblemDetails>(
+                StatusCodes.Status400BadRequest,
+                contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
 
         return app;

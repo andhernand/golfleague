@@ -15,13 +15,13 @@ public class DeleteTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         var createdTournament = await Mother.CreateTournamentAsync(client);
         var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
             client,
-            createdGolfer!.GolferId,
-            createdTournament!.TournamentId);
+            createdGolfer.GolferId,
+            createdTournament.TournamentId);
 
         // Act
         var response = await client.DeleteAsync(
             $"{Mother.TournamentParticipationsApiBasePath}"
-            + $"?golferId={createdTournamentParticipation!.GolferId}"
+            + $"?golferId={createdTournamentParticipation.GolferId}"
             + $"&tournamentId={createdTournamentParticipation.TournamentId}"
             + $"&year={createdTournamentParticipation.Year}");
 

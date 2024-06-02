@@ -2,6 +2,8 @@
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class GetTournamentByIdEndpoint
@@ -18,7 +20,7 @@ public static class GetTournamentByIdEndpoint
                 var tournament = await service.GetTournamentByIdAsync(id, token);
                 if (tournament is null)
                 {
-                    return Results.NotFound();
+                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
                 }
 
                 var response = tournament.MapToResponse();
@@ -27,7 +29,7 @@ public static class GetTournamentByIdEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Produces<TournamentResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization();
 
         return app;

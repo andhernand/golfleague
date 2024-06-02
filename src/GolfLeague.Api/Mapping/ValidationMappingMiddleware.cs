@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-using GolfLeague.Contracts.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 using Serilog;
 
@@ -18,18 +18,18 @@ public class ValidationMappingMiddleware(RequestDelegate next)
         }
         catch (ValidationException ex)
         {
-            context.Response.StatusCode = 400;
-            var validationFailureResponse = new ValidationFailureResponse
-            {
-                Errors = ex.Errors.Select(x => new ValidationResponse
-                {
-                    PropertyName = x.PropertyName, ErrorMessage = x.ErrorMessage
-                })
-            };
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            _logger.Warning("Validation failure: {@ValidationFailureResponse}", validationFailureResponse);
+            var problems = ex.Errors.GroupBy(error => error.PropertyName)
+                .ToDictionary(group => group.Key, group => group
+                    .Select(error => error.ErrorMessage)
+                    .ToArray());
 
-            await context.Response.WriteAsJsonAsync(validationFailureResponse);
+            var validationProblem = new ValidationProblemDetails(problems) { Status = StatusCodes.Status400BadRequest };
+
+            _logger.Warning("Validation failure: {@ValidationProblemDetails}", validationProblem);
+
+            await context.Response.WriteAsJsonAsync(validationProblem);
         }
     }
 }

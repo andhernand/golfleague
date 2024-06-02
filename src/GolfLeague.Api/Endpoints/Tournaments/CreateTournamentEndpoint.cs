@@ -4,6 +4,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
 public static class CreateTournamentEndpoint
@@ -33,7 +35,9 @@ public static class CreateTournamentEndpoint
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<CreateTournamentRequest>(false, "application/json")
             .Produces<TournamentResponse>(StatusCodes.Status201Created)
-            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ValidationProblemDetails>(
+                StatusCodes.Status400BadRequest,
+                contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
 
         return app;

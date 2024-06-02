@@ -18,7 +18,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
 
         var expected = new GolferResponse
         {
-            GolferId = createdGolfer!.GolferId,
+            GolferId = createdGolfer.GolferId,
             FirstName = createdGolfer.FirstName,
             LastName = createdGolfer.LastName,
             Email = createdGolfer.Email,
@@ -64,8 +64,8 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
         var createdTournament = await Mother.CreateTournamentAsync(client);
         var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
             client,
-            createdGolfer!.GolferId,
-            createdTournament!.TournamentId);
+            createdGolfer.GolferId,
+            createdTournament.TournamentId);
 
         var expectedGolfer = new GolferResponse
         {
@@ -82,7 +82,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
                     TournamentId = createdTournament.TournamentId,
                     Name = createdTournament.Name,
                     Format = createdTournament.Format,
-                    Year = createdTournamentParticipation!.Year
+                    Year = createdTournamentParticipation.Year
                 }
             }
         };

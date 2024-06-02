@@ -15,7 +15,7 @@ public class DeleteTournamentEndpointTests(GolfApiFactory golfApiFactory) : ICla
 
         // Act
         var response = await client.DeleteAsync(
-            $"{Mother.TournamentsApiBasePath}/{createdTournament!.TournamentId}");
+            $"{Mother.TournamentsApiBasePath}/{createdTournament.TournamentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);

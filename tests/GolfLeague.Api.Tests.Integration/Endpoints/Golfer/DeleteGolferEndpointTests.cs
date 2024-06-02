@@ -14,7 +14,7 @@ public class DeleteGolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFi
         var createdGolfer = await Mother.CreateGolferAsync(client);
 
         // Act
-        var response = await client.DeleteAsync($"{Mother.GolfersApiBasePath}/{createdGolfer!.GolferId}");
+        var response = await client.DeleteAsync($"{Mother.GolfersApiBasePath}/{createdGolfer.GolferId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);

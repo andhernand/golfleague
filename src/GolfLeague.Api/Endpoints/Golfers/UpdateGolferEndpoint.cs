@@ -4,6 +4,8 @@ using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class UpdateGolferEndpoint
@@ -22,7 +24,7 @@ public static class UpdateGolferEndpoint
                 var updatedGolfer = await service.UpdateAsync(golfer, token);
                 if (updatedGolfer is null)
                 {
-                    return Results.NotFound();
+                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
                 }
 
                 var response = updatedGolfer.MapToResponse();
@@ -30,10 +32,12 @@ public static class UpdateGolferEndpoint
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
-            .Accepts<UpdateGolferRequest>(false, "application/json")
+            .Accepts<UpdateGolferRequest>(isOptional: false, contentType: "application/json")
             .Produces<GolferResponse>(contentType: "application/json")
-            .Produces(StatusCodes.Status404NotFound)
-            .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
+            .Produces<ValidationProblemDetails>(
+                StatusCodes.Status400BadRequest,
+                contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
 
         return app;
