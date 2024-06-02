@@ -1,8 +1,5 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+﻿namespace Identity.Api;
 
-namespace Identity.Api;
-
-// ReSharper disable once ClassNeverInstantiated.Global
 public class TokenGenerationRequest
 {
     public required bool IsAdmin { get; init; }

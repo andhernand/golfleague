@@ -1,5 +1,4 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
-namespace GolfLeague.Contracts.Responses;
+﻿namespace GolfLeague.Contracts.Responses;
 
 public class TournamentsResponse
 {

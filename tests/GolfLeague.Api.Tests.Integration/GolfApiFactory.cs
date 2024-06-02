@@ -11,7 +11,6 @@ using Testcontainers.MsSql;
 
 namespace GolfLeague.Api.Tests.Integration;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifetime
 {
     private static readonly string ApiUserName;

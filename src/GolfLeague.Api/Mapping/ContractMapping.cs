@@ -100,7 +100,6 @@ public static class ContractMapping
         };
     }
 
-    // ReSharper disable once MemberCanBePrivate.Global
     public static TournamentDetailResponse MapToResponse(this TournamentDetail tournamentDetail)
     {
         return new TournamentDetailResponse
@@ -112,7 +111,6 @@ public static class ContractMapping
         };
     }
 
-    // ReSharper disable once MemberCanBePrivate.Global
     public static ParticipationDetailResponse MapToResponse(this ParticipationDetail participationDetail)
     {
         return new ParticipationDetailResponse

@@ -1,8 +1,5 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+﻿namespace GolfLeague.Contracts.Requests;
 
-namespace GolfLeague.Contracts.Requests;
-
-// ReSharper disable once ClassNeverInstantiated.Global
 public class CreateGolferRequest
 {
     public required string FirstName { get; init; }
