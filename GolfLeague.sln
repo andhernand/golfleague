@@ -42,6 +42,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{BAC695F1-B249-4015-8478-649E17B02516}"
+	ProjectSection(SolutionItems) = preProject
+		Helpers\README.MD = Helpers\README.MD
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "Helpers\Identity.Api\Identity.Api.csproj", "{D8AFDC09-2E05-4C0B-9263-8218922449C6}"
 EndProject
