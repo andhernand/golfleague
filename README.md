@@ -18,7 +18,7 @@ git clone https://github.com/andhernand/golfleague.git
 cd golfleague
 ```
 
-## Setup Environment Variables
+### Setup Environment Variables
 
 The [.env](.env) file in the root directory of the project contains the environment variables necessary for running the application.
 
@@ -26,7 +26,7 @@ The [.env](.env) file in the root directory of the project contains the environm
 
 ***NOTE:*** I chose to store the passwords in the .env file, for example only. Please use secrets or a key/value vault.
 
-## Start MSSQL Server with Docker
+### Start MSSQL Server with Docker
 
 Make sure Docker Desktop is running, then execute the following command to start the MSSQL server container:
 
@@ -38,7 +38,7 @@ docker-compose up -d
 
 Take a look at the [docker-compose.yml](docker-compose.yml) file in the root directory of the project for configuration details.
 
-## Restore and Run the API
+### Restore and Run the API
 
 ```bash
 dotnet build
@@ -49,15 +49,23 @@ The API will be available at [https://localhost:7184](https://localhost:7184). Y
 
 ***NOTE:*** This can be changed in the [launchSettings.json](src/GolfLeague.Api/Properties/launchSettings.json) file.
 
-## Database Access with Dapper
+### Authentication and Authorization
+
+The API is set up to only accept authenticated users. I have provided an additional [Identity.Api](Helpers/Identity.Api) project for generating JWT Tokens. There is a [README](Helpers/README.MD) file to explain how to use it.
+
+* An Authenticated user can only call HTTP GET methods (read-only).
+* A Trusted user can call HTTP GET, HTTP POST, and HTTP PUT methods (read-write).
+* An Admin user can call HTTP GET, HTTP POST, HTTP PUT, and HTTP DELETE methods (read-write-delete).
+
+### Database Access with Dapper
 
 This project uses Dapper for database access. You can find the database context and repository implementations in the [Database](src/GolfLeague.Application/Database) folder.
 
-## Input Validation with FluentValidation
+### Input Validation with FluentValidation
 
 FluentValidation is used to handle input validation. Validators are located in the [Validators](src/GolfLeague.Application/Validators) folder.
 
-## Integration Testing with Testcontainers
+### Integration Testing with Testcontainers
 
 Testcontainers is used to create MSSQL databases for integration tests. Tests are located in the [Tests](tests) folder. folder. To run the tests, use the following command:
 
@@ -65,14 +73,10 @@ Testcontainers is used to create MSSQL databases for integration tests. Tests ar
 dotnet test
 ```
 
-## Contributing
+### Contributing
 
 Contributions are welcome! Please fork this repository and submit a pull request with your changes.
 
-## License
+### License
 
 This project is licensed under the MIT License. See the [LICENSE](License) file for more details.
-
-## Contact
-
-If you have any questions or feedback, feel free to contact me at [andhernand@gmail.com](mailto:andhernand@gmail.com).
