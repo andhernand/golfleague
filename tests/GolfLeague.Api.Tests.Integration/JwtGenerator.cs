@@ -4,6 +4,8 @@ using System.Text;
 
 using Bogus;
 
+using GolfLeague.Api.Options;
+
 using Microsoft.IdentityModel.Tokens;
 
 namespace GolfLeague.Api.Tests.Integration;
@@ -18,9 +20,12 @@ public static class JwtGenerator
 
     static JwtGenerator()
     {
-        Key = Encoding.UTF8.GetBytes(GetConfigurationValueOrThrow("JwtSettings:Key"));
-        CustomIssuer = GetConfigurationValueOrThrow("JwtSettings:Issuer");
-        CustomAudience = GetConfigurationValueOrThrow("JwtSettings:Audience");
+        var jwtOptions = new JwtOptions();
+        ConfigurationHelper.Configuration.GetSection("JwtSettings").Bind(jwtOptions);
+
+        Key = Encoding.UTF8.GetBytes(jwtOptions.Key);
+        CustomIssuer = jwtOptions.Issuer;
+        CustomAudience = jwtOptions.Audience;
     }
 
     public static string GenerateToken(
@@ -74,11 +79,5 @@ public static class JwtGenerator
         public const string UserId = "userid";
         public const string Admin = "admin";
         public const string TrustedUser = "trusted_user";
-    }
-
-    private static string GetConfigurationValueOrThrow(string key)
-    {
-        return ConfigurationHelper.Configuration[key]
-               ?? throw new InvalidOperationException($"{key} not found configuration");
     }
 }

@@ -4,6 +4,7 @@ using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints;
 using GolfLeague.Api.Health;
 using GolfLeague.Api.Mapping;
+using GolfLeague.Api.Options;
 using GolfLeague.Api.Swagger;
 using GolfLeague.Application;
 
@@ -16,13 +17,16 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
-var config = builder.Configuration;
+using var config = builder.Configuration;
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+var jwtOptions = new JwtOptions();
+config.GetSection("JwtSettings").Bind(jwtOptions);
 
 builder.Services.AddAuthentication(options =>
     {
@@ -33,9 +37,9 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
-        options.TokenValidationParameters.ValidIssuer = config["JwtSettings:Issuer"];
-        options.TokenValidationParameters.ValidAudience = config["JwtSettings:Audience"];
+            Encoding.UTF8.GetBytes(jwtOptions.Key));
+        options.TokenValidationParameters.ValidIssuer = jwtOptions.Issuer;
+        options.TokenValidationParameters.ValidAudience = jwtOptions.Audience;
         options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(5);
         options.TokenValidationParameters.ValidateIssuerSigningKey = true;
         options.TokenValidationParameters.ValidateLifetime = true;
