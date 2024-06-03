@@ -2,8 +2,6 @@
 
 using Microsoft.Data.SqlClient;
 
-using Serilog;
-
 namespace GolfLeague.Application.Database;
 
 public interface IDbConnectionFactory
@@ -13,12 +11,8 @@ public interface IDbConnectionFactory
 
 public class SqlServerDbConnectionFactory(string connectionString) : IDbConnectionFactory
 {
-    private readonly ILogger _logger = Log.ForContext<SqlServerDbConnectionFactory>();
-
     public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
     {
-        _logger.Information("Creating DD Connection");
-
         var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(token);
         return connection;
