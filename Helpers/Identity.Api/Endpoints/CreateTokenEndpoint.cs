@@ -7,7 +7,6 @@ public static class CreateTokenEndpoint
     private const string Name = "CreateToken";
     private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(CreateTokenEndpoint));
 
-    // ReSharper disable once UnusedMethodReturnValue.Global
     public static IEndpointRouteBuilder MapCreateToken(this IEndpointRouteBuilder app)
     {
         app.MapPost(IdentityApiConstants.Tokens.Create, (TokenGenerationRequest request) =>

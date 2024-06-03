@@ -59,15 +59,15 @@ The API is set up to only accept authenticated users. I have provided an additio
 
 ### Database Access with Dapper
 
-This project uses Dapper for database access. You can find the database context and repository implementations in the [Database](src/GolfLeague.Application/Database) folder.
+This project uses [Dapper](https://github.com/DapperLib/Dapper) for database access. You can find the database connection factory in the [Database](src/GolfLeague.Application/Database) folder. You can find the repository implementations in the [Repositories](src/GolfLeague.Application/Repositories) directory.
 
 ### Input Validation with FluentValidation
 
-FluentValidation is used to handle input validation. Validators are located in the [Validators](src/GolfLeague.Application/Validators) folder.
+[FluentValidation](https://docs.fluentvalidation.net/) is used to handle input validation. Validators are located in the [Validators](src/GolfLeague.Application/Validators) folder.
 
 ### Integration Testing with Testcontainers
 
-Testcontainers is used to create MSSQL databases for integration tests. Tests are located in the [Tests](tests) folder. folder. To run the tests, use the following command:
+[Testcontainers for .NET](https://dotnet.testcontainers.org/) is being used to create MSSQL databases for all integration tests. Tests are located in the [Tests](tests) folder. To run the tests, use the following command:
 
 ```bash
 dotnet test

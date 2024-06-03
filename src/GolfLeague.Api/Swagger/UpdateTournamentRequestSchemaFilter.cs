@@ -8,7 +8,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GolfLeague.Api.Swagger;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class UpdateTournamentRequestSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)

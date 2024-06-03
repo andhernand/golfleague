@@ -1,8 +1,5 @@
-﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
+﻿namespace GolfLeague.Application.Models;
 
-namespace GolfLeague.Application.Models;
-
-// ReSharper disable once ClassNeverInstantiated.Global
 public class ParticipationDetail
 {
     public required int GolferId { get; init; }
