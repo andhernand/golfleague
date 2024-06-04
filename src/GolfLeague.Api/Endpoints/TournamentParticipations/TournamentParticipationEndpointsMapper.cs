@@ -5,8 +5,9 @@ public static class TournamentParticipationEndpointsMapper
     public static IEndpointRouteBuilder MapTournamentParticipationEndpoints(this IEndpointRouteBuilder app)
     {
         return app
-            .MapCreateTournamentParticipation()
             .MapGetTournamentParticipationById()
-            .MapDeleteTournamentParticipation();
+            .MapDeleteTournamentParticipation()
+            .MapCreateGolferTournamentParticipation()
+            .MapCreateTournamentGolferParticipationEndpoint();
     }
 }

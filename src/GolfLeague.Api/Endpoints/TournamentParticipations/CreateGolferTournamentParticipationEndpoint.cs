@@ -8,21 +8,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GolfLeague.Api.Endpoints.TournamentParticipations;
 
-public static class CreateTournamentParticipationEndpoint
+public static class CreateGolferTournamentParticipationEndpoint
 {
-    private const string Name = "CreateTournamentParticipation";
+    private const string Name = "CreateGolferTournamentParticipation";
 
-    public static IEndpointRouteBuilder MapCreateTournamentParticipation(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapCreateGolferTournamentParticipation(this IEndpointRouteBuilder app)
     {
-        app.MapPost(GolfApiEndpoints.TournamentParticipation.Create, async (
-                CreateTournamentParticipationsRequest request,
+        app.MapPost(GolfApiEndpoints.Golfers.GolferTournamentParticipations, async (
+                int id,
                 ITournamentParticipationService service,
-                CancellationToken token = default) =>
+                CreateGolferTournamentParticipationRequest request,
+                CancellationToken cancellationToken = default) =>
             {
-                var tournamentParticipation = request.MapToTournamentParticipation();
-                await service.CreateAsync(tournamentParticipation, token);
+                var participation = request.MapToTournamentParticipation(id);
+                _ = await service.CreateAsync(participation, cancellationToken);
 
-                var response = tournamentParticipation.MapToResponse();
+                var response = participation.MapToResponse();
                 return TypedResults.CreatedAtRoute(
                     response,
                     GetTournamentParticipationByIdEndpoint.Name,

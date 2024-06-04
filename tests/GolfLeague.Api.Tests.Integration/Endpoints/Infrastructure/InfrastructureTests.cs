@@ -3,15 +3,26 @@ using System.Net.Http.Headers;
 
 using FluentAssertions;
 
+using Microsoft.AspNetCore.Mvc.Testing;
+
 namespace GolfLeague.Api.Tests.Integration.Endpoints.Infrastructure;
 
-public class InfrastructureTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
+public class DatabaseNotNeededFactory : WebApplicationFactory<IGolfApiMarker>
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseSetting("Database:ConnectionString", "Server=localhost,9433;TrustServerCertificate=True;");
+        base.ConfigureWebHost(builder);
+    }
+}
+
+public class InfrastructureTests(DatabaseNotNeededFactory factory) : IClassFixture<DatabaseNotNeededFactory>
 {
     [Fact]
     public async Task Authentication_WhenJwtTokenIsExpired_ShouldFailWithUnauthenticated()
     {
         // arrange
-        using var client = golfApiFactory.CreateClient();
+        using var client = factory.CreateClient();
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken(customTimeSpan: TimeSpan.FromSeconds(1)));
@@ -26,15 +37,32 @@ public class InfrastructureTests(GolfApiFactory golfApiFactory) : IClassFixture<
     }
 
     [Fact]
-    public async Task HealthCheck_WhenHealthy_ShouldReturnHealthy()
+    public async Task HealthCheck_WhenUnhealthy_ShouldReturnUnhealthy()
     {
-        using var client = golfApiFactory.CreateClient();
+        // Arrange
+        using var client = factory.CreateClient();
 
+        // Act
+        // var response = await client.GetAsync("/swagger/v1/swagger.json");
         var response = await client.GetAsync("/_health");
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
 
         var message = await response.Content.ReadAsStringAsync();
-        message.Should().Be("Healthy");
+        message.Should().Be("Unhealthy");
+    }
+
+    [Fact]
+    public async Task Swagger_WhenCalled_ShouldReturnOK()
+    {
+        // Arrange
+        using var client = factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/swagger/v1/swagger.json");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

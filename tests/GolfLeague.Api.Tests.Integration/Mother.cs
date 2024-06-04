@@ -43,18 +43,34 @@ public static class Mother
         return tournament!;
     }
 
-    public static async Task<TournamentParticipationResponse> CreateTournamentParticipationAsync(
+    public static async Task<TournamentParticipationResponse> CreateGolferTournamentParticipationAsync(
         HttpClient client,
         int golferId,
         int tournamentId)
     {
-        var tournamentParticipationsRequest = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = golferId, TournamentId = tournamentId, Year = GenerateYear()
+            TournamentId = tournamentId, Year = GenerateYear()
         };
 
         var response = await client.PostAsJsonAsync(
-            TournamentParticipationsApiBasePath, tournamentParticipationsRequest);
+            $"{GolfersApiBasePath}/{golferId}/tournamentparticipations",
+            request);
+
+        var tournamentParticipation = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
+        return tournamentParticipation!;
+    }
+
+    public static async Task<TournamentParticipationResponse> CreateTournamentGolferParticipationAsync(
+        HttpClient client,
+        int golferId,
+        int tournamentId)
+    {
+        var request = new CreateTournamentGolferParticipationRequest { GolferId = golferId, Year = GenerateYear() };
+
+        var response = await client.PostAsJsonAsync(
+            $"{TournamentsApiBasePath}/{tournamentId}/tournamentparticipations",
+            request);
 
         var tournamentParticipation = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
         return tournamentParticipation!;

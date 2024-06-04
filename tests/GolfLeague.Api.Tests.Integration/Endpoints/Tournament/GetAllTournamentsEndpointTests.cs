@@ -18,7 +18,7 @@ public abstract class GetAllTournamentsEndpointTests
             using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
             var createdGolfer = await Mother.CreateGolferAsync(client);
             var createdTournament = await Mother.CreateTournamentAsync(client);
-            var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+            var createdTournamentParticipation = await Mother.CreateTournamentGolferParticipationAsync(
                 client,
                 createdGolfer.GolferId,
                 createdTournament.TournamentId);

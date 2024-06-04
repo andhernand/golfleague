@@ -91,15 +91,6 @@ public static class ContractMapping
         };
     }
 
-    public static TournamentParticipation MapToTournamentParticipation(
-        this CreateTournamentParticipationsRequest request)
-    {
-        return new TournamentParticipation
-        {
-            GolferId = request.GolferId, TournamentId = request.TournamentId, Year = request.Year
-        };
-    }
-
     public static TournamentDetailResponse MapToResponse(this TournamentDetail tournamentDetail)
     {
         return new TournamentDetailResponse
@@ -119,6 +110,26 @@ public static class ContractMapping
             FirstName = participationDetail.FirstName,
             LastName = participationDetail.LastName,
             Year = participationDetail.Year
+        };
+    }
+
+    public static TournamentParticipation MapToTournamentParticipation(
+        this CreateGolferTournamentParticipationRequest request,
+        int golferId)
+    {
+        return new TournamentParticipation
+        {
+            GolferId = golferId, TournamentId = request.TournamentId, Year = request.Year
+        };
+    }
+
+    public static TournamentParticipation MapToTournamentParticipation(
+        this CreateTournamentGolferParticipationRequest request,
+        int tournamentId)
+    {
+        return new TournamentParticipation
+        {
+            GolferId = request.GolferId, TournamentId = tournamentId, Year = request.Year
         };
     }
 }

@@ -29,12 +29,13 @@ public class GolferValidator : AbstractValidator<Golfer>
             });
 
         RuleFor(m => m.JoinDate)
-            .NotEmpty();
-
-        RuleFor(m => m.JoinDate.Year)
-            .LessThanOrEqualTo(DateTime.UtcNow.Year)
-            .OverridePropertyName("JoinDate")
-            .WithName("Join Date");
+            .NotEmpty()
+            .DependentRules(() =>
+            {
+                RuleFor(m => m.JoinDate.Year)
+                    .LessThanOrEqualTo(DateTime.UtcNow.Year)
+                    .OverridePropertyName("JoinDate");
+            });
 
         RuleFor(m => m.Handicap)
             .InclusiveBetween(0, 54)

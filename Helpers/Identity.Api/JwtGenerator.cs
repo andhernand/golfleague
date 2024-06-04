@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 using Bogus;
 
@@ -22,35 +23,12 @@ public static class JwtGenerator
     {
         Logger = Log.ForContext(typeof(JwtGenerator));
 
-        var keyString = ConfigurationHelper.Configuration["JwtSettings:Key"];
-        if (string.IsNullOrEmpty(keyString))
-        {
-            var ex = new InvalidOperationException("JWT Key not found in configuration");
-            Logger.Error(ex, "JWT Key not found in configuration");
-            throw ex;
-        }
+        var jwtSettings = new JwtOptions();
+        ConfigurationHelper.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 
-        Key = System.Text.Encoding.UTF8.GetBytes(keyString);
-
-        var issuer = ConfigurationHelper.Configuration["JwtSettings:Issuer"]!;
-        if (string.IsNullOrEmpty(issuer))
-        {
-            var ex = new InvalidOperationException("JWT Issuer not found in configuration");
-            Logger.Error(ex, "JWT Issuer not found in configuration");
-            throw ex;
-        }
-
-        CustomIssuer = issuer;
-
-        var audience = ConfigurationHelper.Configuration["JwtSettings:Audience"];
-        if (string.IsNullOrEmpty(audience))
-        {
-            var ex = new InvalidOperationException("JWT Audience not found in configuration");
-            Logger.Error(ex, "JWT Audience not found in configuration");
-            throw ex;
-        }
-
-        CustomAudience = audience;
+        Key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+        CustomIssuer = jwtSettings.Issuer;
+        CustomAudience = jwtSettings.Audience;
     }
 
     public static string GenerateToken(
