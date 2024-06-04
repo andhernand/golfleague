@@ -13,23 +13,25 @@ namespace GolfLeague.Api.Tests.Integration.Endpoints.TournamentParticipation;
 public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<GolfApiFactory>
 {
     [Fact]
-    public async Task CreateTournamentParticipation_WhenDataIsCorrect_ShouldCreateTournamentParticipation()
+    public async Task CreateGolferTournamentParticipation_WhenDataIsCorrect_ShouldCreateTournamentParticipation()
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
         var expectedGolfer = await Mother.CreateGolferAsync(client);
         var expectedTournament = await Mother.CreateTournamentAsync(client);
         var expectedYear = Mother.GenerateYear();
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = expectedGolfer.GolferId, TournamentId = expectedTournament.TournamentId, Year = expectedYear
+            TournamentId = expectedTournament.TournamentId, Year = expectedYear
         };
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{expectedGolfer.GolferId}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -48,23 +50,63 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenGolferIdIsInvalid_ShouldReturnBadRequest()
+    public async Task CreateTournamentGolferParticipation_WhenDataIsCorrect_ShouldCreateTournamentParticipation()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var expectedGolfer = await Mother.CreateGolferAsync(client);
+        var expectedTournament = await Mother.CreateTournamentAsync(client);
+        var expectedYear = Mother.GenerateYear();
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = expectedGolfer.GolferId, Year = expectedYear
+        };
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{expectedTournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var actual = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
+
+        response.Headers.Location.Should().Be(
+            $"http://localhost{Mother.TournamentParticipationsApiBasePath}"
+            + $"?golferId={actual!.GolferId}"
+            + $"&tournamentId={actual.TournamentId}"
+            + $"&year={actual.Year}");
+
+        actual!.GolferId.Should().Be(expectedGolfer.GolferId);
+        actual.TournamentId.Should().Be(expectedTournament.TournamentId);
+        actual.Year.Should().Be(expectedYear);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenGolferIdIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
 
         var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
             { "GolferId", ["'Golfer Id' must not be empty."] }
         });
 
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = default, TournamentId = 12323, Year = 2015
+            TournamentId = createdTournament.TournamentId, Year = Mother.GenerateYear()
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{default(int)}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -74,23 +116,113 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenTournamentIdInvalid_ShouldReturnBadRequest()
+    public async Task CreateTournamentGolferParticipation_WhenGolferIdIsInvalid_ShouldReturnBadRequest()
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "GolferId", ["'Golfer Id' must not be empty."] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = default, Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{createdTournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenGolferIdDoesNotExist_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "GolferId", ["'Golfer Id' does not exists in the system"] }
+        });
+
+        var request = new CreateGolferTournamentParticipationRequest
+        {
+            TournamentId = createdTournament.TournamentId, Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournamentGolferParticipation_WhenGolferIdDoesNotExist_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var createdTournament = await Mother.CreateTournamentAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "GolferId", ["'Golfer Id' does not exists in the system"] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{createdTournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenTournamentIdInvalid_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
 
         var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
             { "TournamentId", ["'Tournament Id' must not be empty."] }
         });
 
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest()
         {
-            GolferId = 23112, TournamentId = default, Year = 2015
+            TournamentId = default, Year = Mother.GenerateYear()
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -100,23 +232,114 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenYearIsInvalid_ShouldReturnBadRequest()
+    public async Task CreateTournamentGolferParticipation_WhenTournamentIdInvalid_ShouldReturnBadRequest()
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "TournamentId", ["'Tournament Id' must not be empty."] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest()
+        {
+            GolferId = golfer.GolferId, Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{default(int)}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenTournamentIdDoesNotExist_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "TournamentId", ["'Tournament Id' does not exists in the system"] }
+        });
+
+        var request = new CreateGolferTournamentParticipationRequest()
+        {
+            TournamentId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournamentGolferParticipation_WhenTournamentIdDoesNotExist_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "TournamentId", ["'Tournament Id' does not exists in the system"] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest()
+        {
+            GolferId = golfer.GolferId, Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenYearIsInvalid_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
 
         var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
             { "Year", ["'Year' must not be empty."] }
         });
 
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = 3214, TournamentId = 12323, Year = default
+            TournamentId = tournament.TournamentId, Year = default
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -126,16 +349,165 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenTournamentParticipationAlreadyExists_ShouldReturnBadRequest()
+    public async Task CreateTournamentGolferParticipation_WhenYearIsInvalid_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Year", ["'Year' must not be empty."] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest { GolferId = golfer.GolferId, Year = default };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenYearIsLessThan1916_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        const int lowYear = 1910;
+        var currentYear = DateTime.UtcNow.Year;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Year", [$"'Year' must be between 1916 and {currentYear}. You entered {lowYear}."] }
+        });
+
+        var request = new CreateGolferTournamentParticipationRequest
+        {
+            TournamentId = tournament.TournamentId, Year = lowYear
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournamentGolferParticipation_WhenYearIsLessThan1916_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        const int lowYear = 1910;
+        var currentYear = DateTime.UtcNow.Year;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Year", [$"'Year' must be between 1916 and {currentYear}. You entered {lowYear}."] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest { GolferId = golfer.GolferId, Year = lowYear };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenYearIsGreaterThanCurrentYear_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        var currentYear = DateTime.UtcNow.Year;
+        var higherYear = currentYear + 3;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Year", [$"'Year' must be between 1916 and {currentYear}. You entered {higherYear}."] }
+        });
+
+        var request = new CreateGolferTournamentParticipationRequest
+        {
+            TournamentId = tournament.TournamentId, Year = higherYear
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateTournamentGolferParticipation_WhenYearIsGreaterThanCurrentYear_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        var currentYear = DateTime.UtcNow.Year;
+        var higherYear = currentYear + 3;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Year", [$"'Year' must be between 1916 and {currentYear}. You entered {higherYear}."] }
+        });
+
+        var request = new CreateTournamentGolferParticipationRequest { GolferId = golfer.GolferId, Year = higherYear };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenAlreadyExists_ShouldReturnBadRequest()
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
-        var createdGolfer = await Mother.CreateGolferAsync(client);
-        var createdTournament = await Mother.CreateTournamentAsync(client);
-        var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+        var participation = await Mother.CreateGolferTournamentParticipationAsync(
             client,
-            createdGolfer.GolferId,
-            createdTournament.TournamentId);
+            golfer.GolferId,
+            tournament.TournamentId);
 
         var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
         {
@@ -145,15 +517,15 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
 
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = createdTournamentParticipation.GolferId,
-            TournamentId = createdTournamentParticipation.TournamentId,
-            Year = createdTournamentParticipation.Year
+            TournamentId = participation.TournamentId, Year = participation.Year
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{golfer.GolferId}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -163,39 +535,115 @@ public class CreateTournamentParticipationEndpointTests(GolfApiFactory golfApiFa
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
+    public async Task CreateTournamentGolferParticipation_WhenAlreadyExists_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+        var participation = await Mother.CreateTournamentGolferParticipationAsync(
+            client,
+            golfer.GolferId,
+            tournament.TournamentId);
+
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "TournamentParticipation", ["TournamentParticipation already exists in the system."] }
+        });
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", JwtGenerator.GenerateToken(isTrusted: true));
+
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = participation.GolferId, Year = participation.Year
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
     {
         // Arrange
         using var client = golfApiFactory.CreateClient();
 
-        var request = new CreateTournamentParticipationsRequest
+        var request = new CreateGolferTournamentParticipationRequest
         {
-            GolferId = Mother.GeneratePositiveInteger(),
-            TournamentId = Mother.GeneratePositiveInteger(),
-            Year = Mother.GenerateYear()
+            TournamentId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
-    public async Task CreateTournamentParticipation_WhenClientDoesNotHaveProperPermissions_ShouldFailWithForbidden()
+    public async Task CreateTournamentGolferParticipation_WhenClientIsUnauthorized_ShouldFailWithUnauthorized()
     {
         // Arrange
-        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
-        var request = new CreateTournamentParticipationsRequest
+        using var client = golfApiFactory.CreateClient();
+
+        var request = new CreateTournamentGolferParticipationRequest
         {
-            GolferId = Mother.GeneratePositiveInteger(),
-            TournamentId = Mother.GeneratePositiveInteger(),
-            Year = Mother.GenerateYear()
+            GolferId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
         };
 
         // Act
-        var response = await client.PostAsJsonAsync(Mother.TournamentParticipationsApiBasePath, request);
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task CreateGolferTournamentParticipation_WhenInsufficientPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+        var request = new CreateGolferTournamentParticipationRequest
+        {
+            TournamentId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.GolfersApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task CreateTournamentGolferParticipation_WhenInsufficientPermissions_ShouldFailWithForbidden()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory);
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = Mother.GeneratePositiveInteger(), Year = Mother.GenerateYear()
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{Mother.GeneratePositiveInteger()}/tournamentparticipations",
+            request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);

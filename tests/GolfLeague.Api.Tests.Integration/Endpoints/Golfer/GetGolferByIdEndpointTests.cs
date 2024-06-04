@@ -62,7 +62,7 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
 
         var createdGolfer = await Mother.CreateGolferAsync(client);
         var createdTournament = await Mother.CreateTournamentAsync(client);
-        var createdTournamentParticipation = await Mother.CreateTournamentParticipationAsync(
+        var createdTournamentParticipation = await Mother.CreateGolferTournamentParticipationAsync(
             client,
             createdGolfer.GolferId,
             createdTournament.TournamentId);
@@ -112,5 +112,18 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
 
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task HealthCheck_WhenHealthy_ShouldReturnHealthy()
+    {
+        using var client = golfApiFactory.CreateClient();
+
+        var response = await client.GetAsync("/_health");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var message = await response.Content.ReadAsStringAsync();
+        message.Should().Be("Healthy");
     }
 }
