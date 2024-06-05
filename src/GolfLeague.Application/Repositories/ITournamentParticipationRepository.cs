@@ -14,4 +14,5 @@ public interface ITournamentParticipationRepository
 
     Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByIdAsync(TournamentParticipation id, CancellationToken token = default);
+    Task<bool> UpdateAsync(UpdateTournamentParticipation update, CancellationToken token = default);
 }

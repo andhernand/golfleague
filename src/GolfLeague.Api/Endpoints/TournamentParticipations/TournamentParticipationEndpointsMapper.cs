@@ -8,6 +8,8 @@ public static class TournamentParticipationEndpointsMapper
             .MapGetTournamentParticipationById()
             .MapDeleteTournamentParticipation()
             .MapCreateGolferTournamentParticipation()
-            .MapCreateTournamentGolferParticipationEndpoint();
+            .MapCreateTournamentGolferParticipationEndpoint()
+            .MapUpdateGolferTournamentParticipation()
+            .MapUpdateTournamentGolferParticipation();
     }
 }

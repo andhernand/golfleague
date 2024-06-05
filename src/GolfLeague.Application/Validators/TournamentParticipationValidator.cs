@@ -55,13 +55,13 @@ public class TournamentParticipationValidator : AbstractValidator<TournamentPart
             .When(x => x.GolferId != default && x.TournamentId != default && x.Year != default);
     }
 
-    private async Task<bool> ValidateGolferIdAsync(int golferId, CancellationToken token)
+    private async Task<bool> ValidateGolferIdAsync(int golferId, CancellationToken token = default)
     {
         var exists = await _golferRepository.ExistsByIdAsync(golferId, token);
         return exists;
     }
 
-    private async Task<bool> ValidateTournamentIdAsync(int tournamentId, CancellationToken token)
+    private async Task<bool> ValidateTournamentIdAsync(int tournamentId, CancellationToken token = default)
     {
         var exists = await _tournamentRepository.ExistsByIdAsync(tournamentId, token);
         return exists;

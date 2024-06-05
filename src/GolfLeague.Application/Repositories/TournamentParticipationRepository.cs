@@ -80,7 +80,8 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
 
     public async Task<bool> ExistsByIdAsync(TournamentParticipation id, CancellationToken token = default)
     {
-        _logger.Information("Checking for the existence of TournamentParticipation with {@TournamentParticipation}",
+        _logger.Information(
+            "Checking for the existence of TournamentParticipation with {@TournamentParticipation}",
             id);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
@@ -97,5 +98,31 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
                 id,
                 commandType: CommandType.Text,
                 cancellationToken: token));
+    }
+
+    public async Task<bool> UpdateAsync(UpdateTournamentParticipation update, CancellationToken token = default)
+    {
+        _logger.Information(
+            "Updating {@Original} with {@Update}",
+            update.Original,
+            update.Update);
+
+        using var connection = await connectionFactory.CreateConnectionAsync(token);
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@OriginalGolferId", update.Original.GolferId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@OriginalTournamentId", update.Original.TournamentId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@OriginalYear", update.Original.Year.ToString(), DbType.String, ParameterDirection.Input);
+        parameters.Add("@NewGolferId", update.Update.GolferId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@NewTournamentId", update.Update.TournamentId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@NewYear", update.Update.Year.ToString(), DbType.String, ParameterDirection.Input);
+
+        var result = await connection.ExecuteAsync(new CommandDefinition(
+            "dbo.usp_TournamentParticipation_Update",
+            parameters,
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: token));
+
+        return result > 0;
     }
 }
