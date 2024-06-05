@@ -132,4 +132,38 @@ public static class ContractMapping
             GolferId = request.GolferId, TournamentId = tournamentId, Year = request.Year
         };
     }
+
+    public static UpdateTournamentParticipation MapToUpdateTournamentParticipation(
+        this UpdateGolferTournamentParticipationRequest request,
+        int golferId)
+    {
+        return new UpdateTournamentParticipation
+        {
+            Original = new TournamentParticipation
+            {
+                GolferId = golferId, TournamentId = request.OriginalTournamentId, Year = request.OriginalYear
+            },
+            Update = new TournamentParticipation
+            {
+                GolferId = golferId, TournamentId = request.NewTournamentId, Year = request.NewYear
+            }
+        };
+    }
+
+    public static UpdateTournamentParticipation MapToUpdateTournamentParticipation(
+        this UpdateTournamentGolferParticipationRequest request,
+        int tournamentId)
+    {
+        return new UpdateTournamentParticipation
+        {
+            Original = new TournamentParticipation
+            {
+                GolferId = request.OriginalGolferId, TournamentId = tournamentId, Year = request.OriginalYear
+            },
+            Update = new TournamentParticipation
+            {
+                GolferId = request.NewGolferId, TournamentId = tournamentId, Year = request.NewYear
+            }
+        };
+    }
 }

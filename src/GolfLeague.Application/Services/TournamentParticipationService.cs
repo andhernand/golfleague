@@ -25,8 +25,24 @@ public class TournamentParticipationService(
         return await repository.GetTournamentParticipationById(id, cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default)
     {
         return await repository.DeleteAsync(id, cancellationToken);
+    }
+
+    public async Task<TournamentParticipation?> UpdateAsync(
+        UpdateTournamentParticipation update,
+        CancellationToken token = default)
+    {
+        await validator.ValidateAndThrowAsync(update.Update, cancellationToken: token);
+
+        var participationExists = await repository.ExistsByIdAsync(update.Original, token);
+        if (!participationExists)
+        {
+            return null;
+        }
+
+        _ = await repository.UpdateAsync(update, token);
+        return update.Update;
     }
 }

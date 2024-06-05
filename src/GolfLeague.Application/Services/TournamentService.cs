@@ -36,7 +36,7 @@ public class TournamentService(ITournamentRepository repository, IValidator<Tour
         return tournament;
     }
 
-    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
+    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token = default)
     {
         return await repository.DeleteByIdAsync(id, token);
     }

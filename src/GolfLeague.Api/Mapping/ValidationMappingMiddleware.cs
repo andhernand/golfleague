@@ -31,5 +31,16 @@ public class ValidationMappingMiddleware(RequestDelegate next)
 
             await context.Response.WriteAsJsonAsync(validationProblem);
         }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Unhandled Exception Occured");
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            var problemDetail = new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError, Title = ex.Message
+            };
+
+            await context.Response.WriteAsJsonAsync(problemDetail);
+        }
     }
 }

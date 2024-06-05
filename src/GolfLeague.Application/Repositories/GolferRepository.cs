@@ -39,7 +39,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return golferId;
     }
 
-    public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token)
+    public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token = default)
     {
         _logger.Information("Retrieving Golfer by {GolferId}", id);
 
@@ -73,7 +73,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return golferDictionary.Values.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token)
+    public async Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token = default)
     {
         _logger.Information("Retrieving All Golfers");
 
@@ -106,7 +106,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return golferDictionary.Values;
     }
 
-    public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token)
+    public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token = default)
     {
         _logger.Information("Updating {@Golfer}", golfer);
 
@@ -128,7 +128,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return result > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token)
+    public async Task<bool> DeleteByIdAsync(int id, CancellationToken token = default)
     {
         _logger.Information("Deleting {GolferId}", id);
 
@@ -150,7 +150,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return result;
     }
 
-    public async Task<bool> ExistsByIdAsync(int id, CancellationToken token)
+    public async Task<bool> ExistsByIdAsync(int id, CancellationToken token = default)
     {
         _logger.Information("Checking for the existence of a Golfer with {GolferId}", id);
 

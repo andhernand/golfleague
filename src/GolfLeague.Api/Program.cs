@@ -78,7 +78,6 @@ app.UseHealthChecks(new PathString("/_health"));
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSerilogRequestLogging();
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapApiEndpoints();
 

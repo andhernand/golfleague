@@ -2,6 +2,6 @@
 
 public class CreateTournamentGolferParticipationRequest
 {
-    public int GolferId { get; set; }
-    public int Year { get; set; }
+    public required int GolferId { get; init; }
+    public required int Year { get; init; }
 }

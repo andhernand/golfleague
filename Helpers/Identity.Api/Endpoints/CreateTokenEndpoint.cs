@@ -11,8 +11,9 @@ public static class CreateTokenEndpoint
     {
         app.MapPost(IdentityApiConstants.Tokens.Create, (TokenGenerationRequest request) =>
             {
+                Logger.Information("Generating {@TokenGenerationRequest}", request);
                 var jwt = JwtGenerator.GenerateToken(request.IsAdmin, request.IsTrusted);
-                Logger.Verbose("Created Token: {JwtToken}", jwt);
+                Logger.Verbose("Created: {JwtToken}", jwt);
                 return TypedResults.Text(jwt);
             })
             .WithName(Name)

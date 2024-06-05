@@ -14,7 +14,7 @@ public static class CreateTournamentGolferParticipationEndpoint
 
     public static IEndpointRouteBuilder MapCreateTournamentGolferParticipationEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost(GolfApiEndpoints.Tournaments.TournamentGolferParticipations, async (
+        app.MapPost(GolfApiEndpoints.Tournaments.CreateTournamentGolferParticipations, async (
                 int id,
                 ITournamentParticipationService service,
                 CreateTournamentGolferParticipationRequest request,

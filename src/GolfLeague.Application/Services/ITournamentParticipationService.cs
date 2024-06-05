@@ -13,4 +13,5 @@ public interface ITournamentParticipationService
         CancellationToken cancellationToken = default);
 
     Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default);
+    Task<TournamentParticipation?> UpdateAsync(UpdateTournamentParticipation update, CancellationToken token = default);
 }
