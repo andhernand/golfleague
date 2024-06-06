@@ -42,15 +42,16 @@ public abstract class GetAllGolfersEndpointTests
                                 TournamentId = createdTournament.TournamentId,
                                 Name = createdTournament.Name,
                                 Format = createdTournament.Format,
-                                Year = createdTournamentParticipation.Year
+                                Year = createdTournamentParticipation.Year,
+                                Score = createdTournamentParticipation.Score
                             }
                         }
                     }
                 }
             };
 
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", JwtGenerator.GenerateToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer", JwtGenerator.GenerateToken());
 
             // Act
             var response = await client.GetAsync(Mother.GolfersApiBasePath);

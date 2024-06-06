@@ -82,7 +82,8 @@ public class GetGolferByIdEndpointTests(GolfApiFactory golfApiFactory) : IClassF
                     TournamentId = createdTournament.TournamentId,
                     Name = createdTournament.Name,
                     Format = createdTournament.Format,
-                    Year = createdTournamentParticipation.Year
+                    Year = createdTournamentParticipation.Year,
+                    Score = createdTournamentParticipation.Score
                 }
             }
         };

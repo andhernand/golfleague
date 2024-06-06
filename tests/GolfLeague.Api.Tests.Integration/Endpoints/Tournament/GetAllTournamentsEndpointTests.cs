@@ -39,7 +39,8 @@ public abstract class GetAllTournamentsEndpointTests
                                 GolferId = createdGolfer.GolferId,
                                 FirstName = createdGolfer.FirstName,
                                 LastName = createdGolfer.LastName,
-                                Year = createdTournamentParticipation.Year
+                                Year = createdTournamentParticipation.Year,
+                                Score = createdTournamentParticipation.Score
                             }
                         }
                     }
