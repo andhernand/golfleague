@@ -87,7 +87,8 @@ public static class ContractMapping
         {
             GolferId = tournamentParticipation.GolferId,
             TournamentId = tournamentParticipation.TournamentId,
-            Year = tournamentParticipation.Year
+            Year = tournamentParticipation.Year,
+            Score = tournamentParticipation.Score
         };
     }
 
@@ -98,7 +99,8 @@ public static class ContractMapping
             TournamentId = tournamentDetail.TournamentId,
             Name = tournamentDetail.Name,
             Format = tournamentDetail.Format,
-            Year = tournamentDetail.Year
+            Year = tournamentDetail.Year,
+            Score = tournamentDetail.Score
         };
     }
 
@@ -109,7 +111,8 @@ public static class ContractMapping
             GolferId = participationDetail.GolferId,
             FirstName = participationDetail.FirstName,
             LastName = participationDetail.LastName,
-            Year = participationDetail.Year
+            Year = participationDetail.Year,
+            Score = participationDetail.Score
         };
     }
 
@@ -119,7 +122,7 @@ public static class ContractMapping
     {
         return new TournamentParticipation
         {
-            GolferId = golferId, TournamentId = request.TournamentId, Year = request.Year
+            GolferId = golferId, TournamentId = request.TournamentId, Year = request.Year, Score = request.Score
         };
     }
 
@@ -129,7 +132,7 @@ public static class ContractMapping
     {
         return new TournamentParticipation
         {
-            GolferId = request.GolferId, TournamentId = tournamentId, Year = request.Year
+            GolferId = request.GolferId, TournamentId = tournamentId, Year = request.Year, Score = request.Score
         };
     }
 
@@ -145,7 +148,10 @@ public static class ContractMapping
             },
             Update = new TournamentParticipation
             {
-                GolferId = golferId, TournamentId = request.NewTournamentId, Year = request.NewYear
+                GolferId = golferId,
+                TournamentId = request.NewTournamentId,
+                Year = request.NewYear,
+                Score = request.NewScore
             }
         };
     }
@@ -162,7 +168,10 @@ public static class ContractMapping
             },
             Update = new TournamentParticipation
             {
-                GolferId = request.NewGolferId, TournamentId = tournamentId, Year = request.NewYear
+                GolferId = request.NewGolferId,
+                TournamentId = tournamentId,
+                Year = request.NewYear,
+                Score = request.NewScore
             }
         };
     }

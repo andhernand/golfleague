@@ -50,7 +50,7 @@ public static class Mother
     {
         var request = new CreateGolferTournamentParticipationRequest
         {
-            TournamentId = tournamentId, Year = GenerateYear()
+            TournamentId = tournamentId, Year = GenerateYear(), Score = GenerateScore()
         };
 
         var response = await client.PostAsJsonAsync(
@@ -66,7 +66,10 @@ public static class Mother
         int golferId,
         int tournamentId)
     {
-        var request = new CreateTournamentGolferParticipationRequest { GolferId = golferId, Year = GenerateYear() };
+        var request = new CreateTournamentGolferParticipationRequest
+        {
+            GolferId = golferId, Year = GenerateYear(), Score = GenerateScore()
+        };
 
         var response = await client.PostAsJsonAsync(
             $"{TournamentsApiBasePath}/{tournamentId}/tournamentparticipations",
@@ -141,5 +144,10 @@ public static class Mother
     public static ValidationProblemDetails CreateValidationProblemDetails(Dictionary<string, string[]> errors)
     {
         return new ValidationProblemDetails { Status = StatusCodes.Status400BadRequest, Errors = errors };
+    }
+
+    public static int GenerateScore()
+    {
+        return new Faker().Random.Int(50, 130);
     }
 }

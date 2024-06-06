@@ -48,6 +48,10 @@ public class TournamentParticipationValidator : AbstractValidator<TournamentPart
                     .InclusiveBetween(1916, DateTime.UtcNow.Year);
             });
 
+        RuleFor(x => x.Score)
+            .InclusiveBetween(50, 130)
+            .When(x => x.Score is not null);
+
         RuleFor(x => x)
             .MustAsync(ValidateTournamentParticipationAsync)
             .OverridePropertyName("TournamentParticipation")

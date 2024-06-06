@@ -6,4 +6,5 @@ public class TournamentDetail
     public required string Name { get; init; }
     public required string Format { get; init; }
     public required int Year { get; init; }
+    public int? Score { get; init; }
 }

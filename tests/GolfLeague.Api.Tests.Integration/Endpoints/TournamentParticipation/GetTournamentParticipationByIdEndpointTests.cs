@@ -15,12 +15,12 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory, isAdmin: true);
-        var createdGolfer = await Mother.CreateGolferAsync(client);
-        var createdTournament = await Mother.CreateTournamentAsync(client);
-        var createdTournamentParticipation = await Mother.CreateGolferTournamentParticipationAsync(
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+        var participation = await Mother.CreateGolferTournamentParticipationAsync(
             client,
-            createdGolfer.GolferId,
-            createdTournament.TournamentId);
+            golfer.GolferId,
+            tournament.TournamentId);
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer", JwtGenerator.GenerateToken());
@@ -28,16 +28,15 @@ public class GetTournamentParticipationByIdEndpointTests(GolfApiFactory golfApiF
         // Act
         var response = await client.GetAsync(
             $"{Mother.TournamentParticipationsApiBasePath}"
-            + $"?golferId={createdTournamentParticipation.GolferId}"
-            + $"&tournamentId={createdTournamentParticipation.TournamentId}"
-            + $"&year={createdTournamentParticipation.Year}");
+            + $"?golferId={participation.GolferId}"
+            + $"&tournamentId={participation.TournamentId}"
+            + $"&year={participation.Year}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var actual = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
-
-        actual.Should().BeEquivalentTo(createdTournamentParticipation);
+        actual.Should().BeEquivalentTo(participation);
     }
 
     [Fact]

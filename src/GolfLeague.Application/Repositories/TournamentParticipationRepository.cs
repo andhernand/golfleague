@@ -26,6 +26,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
         parameters.Add("@GolferId", tournamentParticipation.GolferId, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@TournamentId", tournamentParticipation.TournamentId, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@Year", tournamentParticipation.Year.ToString(), DbType.String, ParameterDirection.Input);
+        parameters.Add("@Score", tournamentParticipation.Score, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@RowCount", 0, DbType.Int32, ParameterDirection.Output);
 
         await connection.ExecuteAsync(new CommandDefinition(
@@ -49,7 +50,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
         var tournamentParticipation = await connection.QuerySingleOrDefaultAsync<TournamentParticipation>(
             new CommandDefinition(
                 "dbo.usp_TournamentParticipation_GetById",
-                id,
+                new { id.GolferId, id.TournamentId, id.Year },
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: cancellationToken));
 
@@ -95,7 +96,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
                     AND [TournamentId] = @TournamentId
                     AND [Year] = @Year;
                 """,
-                id,
+                new { id.GolferId, id.TournamentId, id.Year },
                 commandType: CommandType.Text,
                 cancellationToken: token));
     }
@@ -116,6 +117,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
         parameters.Add("@NewGolferId", update.Update.GolferId, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@NewTournamentId", update.Update.TournamentId, DbType.Int32, ParameterDirection.Input);
         parameters.Add("@NewYear", update.Update.Year.ToString(), DbType.String, ParameterDirection.Input);
+        parameters.Add("@Score", update.Update.Score, DbType.Int32, ParameterDirection.Input);
 
         var result = await connection.ExecuteAsync(new CommandDefinition(
             "dbo.usp_TournamentParticipation_Update",

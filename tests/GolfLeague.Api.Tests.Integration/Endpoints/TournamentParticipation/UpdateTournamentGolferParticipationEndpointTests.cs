@@ -24,7 +24,10 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
 
         var expected = new TournamentParticipationResponse
         {
-            TournamentId = tournament.TournamentId, GolferId = golfer.GolferId, Year = Mother.GenerateYear()
+            TournamentId = tournament.TournamentId,
+            GolferId = golfer.GolferId,
+            Year = Mother.GenerateYear(),
+            Score = Mother.GenerateScore()
         };
 
         var request = new UpdateTournamentGolferParticipationRequest
@@ -32,7 +35,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = expected.Year
+            NewYear = expected.Year,
+            NewScore = expected.Score
         };
 
         // Act
@@ -67,7 +71,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = default,
-            NewYear = Mother.GenerateYear()
+            NewYear = Mother.GenerateYear(),
+            NewScore = participation.Score
         };
 
         // Act
@@ -102,7 +107,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = Mother.GeneratePositiveInteger(),
-            NewYear = participation.Year
+            NewYear = participation.Year,
+            NewScore = participation.Score
         };
 
         // Act
@@ -137,7 +143,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = Mother.GenerateYear()
+            NewYear = Mother.GenerateYear(),
+            NewScore = Mother.GenerateScore()
         };
 
         // Act
@@ -172,7 +179,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = Mother.GenerateYear()
+            NewYear = Mother.GenerateYear(),
+            NewScore = Mother.GenerateScore()
         };
 
         // Act
@@ -207,7 +215,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = default
+            NewYear = default,
+            NewScore = participation.Score
         };
 
         // Act
@@ -244,7 +253,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = lowYear
+            NewYear = lowYear,
+            NewScore = participation.Score
         };
 
         // Act
@@ -281,7 +291,84 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = golfer.GolferId,
-            NewYear = higherYear
+            NewYear = higherYear,
+            NewScore = participation.Score
+        };
+
+        // Act
+        var response = await client.PutAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task UpdateTournamentGolferParticipation_WhenScoreIsLessThan50_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+        var participation = await Mother.CreateGolferTournamentParticipationAsync(
+            client, golfer.GolferId, tournament.TournamentId);
+        var newGolfer = await Mother.CreateGolferAsync(client);
+
+        const int lowScore = 44;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Score", [$"'Score' must be between 50 and 130. You entered {lowScore}."] }
+        });
+
+        var request = new UpdateTournamentGolferParticipationRequest
+        {
+            OriginalGolferId = golfer.GolferId,
+            OriginalYear = participation.Year,
+            NewGolferId = newGolfer.GolferId,
+            NewYear = participation.Year,
+            NewScore = lowScore
+        };
+
+        // Act
+        var response = await client.PutAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var errors = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task UpdateTournamentGolferParticipation_WhenScoreIsGreaterThan130_ShouldReturnBadRequest()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+        var participation = await Mother.CreateGolferTournamentParticipationAsync(
+            client, golfer.GolferId, tournament.TournamentId);
+        var newGolfer = await Mother.CreateGolferAsync(client);
+
+        const int highScore = 166;
+        var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
+        {
+            { "Score", [$"'Score' must be between 50 and 130. You entered {highScore}."] }
+        });
+
+        var request = new UpdateTournamentGolferParticipationRequest
+        {
+            OriginalGolferId = golfer.GolferId,
+            OriginalYear = participation.Year,
+            NewGolferId = newGolfer.GolferId,
+            NewYear = participation.Year,
+            NewScore = highScore
         };
 
         // Act
@@ -320,7 +407,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = golfer.GolferId,
             OriginalYear = participation.Year,
             NewGolferId = newGolfer.GolferId,
-            NewYear = newParticipation.Year
+            NewYear = newParticipation.Year,
+            NewScore = newParticipation.Score
         };
 
         // Act
@@ -336,6 +424,41 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
     }
 
     [Fact]
+    public async Task UpdateTournamentGolferParticipation_WhenDoesNotExist_ShouldReturnNotFound()
+    {
+        // Arrange
+        using var client = Mother.CreateAuthorizedClient(golfApiFactory, isTrusted: true);
+        var golfer = await Mother.CreateGolferAsync(client);
+        var tournament = await Mother.CreateTournamentAsync(client);
+
+        var expected = new ProblemDetails
+        {
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+            Title = "Not Found",
+            Status = StatusCodes.Status404NotFound
+        };
+
+        var request = new UpdateTournamentGolferParticipationRequest()
+        {
+            OriginalGolferId = Mother.GeneratePositiveInteger(),
+            OriginalYear = Mother.GenerateYear(),
+            NewGolferId = golfer.GolferId,
+            NewYear = Mother.GenerateYear(),
+            NewScore = Mother.GenerateScore()
+        };
+
+        // Act
+        var response = await client.PutAsJsonAsync(
+            $"{Mother.TournamentsApiBasePath}/{tournament.TournamentId}/tournamentparticipations",
+            request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.Should().BeEquivalentTo(expected);
+    }
+    
+    [Fact]
     public async Task UpdateTournamentGolferParticipation_WhenUnauthorized_ShouldReturnUnauthorized()
     {
         // Arrange
@@ -345,7 +468,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = Mother.GeneratePositiveInteger(),
             OriginalYear = Mother.GenerateYear(),
             NewGolferId = Mother.GeneratePositiveInteger(),
-            NewYear = Mother.GenerateYear()
+            NewYear = Mother.GenerateYear(),
+            NewScore = Mother.GenerateScore()
         };
 
         // Act
@@ -367,7 +491,8 @@ public class UpdateTournamentGolferParticipationEndpointTests(GolfApiFactory gol
             OriginalGolferId = Mother.GeneratePositiveInteger(),
             OriginalYear = Mother.GenerateYear(),
             NewGolferId = Mother.GeneratePositiveInteger(),
-            NewYear = Mother.GenerateYear()
+            NewYear = Mother.GenerateYear(),
+            NewScore = Mother.GenerateScore()
         };
 
         // Act
