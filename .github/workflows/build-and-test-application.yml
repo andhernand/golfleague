@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4.1.6
 
       - name: Cache .NET packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4.0.2
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -65,5 +65,5 @@ jobs:
         with:
           name: golfleague-artifacts
           path: |
-            **/bin/Release/**
+            src/bin/Release/**
           overwrite: true
