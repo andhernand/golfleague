@@ -65,5 +65,5 @@ jobs:
         with:
           name: golfleague-artifacts
           path: |
-            src/bin/Release/**
+            src/**/bin/Release/**
           overwrite: true
