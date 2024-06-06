@@ -60,10 +60,14 @@ jobs:
           recreate: true
           path: code-coverage-results.md
 
-      - name: Upload build artifacts
+      - name: Create NuGet packages
+        run: |
+          mkdir -p ./nuget_packages
+          find ./src -name "*.csproj" -exec dotnet pack {} -c Release -o ./nuget_packages \;
+
+      - name: Upload NuGet packages
         uses: actions/upload-artifact@v4.3.3
         with:
-          name: golfleague-artifacts
-          path: |
-            src/**/bin/Release/**
+          name: nuget-packages
+          path: ./nuget_packages/*.nupkg
           overwrite: true
