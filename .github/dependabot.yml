@@ -16,3 +16,11 @@ updates:
     commit-message:
       prefix: "NuGet"
       include: "scope"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
