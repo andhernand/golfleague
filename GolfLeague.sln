@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql = db\migrations\V1_0_4__Create_TournamentParticipation_Stored_Procedures.sql
 		db\migrations\V1_0_5__Create_TournamentParticipation_Update_Stored_Procedure.sql = db\migrations\V1_0_5__Create_TournamentParticipation_Update_Stored_Procedure.sql
 		db\migrations\V1_0_6__Alter_TournamentParticipation_Table_And_All_Stored_Procedure.sql = db\migrations\V1_0_6__Alter_TournamentParticipation_Table_And_All_Stored_Procedure.sql
+		db\migrations\V1_0_7__Alter_Delete_Golfer_Sproc_To_Delete_Participations.sql = db\migrations\V1_0_7__Alter_Delete_Golfer_Sproc_To_Delete_Participations.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"
@@ -61,7 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\build-and-test-application.yml = .github\workflows\build-and-test-application.yml
 	EndProjectSection
 EndProject
-Project("{54a90642-561a-4bb1-a94e-469adee60c69}") = "golfleague.web", "src\golfleague.web\golfleague.web.esproj", "{7E88FF24-6F3D-4A3A-86A5-08C9E95E9DCB}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "golfleague.web", "src\golfleague.web\golfleague.web.esproj", "{7E88FF24-6F3D-4A3A-86A5-08C9E95E9DCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
