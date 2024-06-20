@@ -12,7 +12,7 @@ namespace GolfLeague.Application;
 
 public static class GolfLeagueServiceCollectionExtensions
 {
-    public static IServiceCollection AddGolfLeagueApplication(this IServiceCollection services)
+    public static void AddGolfLeagueApplication(this IServiceCollection services)
     {
         SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
@@ -26,12 +26,10 @@ public static class GolfLeagueServiceCollectionExtensions
         services.AddSingleton<ITournamentParticipationRepository, TournamentParticipationRepository>();
 
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
-        return services;
     }
 
-    public static IServiceCollection AddGolfLeagueDatabase(this IServiceCollection services, string connectionString)
+    public static void AddGolfLeagueDatabase(this IServiceCollection services, string connectionString)
     {
         services.AddSingleton<IDbConnectionFactory>(_ => new SqlServerDbConnectionFactory(connectionString));
-        return services;
     }
 }

@@ -8,7 +8,7 @@ public static class GetAllGolfersEndpoint
 {
     private const string Name = "GetAllGolfers";
 
-    public static IEndpointRouteBuilder MapGetAllGolfers(this IEndpointRouteBuilder app)
+    public static void MapGetAllGolfers(this IEndpointRouteBuilder app)
     {
         app.MapGet(GolfApiEndpoints.Golfers.GetAll, async (
                 IGolferService service,
@@ -22,7 +22,5 @@ public static class GetAllGolfersEndpoint
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Produces<GolfersResponse>(contentType: "application/json")
             .RequireAuthorization();
-
-        return app;
     }
 }

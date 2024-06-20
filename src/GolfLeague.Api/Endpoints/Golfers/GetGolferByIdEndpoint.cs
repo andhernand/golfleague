@@ -10,7 +10,7 @@ public static class GetGolferByIdEndpoint
 {
     public const string Name = "GetGolferById";
 
-    public static IEndpointRouteBuilder MapGetGolferById(this IEndpointRouteBuilder app)
+    public static void MapGetGolferById(this IEndpointRouteBuilder app)
     {
         app.MapGet(GolfApiEndpoints.Golfers.Get, async (
                 int id,
@@ -31,7 +31,5 @@ public static class GetGolferByIdEndpoint
             .Produces<GolferResponse>(contentType: "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization();
-
-        return app;
     }
 }

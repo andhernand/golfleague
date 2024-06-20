@@ -12,7 +12,7 @@ public static class UpdateGolferTournamentParticipationEndpoint
 {
     private const string Name = "UpdateGolferTournamentParticipation";
 
-    public static IEndpointRouteBuilder MapUpdateGolferTournamentParticipation(this IEndpointRouteBuilder app)
+    public static void MapUpdateGolferTournamentParticipation(this IEndpointRouteBuilder app)
     {
         app.MapPut(GolfApiEndpoints.Golfers.UpdateGolferTournamentParticipations, async (
                 int id,
@@ -40,7 +40,5 @@ public static class UpdateGolferTournamentParticipationEndpoint
                 StatusCodes.Status400BadRequest,
                 contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
-
-        return app;
     }
 }

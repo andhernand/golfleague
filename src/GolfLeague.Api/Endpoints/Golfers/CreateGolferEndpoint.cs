@@ -12,7 +12,7 @@ public static class CreateGolferEndpoint
 {
     private const string Name = "CreateGolfer";
 
-    public static IEndpointRouteBuilder MapCreateGolfer(this IEndpointRouteBuilder app)
+    public static void MapCreateGolfer(this IEndpointRouteBuilder app)
     {
         app.MapPost(GolfApiEndpoints.Golfers.Create, async (
                 CreateGolferRequest request,
@@ -37,7 +37,5 @@ public static class CreateGolferEndpoint
                 StatusCodes.Status400BadRequest,
                 contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
-
-        return app;
     }
 }

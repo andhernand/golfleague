@@ -12,7 +12,7 @@ public static class UpdateGolferEndpoint
 {
     private const string Name = "UpdateGolfer";
 
-    public static IEndpointRouteBuilder MapUpdateGolfer(this IEndpointRouteBuilder app)
+    public static void MapUpdateGolfer(this IEndpointRouteBuilder app)
     {
         app.MapPut(GolfApiEndpoints.Golfers.Update, async (
                 int id,
@@ -39,7 +39,5 @@ public static class UpdateGolferEndpoint
                 StatusCodes.Status400BadRequest,
                 contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
-
-        return app;
     }
 }

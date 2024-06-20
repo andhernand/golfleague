@@ -6,11 +6,10 @@ namespace GolfLeague.Api.Endpoints;
 
 public static class EndpointsExtensions
 {
-    public static IEndpointRouteBuilder MapApiEndpoints(this IEndpointRouteBuilder app)
+    public static void MapApiEndpoints(this IEndpointRouteBuilder app)
     {
-        return app
-            .MapGolferEndpoints()
-            .MapTournamentEndpoints()
-            .MapTournamentParticipationEndpoints();
+        app.MapGolferEndpoints();
+        app.MapTournamentEndpoints();
+        app.MapTournamentParticipationEndpoints();
     }
 }

@@ -12,7 +12,7 @@ public static class CreateTournamentGolferParticipationEndpoint
 {
     private const string Name = "CreateTournamentGolferParticipation";
 
-    public static IEndpointRouteBuilder MapCreateTournamentGolferParticipationEndpoint(this IEndpointRouteBuilder app)
+    public static void MapCreateTournamentGolferParticipationEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost(GolfApiEndpoints.Tournaments.CreateTournamentGolferParticipations, async (
                 int id,
@@ -36,7 +36,5 @@ public static class CreateTournamentGolferParticipationEndpoint
                 StatusCodes.Status400BadRequest,
                 contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
-
-        return app;
     }
 }

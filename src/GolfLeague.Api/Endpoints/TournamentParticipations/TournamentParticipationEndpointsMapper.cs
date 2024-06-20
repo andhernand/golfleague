@@ -2,14 +2,13 @@
 
 public static class TournamentParticipationEndpointsMapper
 {
-    public static IEndpointRouteBuilder MapTournamentParticipationEndpoints(this IEndpointRouteBuilder app)
+    public static void MapTournamentParticipationEndpoints(this IEndpointRouteBuilder app)
     {
-        return app
-            .MapGetTournamentParticipationById()
-            .MapDeleteTournamentParticipation()
-            .MapCreateGolferTournamentParticipation()
-            .MapCreateTournamentGolferParticipationEndpoint()
-            .MapUpdateGolferTournamentParticipation()
-            .MapUpdateTournamentGolferParticipation();
+        app.MapGetTournamentParticipationById();
+        app.MapDeleteTournamentParticipation();
+        app.MapCreateGolferTournamentParticipation();
+        app.MapCreateTournamentGolferParticipationEndpoint();
+        app.MapUpdateGolferTournamentParticipation();
+        app.MapUpdateTournamentGolferParticipation();
     }
 }

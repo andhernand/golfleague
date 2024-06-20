@@ -2,13 +2,12 @@
 
 public static class GolferEndpointsExtensions
 {
-    public static IEndpointRouteBuilder MapGolferEndpoints(this IEndpointRouteBuilder app)
+    public static void MapGolferEndpoints(this IEndpointRouteBuilder app)
     {
-        return app
-            .MapCreateGolfer()
-            .MapGetGolferById()
-            .MapGetAllGolfers()
-            .MapDeleteGolfer()
-            .MapUpdateGolfer();
+        app.MapCreateGolfer();
+        app.MapGetGolferById();
+        app.MapGetAllGolfers();
+        app.MapDeleteGolfer();
+        app.MapUpdateGolfer();
     }
 }

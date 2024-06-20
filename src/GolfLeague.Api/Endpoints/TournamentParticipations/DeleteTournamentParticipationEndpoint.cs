@@ -10,7 +10,7 @@ public static class DeleteTournamentParticipationEndpoint
 {
     private const string Name = "DeleteTournamentParticipation";
 
-    public static IEndpointRouteBuilder MapDeleteTournamentParticipation(this IEndpointRouteBuilder app)
+    public static void MapDeleteTournamentParticipation(this IEndpointRouteBuilder app)
     {
         app.MapDelete(GolfApiEndpoints.TournamentParticipation.Delete, async (
                 [FromQuery] int golferId,
@@ -28,7 +28,5 @@ public static class DeleteTournamentParticipationEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.AdminPolicyName);
-
-        return app;
     }
 }
