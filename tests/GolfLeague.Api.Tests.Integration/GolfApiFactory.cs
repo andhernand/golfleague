@@ -21,6 +21,7 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder()
         .WithPassword(SaPassword)
         .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithEnvironment("ACCEPT_EULA", "Y")
         .WithEnvironment("MSSQL_PID", "Developer")
         .Build();
 
