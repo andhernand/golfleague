@@ -9,7 +9,7 @@ public static class DeleteGolferEndpoint
 {
     private const string Name = "DeleteGolfer";
 
-    public static IEndpointRouteBuilder MapDeleteGolfer(this IEndpointRouteBuilder app)
+    public static void MapDeleteGolfer(this IEndpointRouteBuilder app)
     {
         app.MapDelete(GolfApiEndpoints.Golfers.Delete, async (
                 int id,
@@ -24,7 +24,5 @@ public static class DeleteGolferEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.AdminPolicyName);
-
-        return app;
     }
 }

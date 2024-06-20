@@ -8,7 +8,7 @@ public static class GetAllTournamentsEndpoint
 {
     private const string Name = "GetAllTournaments";
 
-    public static IEndpointRouteBuilder MapGetAllTournaments(this IEndpointRouteBuilder app)
+    public static void MapGetAllTournaments(this IEndpointRouteBuilder app)
     {
         app.MapGet(GolfApiEndpoints.Tournaments.GetAll, async (
                 ITournamentService service,
@@ -23,7 +23,5 @@ public static class GetAllTournamentsEndpoint
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Produces<TournamentsResponse>(contentType: "application/json")
             .RequireAuthorization();
-
-        return app;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using GolfLeague.Api.Auth;
+using GolfLeague.Api.Endpoints.Tournaments;
 using GolfLeague.Api.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
@@ -6,18 +7,18 @@ using GolfLeague.Contracts.Responses;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace GolfLeague.Api.Endpoints.TournamentParticipations;
+namespace GolfLeague.Api.Endpoints.TournamentParticipation;
 
-public static class CreateGolferTournamentParticipationEndpoint
+public static class CreateTournamentDetailEndpoint
 {
-    private const string Name = "CreateGolferTournamentParticipation";
+    private const string Name = "CreateTournamentGolferParticipation";
 
-    public static IEndpointRouteBuilder MapCreateGolferTournamentParticipation(this IEndpointRouteBuilder app)
+    public static void MapCreateTournamentDetailEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost(GolfApiEndpoints.Golfers.CreateGolferTournamentParticipations, async (
+        app.MapPost(GolfApiEndpoints.Tournaments.CreateTournamentDetail, async (
                 int id,
                 ITournamentParticipationService service,
-                CreateGolferTournamentParticipationRequest request,
+                CreateTournamentDetailRequest request,
                 CancellationToken cancellationToken = default) =>
             {
                 var participation = request.MapToTournamentParticipation(id);
@@ -26,8 +27,8 @@ public static class CreateGolferTournamentParticipationEndpoint
                 var response = participation.MapToResponse();
                 return TypedResults.CreatedAtRoute(
                     response,
-                    GetTournamentParticipationByIdEndpoint.Name,
-                    new { golferId = response.GolferId, tournamentId = response.TournamentId, year = response.Year });
+                    GetTournamentByIdEndpoint.Name,
+                    new { id = response.TournamentId });
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
@@ -36,7 +37,5 @@ public static class CreateGolferTournamentParticipationEndpoint
                 StatusCodes.Status400BadRequest,
                 contentType: "application/problem+json")
             .RequireAuthorization(AuthConstants.TrustedPolicyName);
-
-        return app;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace GolfLeague.Contracts.Requests;
 
-public class CreateGolferTournamentParticipationRequest
+public class CreateParticipationDetailRequest
 {
     public required int TournamentId { get; init; }
     public required int Year { get; init; }

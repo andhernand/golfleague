@@ -14,7 +14,7 @@ public static class Mother
 {
     public const string GolfersApiBasePath = "/api/golfers";
     public const string TournamentsApiBasePath = "/api/tournaments";
-    public const string TournamentParticipationsApiBasePath = "/api/tournamentparticipations";
+    public const string TournamentParticipationApiBasePath = "/api/tournamentparticipation";
 
     public static HttpClient CreateAuthorizedClient(
         GolfApiFactory factory,
@@ -43,36 +43,36 @@ public static class Mother
         return tournament!;
     }
 
-    public static async Task<TournamentParticipationResponse> CreateGolferTournamentParticipationAsync(
+    public static async Task<TournamentParticipationResponse> CreateParticipationDetailAsync(
         HttpClient client,
         int golferId,
         int tournamentId)
     {
-        var request = new CreateGolferTournamentParticipationRequest
+        var request = new CreateParticipationDetailRequest
         {
             TournamentId = tournamentId, Year = GenerateYear(), Score = GenerateScore()
         };
 
         var response = await client.PostAsJsonAsync(
-            $"{GolfersApiBasePath}/{golferId}/tournamentparticipations",
+            $"{GolfersApiBasePath}/{golferId}/tournamentparticipation",
             request);
 
         var tournamentParticipation = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();
         return tournamentParticipation!;
     }
 
-    public static async Task<TournamentParticipationResponse> CreateTournamentGolferParticipationAsync(
+    public static async Task<TournamentParticipationResponse> CreateTournamentDetailAsync(
         HttpClient client,
         int golferId,
         int tournamentId)
     {
-        var request = new CreateTournamentGolferParticipationRequest
+        var request = new CreateTournamentDetailRequest
         {
             GolferId = golferId, Year = GenerateYear(), Score = GenerateScore()
         };
 
         var response = await client.PostAsJsonAsync(
-            $"{TournamentsApiBasePath}/{tournamentId}/tournamentparticipations",
+            $"{TournamentsApiBasePath}/{tournamentId}/tournamentparticipation",
             request);
 
         var tournamentParticipation = await response.Content.ReadFromJsonAsync<TournamentParticipationResponse>();

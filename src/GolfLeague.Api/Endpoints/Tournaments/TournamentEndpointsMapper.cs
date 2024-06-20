@@ -2,13 +2,12 @@
 
 public static class TournamentEndpointsMapper
 {
-    public static IEndpointRouteBuilder MapTournamentEndpoints(this IEndpointRouteBuilder app)
+    public static void MapTournamentEndpoints(this IEndpointRouteBuilder app)
     {
-        return app
-            .MapCreateTournament()
-            .MapGetTournamentById()
-            .MapGetAllTournaments()
-            .MapUpdateTournament()
-            .MapDeleteTournament();
+        app.MapCreateTournament();
+        app.MapGetTournamentById();
+        app.MapGetAllTournaments();
+        app.MapUpdateTournament();
+        app.MapDeleteTournament();
     }
 }

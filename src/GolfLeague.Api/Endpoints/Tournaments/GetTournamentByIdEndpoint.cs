@@ -10,7 +10,7 @@ public static class GetTournamentByIdEndpoint
 {
     public const string Name = "GetTournamentById";
 
-    public static IEndpointRouteBuilder MapGetTournamentById(this IEndpointRouteBuilder app)
+    public static void MapGetTournamentById(this IEndpointRouteBuilder app)
     {
         app.MapGet(GolfApiEndpoints.Tournaments.Get, async (
                 int id,
@@ -31,7 +31,5 @@ public static class GetTournamentByIdEndpoint
             .Produces<TournamentResponse>(contentType: "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .RequireAuthorization();
-
-        return app;
     }
 }
