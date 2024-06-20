@@ -37,7 +37,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		.env = .env
 		.gitignore = .gitignore
 		docker-compose.yml = docker-compose.yml
 		global.json = global.json
@@ -61,6 +60,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{138F68C8-A980-40E4-A660-BB2C57254DB3}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build-and-test-application.yml = .github\workflows\build-and-test-application.yml
+		.github\workflows\web-client-ci.yml = .github\workflows\web-client-ci.yml
 	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "golfleague.web", "src\golfleague.web\golfleague.web.esproj", "{7E88FF24-6F3D-4A3A-86A5-08C9E95E9DCB}"

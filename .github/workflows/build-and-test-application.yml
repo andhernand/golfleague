@@ -15,9 +15,21 @@ jobs:
       contents: read
       pull-requests: write
 
+    env:
+      GOLF_API_SA_PASSWORD: ${{ secrets.GOLF_API_SA_PASSWORD }}
+      GOLF_API_USER_NAME: ${{ secrets.GOLF_API_USER_NAME }}
+      GOLF_API_USER_PASSWORD: ${{ secrets.GOLF_API_USER_PASSWORD }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
       - name: Cache .NET packages
         uses: actions/cache@v4.0.2
