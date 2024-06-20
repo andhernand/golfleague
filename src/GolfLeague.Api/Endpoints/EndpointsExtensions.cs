@@ -1,5 +1,5 @@
 ﻿using GolfLeague.Api.Endpoints.Golfers;
-using GolfLeague.Api.Endpoints.TournamentParticipations;
+using GolfLeague.Api.Endpoints.TournamentParticipation;
 using GolfLeague.Api.Endpoints.Tournaments;
 
 namespace GolfLeague.Api.Endpoints;

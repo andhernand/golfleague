@@ -170,7 +170,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         _createdGolferIds.Add(createdGolfer.GolferId);
         var createdTournament = await Mother.CreateTournamentAsync(client);
         _createdTournamentIds.Add(createdTournament.TournamentId);
-        var createdTournamentParticipation = await Mother.CreateTournamentGolferParticipationAsync(
+        var createdTournamentParticipation = await Mother.CreateTournamentDetailAsync(
             client,
             createdGolfer.GolferId,
             createdTournament.TournamentId);
@@ -335,7 +335,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         _createdGolferIds.Add(createdGolfer.GolferId);
         var createdTournament = await Mother.CreateTournamentAsync(client);
         _createdTournamentIds.Add(createdTournament.TournamentId);
-        var createdTournamentParticipation = await Mother.CreateTournamentGolferParticipationAsync(
+        var createdTournamentParticipation = await Mother.CreateTournamentDetailAsync(
             client,
             createdGolfer.GolferId,
             createdTournament.TournamentId);
@@ -635,7 +635,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         foreach (var createdParticipationId in _createdParticipationIds)
         {
             _ = await client.DeleteAsync(
-                $"{Mother.TournamentParticipationsApiBasePath}"
+                $"{Mother.TournamentParticipationApiBasePath}"
                 + $"?golferId={createdParticipationId.gid}"
                 + $"&tournamentId={createdParticipationId.tid}"
                 + $"&year={createdParticipationId.year}");

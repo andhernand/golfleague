@@ -81,17 +81,6 @@ public static class ContractMapping
         };
     }
 
-    public static TournamentParticipationResponse MapToResponse(this TournamentParticipation tournamentParticipation)
-    {
-        return new TournamentParticipationResponse
-        {
-            GolferId = tournamentParticipation.GolferId,
-            TournamentId = tournamentParticipation.TournamentId,
-            Year = tournamentParticipation.Year,
-            Score = tournamentParticipation.Score
-        };
-    }
-
     public static TournamentDetailResponse MapToResponse(this TournamentDetail tournamentDetail)
     {
         return new TournamentDetailResponse
@@ -117,17 +106,20 @@ public static class ContractMapping
     }
 
     public static TournamentParticipation MapToTournamentParticipation(
-        this CreateGolferTournamentParticipationRequest request,
+        this CreateParticipationDetailRequest detailRequest,
         int golferId)
     {
         return new TournamentParticipation
         {
-            GolferId = golferId, TournamentId = request.TournamentId, Year = request.Year, Score = request.Score
+            GolferId = golferId,
+            TournamentId = detailRequest.TournamentId,
+            Year = detailRequest.Year,
+            Score = detailRequest.Score
         };
     }
 
     public static TournamentParticipation MapToTournamentParticipation(
-        this CreateTournamentGolferParticipationRequest request,
+        this CreateTournamentDetailRequest request,
         int tournamentId)
     {
         return new TournamentParticipation
@@ -136,43 +128,14 @@ public static class ContractMapping
         };
     }
 
-    public static UpdateTournamentParticipation MapToUpdateTournamentParticipation(
-        this UpdateGolferTournamentParticipationRequest request,
-        int golferId)
+    public static TournamentParticipationResponse MapToResponse(this TournamentParticipation participation)
     {
-        return new UpdateTournamentParticipation
+        return new TournamentParticipationResponse
         {
-            Original = new TournamentParticipation
-            {
-                GolferId = golferId, TournamentId = request.OriginalTournamentId, Year = request.OriginalYear
-            },
-            Update = new TournamentParticipation
-            {
-                GolferId = golferId,
-                TournamentId = request.NewTournamentId,
-                Year = request.NewYear,
-                Score = request.NewScore
-            }
-        };
-    }
-
-    public static UpdateTournamentParticipation MapToUpdateTournamentParticipation(
-        this UpdateTournamentGolferParticipationRequest request,
-        int tournamentId)
-    {
-        return new UpdateTournamentParticipation
-        {
-            Original = new TournamentParticipation
-            {
-                GolferId = request.OriginalGolferId, TournamentId = tournamentId, Year = request.OriginalYear
-            },
-            Update = new TournamentParticipation
-            {
-                GolferId = request.NewGolferId,
-                TournamentId = tournamentId,
-                Year = request.NewYear,
-                Score = request.NewScore
-            }
+            GolferId = participation.GolferId,
+            TournamentId = participation.TournamentId,
+            Year = participation.Year,
+            Score = participation.Score
         };
     }
 }
