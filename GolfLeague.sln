@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		db\migrations\V1_0_6__Alter_TournamentParticipation_Table_And_All_Stored_Procedure.sql = db\migrations\V1_0_6__Alter_TournamentParticipation_Table_And_All_Stored_Procedure.sql
 		db\migrations\V1_0_7__Alter_Delete_Golfer_Sproc_To_Delete_Participations.sql = db\migrations\V1_0_7__Alter_Delete_Golfer_Sproc_To_Delete_Participations.sql
 		db\migrations\V1_0_8__Alter_Delete_Tournament_Sproc_To_Delete_Participations.sql = db\migrations\V1_0_8__Alter_Delete_Tournament_Sproc_To_Delete_Participations.sql
+		db\migrations\V1_0_9__Drop_Unneeded_TournamentParticipation_Sprocs.sql = db\migrations\V1_0_9__Drop_Unneeded_TournamentParticipation_Sprocs.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F3D79226-8477-4A92-BD14-BF95461C0683}"
