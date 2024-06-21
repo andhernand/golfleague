@@ -470,3 +470,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# ssl certificate files
+golfleague.web.key
+golfleague.web.pem
