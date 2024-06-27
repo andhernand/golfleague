@@ -39,6 +39,10 @@ jobs:
         run: npm run pcheck
         working-directory: src/golfleague.web
 
+      - name: Vitest Run
+        run: npm run tests
+        working-directory: src/golfleague.web
+
       - name: Build application
         run: npm run build
         working-directory: src/golfleague.web

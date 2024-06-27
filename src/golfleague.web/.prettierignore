@@ -35,4 +35,3 @@ nuget.config
 package-lock.json
 package.json
 golfleague.web.esproj
-vite.config.js
