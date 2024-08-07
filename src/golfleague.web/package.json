@@ -18,7 +18,7 @@
     "normalize.css": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.25.1"
+    "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin-js": "^2.6.1",
@@ -35,9 +35,9 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.9",
     "jsdom": "^24.1.1",
-    "msw": "^2.3.2",
+    "msw": "^2.3.5",
     "prettier": "3.3.3",
-    "vite": "^5.3.5",
+    "vite": "^5.4.0",
     "vitest": "^2.0.5"
   }
 }
