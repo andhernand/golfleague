@@ -6,8 +6,8 @@ Content-Type: application/json; charset=utf-8
 Cache-Control: no-cache
 
 {
-  "isAdmin": true,
-  "isTrusted": false
+  "isAdmin": false,
+  "isTrusted": true
 }
 
 ###
