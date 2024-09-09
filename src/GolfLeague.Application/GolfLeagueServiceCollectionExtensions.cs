@@ -16,13 +16,13 @@ public static class GolfLeagueServiceCollectionExtensions
     {
         SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
-        services.AddSingleton<IGolferService, GolferService>();
+        services.AddTransient<IGolferService, GolferService>();
         services.AddSingleton<IGolferRepository, GolferRepository>();
 
-        services.AddSingleton<ITournamentService, TournamentService>();
+        services.AddTransient<ITournamentService, TournamentService>();
         services.AddSingleton<ITournamentRepository, TournamentRepository>();
 
-        services.AddSingleton<ITournamentParticipationService, TournamentParticipationService>();
+        services.AddTransient<ITournamentParticipationService, TournamentParticipationService>();
         services.AddSingleton<ITournamentParticipationRepository, TournamentParticipationRepository>();
 
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
