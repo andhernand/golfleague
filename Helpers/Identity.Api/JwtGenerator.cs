@@ -38,7 +38,7 @@ public static class JwtGenerator
     {
         try
         {
-            Logger.Verbose("Generating JWT Token");
+            Logger.Information("Generating JWT Token");
 
             var faker = new Faker();
             var claims = new List<Claim>
@@ -57,7 +57,7 @@ public static class JwtGenerator
                 ? DateTime.UtcNow.Add(customTimeSpan.Value)
                 : DateTime.UtcNow.Add(TokenLifetime);
 
-            Logger.Verbose("The JWT Token expires at: {ExpiresAt}", expiresAt);
+            Logger.Information("The JWT Token expires at: {ExpiresAt}", expiresAt);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
