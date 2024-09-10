@@ -31,7 +31,7 @@ try
         using var config = builder.Configuration;
 
         var jwtOptions = new JwtOptions();
-        config.GetSection("JwtSettings").Bind(jwtOptions);
+        config.GetSection(JwtOptions.SectionName).Bind(jwtOptions);
 
         builder.Services.AddAuthentication(options =>
             {
@@ -77,6 +77,8 @@ try
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseSerilogRequestLogging(options => { options.IncludeQueryInRequestPath = true; });
 
         app.UseHttpsRedirection();
         app.UseHealthChecks(new PathString("/_health"));
