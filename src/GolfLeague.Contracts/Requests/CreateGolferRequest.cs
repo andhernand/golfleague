@@ -1,6 +1,6 @@
 ﻿namespace GolfLeague.Contracts.Requests;
 
-public class CreateGolferRequest
+public record CreateGolferRequest
 {
     public required string FirstName { get; init; }
     public required string LastName { get; init; }

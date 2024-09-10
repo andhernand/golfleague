@@ -178,25 +178,22 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
             createdTournamentParticipation.TournamentId,
             createdTournamentParticipation.Year));
 
-        var expected = new TournamentsResponse
+        var expected = new[]
         {
-            Tournaments = new[]
+            new TournamentResponse
             {
-                new TournamentResponse
+                TournamentId = createdTournament.TournamentId,
+                Name = createdTournament.Name,
+                Format = createdTournament.Format,
+                Participants = new[]
                 {
-                    TournamentId = createdTournament.TournamentId,
-                    Name = createdTournament.Name,
-                    Format = createdTournament.Format,
-                    Participants = new[]
+                    new ParticipationDetailResponse
                     {
-                        new ParticipationDetailResponse
-                        {
-                            GolferId = createdGolfer.GolferId,
-                            FirstName = createdGolfer.FirstName,
-                            LastName = createdGolfer.LastName,
-                            Year = createdTournamentParticipation.Year,
-                            Score = createdTournamentParticipation.Score
-                        }
+                        GolferId = createdGolfer.GolferId,
+                        FirstName = createdGolfer.FirstName,
+                        LastName = createdGolfer.LastName,
+                        Year = createdTournamentParticipation.Year,
+                        Score = createdTournamentParticipation.Score
                     }
                 }
             }
@@ -211,7 +208,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+        var tournaments = await response.Content.ReadFromJsonAsync<IEnumerable<TournamentResponse>>();
         tournaments.Should().BeEquivalentTo(expected);
     }
 
@@ -224,17 +221,14 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         var createdTournament = await Mother.CreateTournamentAsync(client);
         _createdTournamentIds.Add(createdTournament.TournamentId);
 
-        var expectedTournaments = new TournamentsResponse
+        var expectedTournaments = new[]
         {
-            Tournaments = new[]
+            new TournamentResponse
             {
-                new TournamentResponse
-                {
-                    TournamentId = createdTournament.TournamentId,
-                    Name = createdTournament.Name,
-                    Format = createdTournament.Format,
-                    Participants = []
-                }
+                TournamentId = createdTournament.TournamentId,
+                Name = createdTournament.Name,
+                Format = createdTournament.Format,
+                Participants = []
             }
         };
 
@@ -247,7 +241,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+        var tournaments = await response.Content.ReadFromJsonAsync<IEnumerable<TournamentResponse>>();
         tournaments.Should().BeEquivalentTo(expectedTournaments);
     }
 
@@ -256,7 +250,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
     {
         // Arrange
         using var client = Mother.CreateAuthorizedClient(golfApiFactory);
-        var expectedTournaments = new TournamentsResponse { Tournaments = [] };
+        var expectedTournaments = Array.Empty<TournamentResponse>();
 
         // Act
         var response = await client.GetAsync(Mother.TournamentsApiBasePath);
@@ -264,7 +258,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var tournaments = await response.Content.ReadFromJsonAsync<TournamentsResponse>();
+        var tournaments = await response.Content.ReadFromJsonAsync<IEnumerable<TournamentResponse>>();
         tournaments.Should().BeEquivalentTo(expectedTournaments);
     }
 

@@ -260,30 +260,27 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         _createdParticipationIds.Add((createdTournamentParticipation.GolferId,
             createdTournamentParticipation.TournamentId, createdTournamentParticipation.Year));
 
-        var expected = new GolfersResponse
+        var expected = new[]
         {
-            Golfers = new[]
+            new GolferResponse
             {
-                new GolferResponse
-                {
-                    GolferId = createdGolfer.GolferId,
-                    FirstName = createdGolfer.FirstName,
-                    LastName = createdGolfer.LastName,
-                    Email = createdGolfer.Email,
-                    Handicap = createdGolfer.Handicap,
-                    JoinDate = createdGolfer.JoinDate,
-                    Tournaments = new[]
+                GolferId = createdGolfer.GolferId,
+                FirstName = createdGolfer.FirstName,
+                LastName = createdGolfer.LastName,
+                Email = createdGolfer.Email,
+                Handicap = createdGolfer.Handicap,
+                JoinDate = createdGolfer.JoinDate,
+                Tournaments =
+                [
+                    new TournamentDetailResponse
                     {
-                        new TournamentDetailResponse
-                        {
-                            TournamentId = createdTournament.TournamentId,
-                            Name = createdTournament.Name,
-                            Format = createdTournament.Format,
-                            Year = createdTournamentParticipation.Year,
-                            Score = createdTournamentParticipation.Score
-                        }
+                        TournamentId = createdTournament.TournamentId,
+                        Name = createdTournament.Name,
+                        Format = createdTournament.Format,
+                        Year = createdTournamentParticipation.Year,
+                        Score = createdTournamentParticipation.Score
                     }
-                }
+                ]
             }
         };
 
@@ -296,7 +293,7 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var golfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
+        var golfers = await response.Content.ReadFromJsonAsync<IEnumerable<GolferResponse>>();
         golfers.Should().BeEquivalentTo(expected);
     }
 
@@ -308,20 +305,17 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         var createdGolfer = await Mother.CreateGolferAsync(client);
         _createdGolferIds.Add(createdGolfer.GolferId);
 
-        var expected = new GolfersResponse
+        var expected = new[]
         {
-            Golfers = new[]
+            new GolferResponse
             {
-                new GolferResponse
-                {
-                    GolferId = createdGolfer.GolferId,
-                    FirstName = createdGolfer.FirstName,
-                    LastName = createdGolfer.LastName,
-                    Email = createdGolfer.Email,
-                    Handicap = createdGolfer.Handicap,
-                    JoinDate = createdGolfer.JoinDate,
-                    Tournaments = Array.Empty<TournamentDetailResponse>()
-                }
+                GolferId = createdGolfer.GolferId,
+                FirstName = createdGolfer.FirstName,
+                LastName = createdGolfer.LastName,
+                Email = createdGolfer.Email,
+                Handicap = createdGolfer.Handicap,
+                JoinDate = createdGolfer.JoinDate,
+                Tournaments = Array.Empty<TournamentDetailResponse>()
             }
         };
 
@@ -334,7 +328,7 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var golfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
+        var golfers = await response.Content.ReadFromJsonAsync<IEnumerable<GolferResponse>>();
         golfers.Should().BeEquivalentTo(expected);
     }
 
@@ -350,8 +344,8 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         //Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var returnedGolfers = await response.Content.ReadFromJsonAsync<GolfersResponse>();
-        returnedGolfers!.Golfers.Should().BeEmpty();
+        var returnedGolfers = await response.Content.ReadFromJsonAsync<IEnumerable<GolferResponse>>();
+        returnedGolfers.Should().BeEmpty();
     }
 
     [Fact]

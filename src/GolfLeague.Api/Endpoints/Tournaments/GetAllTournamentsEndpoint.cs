@@ -21,7 +21,7 @@ public static class GetAllTournamentsEndpoint
             })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
-            .Produces<TournamentsResponse>(contentType: "application/json")
+            .Produces<IEnumerable<TournamentResponse>>(contentType: "application/json")
             .RequireAuthorization();
     }
 }
