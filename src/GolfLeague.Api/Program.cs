@@ -21,6 +21,8 @@ Log.Logger = ApiLogging.CreateBootstrapLogger();
 
 try
 {
+    Log.Information("Golf League API Application starting...");
+
     var builder = WebApplication.CreateBuilder(args);
     {
         builder.Host.UseSerilog((context, logConfig) =>
