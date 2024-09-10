@@ -4,6 +4,7 @@ using Dapper;
 
 using DotNetEnv;
 
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 

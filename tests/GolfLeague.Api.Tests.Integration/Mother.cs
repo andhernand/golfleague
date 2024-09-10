@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 using Bogus;
 
@@ -6,6 +7,7 @@ using GolfLeague.Application.Models;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GolfLeague.Api.Tests.Integration;

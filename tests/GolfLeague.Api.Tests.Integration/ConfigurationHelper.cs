@@ -1,4 +1,6 @@
-﻿namespace GolfLeague.Api.Tests.Integration;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace GolfLeague.Api.Tests.Integration;
 
 public static class ConfigurationHelper
 {

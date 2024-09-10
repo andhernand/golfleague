@@ -6,6 +6,7 @@ using Bogus;
 
 using GolfLeague.Api.Options;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GolfLeague.Api.Tests.Integration;
