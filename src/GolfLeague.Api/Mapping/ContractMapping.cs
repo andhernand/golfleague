@@ -20,9 +20,9 @@ public static class ContractMapping
         };
     }
 
-    public static GolfersResponse MapToResponse(this IEnumerable<Golfer> golfers)
+    public static IEnumerable<GolferResponse> MapToResponse(this IEnumerable<Golfer> golfers)
     {
-        return new GolfersResponse { Golfers = golfers.Select(MapToResponse) };
+        return golfers.Select(MapToResponse);
     }
 
     public static Golfer MapToGolfer(this CreateGolferRequest request)
@@ -63,9 +63,9 @@ public static class ContractMapping
         };
     }
 
-    public static TournamentsResponse MapToResponse(this IEnumerable<Tournament> tournaments)
+    public static IEnumerable<TournamentResponse> MapToResponse(this IEnumerable<Tournament> tournaments)
     {
-        return new TournamentsResponse { Tournaments = tournaments.Select(MapToResponse) };
+        return tournaments.Select(MapToResponse);
     }
 
     public static Tournament MapToTournament(this CreateTournamentRequest request)

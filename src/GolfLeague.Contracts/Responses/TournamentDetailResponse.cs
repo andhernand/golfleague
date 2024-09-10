@@ -1,6 +1,6 @@
 ﻿namespace GolfLeague.Contracts.Responses;
 
-public class TournamentDetailResponse
+public record TournamentDetailResponse
 {
     public required int TournamentId { get; init; }
     public required string Name { get; init; }
