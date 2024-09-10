@@ -1,6 +1,6 @@
 ﻿namespace GolfLeague.Application.Models;
 
-public class TournamentDetail
+public record TournamentDetail
 {
     public required int TournamentId { get; init; }
     public required string Name { get; init; }
