@@ -1,5 +1,7 @@
 using Identity.Api.Endpoints;
 using Identity.Api.Logging;
+using Identity.Api.Options;
+using Identity.Api.Services;
 
 using Serilog;
 
@@ -16,6 +18,13 @@ try
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddOptions<JwtOptions>()
+            .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        builder.Services.AddSingleton<JwtService>();
     }
 
     await using var app = builder.Build();

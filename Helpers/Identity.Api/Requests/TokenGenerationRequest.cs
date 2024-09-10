@@ -1,4 +1,4 @@
-﻿namespace Identity.Api;
+﻿namespace Identity.Api.Requests;
 
 public record TokenGenerationRequest
 {
