@@ -5,9 +5,9 @@ using GolfLeague.Api.Endpoints;
 using GolfLeague.Api.Health;
 using GolfLeague.Api.Logging;
 using GolfLeague.Api.Mapping;
-using GolfLeague.Api.Options;
 using GolfLeague.Api.Swagger;
 using GolfLeague.Application;
+using GolfLeague.Application.Options;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
