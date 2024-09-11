@@ -1,6 +1,7 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Application.Services;
 
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GolfLeague.Api.Endpoints.TournamentParticipation;
@@ -11,24 +12,22 @@ public static class DeleteTournamentParticipationEndpoint
 
     public static void MapDeleteTournamentParticipationEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapDelete(GolfApiEndpoints.TournamentParticipation.Delete, async (
-                [FromQuery] int golferId,
-                [FromQuery] int tournamentId,
-                [FromQuery] int year,
-                ITournamentParticipationService service,
-                CancellationToken cancellationToken = default) =>
-            {
-                var id = new Application.Models.TournamentParticipation
+        app.MapDelete(GolfApiEndpoints.TournamentParticipation.Delete,
+                async Task<Results<NoContent, NotFound>> (
+                    [FromQuery] int golferId,
+                    [FromQuery] int tournamentId,
+                    [FromQuery] int year,
+                    ITournamentParticipationService service,
+                    CancellationToken cancellationToken = default) =>
                 {
-                    GolferId = golferId, TournamentId = tournamentId, Year = year
-                };
-                var deleted = await service.DeleteAsync(id, cancellationToken);
-                return deleted ? Results.NoContent() : Results.Problem(statusCode: StatusCodes.Status404NotFound);
-            })
+                    var deleted = await service.DeleteAsync(golferId, tournamentId, year, cancellationToken);
+                    return deleted
+                        ? TypedResults.NoContent()
+                        : TypedResults.NotFound();
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.AdminPolicyName);
+            .RequireAuthorization(AuthConstants.AdminPolicyName)
+            .WithOpenApi();
     }
 }

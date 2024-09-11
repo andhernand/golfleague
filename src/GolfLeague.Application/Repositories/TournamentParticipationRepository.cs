@@ -14,7 +14,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
 {
     private readonly ILogger _logger = Log.ForContext<TournamentParticipationRepository>();
 
-    public async Task<bool> CreateAsync(
+    public async Task<TournamentParticipation?> CreateAsync(
         TournamentParticipation tournamentParticipation,
         CancellationToken token = default)
     {
@@ -36,7 +36,7 @@ public class TournamentParticipationRepository(IDbConnectionFactory connectionFa
             cancellationToken: token));
 
         var rowCount = parameters.Get<int>("@RowCount");
-        return rowCount > 0;
+        return rowCount > 0 ? tournamentParticipation : null;
     }
 
     public async Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default)

@@ -1,9 +1,23 @@
-﻿using GolfLeague.Application.Models;
+﻿using GolfLeague.Contracts.Requests;
+using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Application.Services;
 
 public interface ITournamentParticipationService
 {
-    Task<bool> CreateAsync(TournamentParticipation tournamentParticipation, CancellationToken token = default);
-    Task<bool> DeleteAsync(TournamentParticipation id, CancellationToken cancellationToken = default);
+    Task<TournamentParticipationResponse?> CreateAsync(
+        int golferId,
+        CreateParticipationDetailRequest request,
+        CancellationToken token = default);
+
+    Task<TournamentParticipationResponse?> CreateAsync(
+        int tournamentId,
+        CreateTournamentDetailRequest request,
+        CancellationToken token = default);
+
+    Task<bool> DeleteAsync(
+        int golferId,
+        int tournamentId,
+        int year,
+        CancellationToken cancellationToken = default);
 }
