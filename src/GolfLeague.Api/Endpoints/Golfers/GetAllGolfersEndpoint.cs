@@ -1,5 +1,4 @@
-﻿using GolfLeague.Application.Mapping;
-using GolfLeague.Application.Services;
+﻿using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
 using Microsoft.AspNetCore.Http.HttpResults;
