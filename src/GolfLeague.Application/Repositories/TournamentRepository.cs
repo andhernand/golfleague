@@ -117,20 +117,27 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
         return tournamentDictionary.Values;
     }
 
-    public async Task<bool> UpdateAsync(Tournament tournament, CancellationToken token = default)
+    public async Task<Tournament?> UpdateAsync(Tournament tournament, CancellationToken token = default)
     {
         _logger.Information("Updating {@Tournament}", tournament);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
 
-        var result = await connection.ExecuteAsync(
+        var parameters = new DynamicParameters();
+        parameters.Add("@TournamentId", tournament.TournamentId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@Name", tournament.Name, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@Format", tournament.Format, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@RowCount", 0, DbType.Int32, ParameterDirection.Output);
+
+        _ = await connection.ExecuteAsync(
             new CommandDefinition(
                 "dbo.usp_Tournament_Update",
-                new { tournament.TournamentId, tournament.Name, tournament.Format },
+                parameters,
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
 
-        return result > 0;
+        var updated = parameters.Get<int>("@RowCount") > 0;
+        return updated ? tournament : null;
     }
 
     public async Task<bool> DeleteByIdAsync(int tournamentId, CancellationToken token = default)
