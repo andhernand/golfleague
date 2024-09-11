@@ -2,6 +2,8 @@
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace GolfLeague.Api.Endpoints.Golfers;
 
 public static class GetAllGolfersEndpoint
@@ -10,17 +12,17 @@ public static class GetAllGolfersEndpoint
 
     public static void MapGetAllGolfers(this IEndpointRouteBuilder app)
     {
-        app.MapGet(GolfApiEndpoints.Golfers.GetAll, async (
-                IGolferService service,
-                CancellationToken token) =>
-            {
-                var golfers = await service.GetAllGolfersAsync(token);
-                var response = golfers.MapToResponse();
-                return TypedResults.Ok(response);
-            })
+        app.MapGet(GolfApiEndpoints.Golfers.GetAll,
+                async Task<Ok<IEnumerable<GolferResponse>>> (
+                    IGolferService service,
+                    CancellationToken token) =>
+                {
+                    var golfers = await service.GetAllGolfersAsync(token);
+                    return TypedResults.Ok(golfers);
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
-            .Produces<IEnumerable<GolferResponse>>(contentType: "application/json")
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .WithOpenApi();
     }
 }
