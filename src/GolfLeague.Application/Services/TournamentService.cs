@@ -17,9 +17,10 @@ public class TournamentService(ITournamentRepository repository) : ITournamentSe
         return tournament.MapToResponse();
     }
 
-    public async Task<Tournament?> GetTournamentByIdAsync(int id, CancellationToken token = default)
+    public async Task<TournamentResponse?> GetTournamentByIdAsync(int id, CancellationToken token = default)
     {
-        return await repository.GetTournamentByIdAsync(id, token);
+        var tournament = await repository.GetTournamentByIdAsync(id, token);
+        return tournament?.MapToResponse();
     }
 
     public async Task<IEnumerable<TournamentResponse>> GetAllTournamentsAsync(CancellationToken token = default)
