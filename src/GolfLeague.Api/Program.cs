@@ -66,8 +66,8 @@ try
             .AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
 
-        builder.Services.AddGolfLeagueApplication();
-        builder.Services.AddGolfLeagueDatabase(config["Database:ConnectionString"]!);
+        builder.Services.AddGolfLeagueDatabase(config.GetConnectionString("GolfLeagueDb"));
+        builder.Services.AddGolfLeagueServices();
     }
 
     await using var app = builder.Build();
@@ -78,8 +78,7 @@ try
             app.UseSwaggerUI();
         }
 
-        app.UseSerilogRequestLogging(options => { options.IncludeQueryInRequestPath = true; });
-
+        app.UseSerilogRequestLogging();
         app.UseHttpsRedirection();
         app.UseHealthChecks(new PathString("/_health"));
 

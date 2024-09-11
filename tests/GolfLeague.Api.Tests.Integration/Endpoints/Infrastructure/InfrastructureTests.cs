@@ -10,7 +10,7 @@ public class DatabaseNotNeededFactory : WebApplicationFactory<IGolfApiMarker>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("Database:ConnectionString",
+        builder.UseSetting("ConnectionStrings:GolfLeagueDb",
             "Server=localhost,9433;Connect Timeout=1;TrustServerCertificate=True;");
         base.ConfigureWebHost(builder);
     }

@@ -10,26 +10,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GolfLeague.Application;
 
-public static class GolfLeagueServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
-    public static void AddGolfLeagueApplication(this IServiceCollection services)
+    public static void AddGolfLeagueServices(this IServiceCollection services)
     {
-        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+        services.AddSingleton<IGolferRepository, GolferRepository>();
+        services.AddSingleton<ITournamentRepository, TournamentRepository>();
+        services.AddSingleton<ITournamentParticipationRepository, TournamentParticipationRepository>();
 
         services.AddTransient<IGolferService, GolferService>();
-        services.AddSingleton<IGolferRepository, GolferRepository>();
-
         services.AddTransient<ITournamentService, TournamentService>();
-        services.AddSingleton<ITournamentRepository, TournamentRepository>();
-
         services.AddTransient<ITournamentParticipationService, TournamentParticipationService>();
-        services.AddSingleton<ITournamentParticipationRepository, TournamentParticipationRepository>();
 
         services.AddValidatorsFromAssemblyContaining<IGolfLeagueApplicationMarker>(ServiceLifetime.Singleton);
     }
 
-    public static void AddGolfLeagueDatabase(this IServiceCollection services, string connectionString)
+    public static void AddGolfLeagueDatabase(this IServiceCollection services, string? connectionString)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(connectionString, nameof(connectionString));
+
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
         services.AddSingleton<IDbConnectionFactory>(_ => new SqlServerDbConnectionFactory(connectionString));
     }
 }

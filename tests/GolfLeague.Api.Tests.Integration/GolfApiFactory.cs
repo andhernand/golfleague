@@ -53,7 +53,7 @@ public class GolfApiFactory : WebApplicationFactory<IGolfApiMarker>, IAsyncLifet
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("Database:ConnectionString", BuildDatabaseUserConnectionString());
+        builder.UseSetting("ConnectionStrings:GolfLeagueDb", BuildDatabaseUserConnectionString());
         base.ConfigureWebHost(builder);
     }
 
