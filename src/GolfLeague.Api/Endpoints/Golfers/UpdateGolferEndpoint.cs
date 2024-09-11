@@ -1,11 +1,10 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints.Filters;
-using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.Golfers;
 
@@ -15,31 +14,24 @@ public static class UpdateGolferEndpoint
 
     public static void MapUpdateGolfer(this IEndpointRouteBuilder app)
     {
-        app.MapPut(GolfApiEndpoints.Golfers.Update, async (
-                int id,
-                UpdateGolferRequest request,
-                IGolferService service,
-                CancellationToken token = default) =>
-            {
-                var golfer = request.MapToGolfer(id);
-                var updatedGolfer = await service.UpdateAsync(golfer, token);
-                if (updatedGolfer is null)
+        app.MapPut(GolfApiEndpoints.Golfers.Update,
+                async Task<Results<Ok<GolferResponse>, NotFound, ValidationProblem>> (
+                    int id,
+                    UpdateGolferRequest request,
+                    IGolferService service,
+                    CancellationToken token = default) =>
                 {
-                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-                }
+                    var golfer = await service.UpdateAsync(id, request, token);
 
-                var response = updatedGolfer.MapToResponse();
-                return TypedResults.Ok(response);
-            })
+                    return golfer is null
+                        ? TypedResults.NotFound()
+                        : TypedResults.Ok(golfer);
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Accepts<UpdateGolferRequest>(isOptional: false, contentType: "application/json")
             .AddEndpointFilter<RequestValidationFilter<UpdateGolferRequest>>()
-            .Produces<GolferResponse>(contentType: "application/json")
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
-            .Produces<ValidationProblemDetails>(
-                StatusCodes.Status400BadRequest,
-                contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.TrustedPolicyName);
+            .RequireAuthorization(AuthConstants.TrustedPolicyName)
+            .WithOpenApi();
     }
 }

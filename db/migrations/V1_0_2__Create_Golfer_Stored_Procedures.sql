@@ -145,7 +145,8 @@ CREATE PROCEDURE [dbo].[usp_Golfer_Update](
 	@LastName NVARCHAR(256),
 	@Email NVARCHAR(256),
 	@JoinDate DATE,
-	@Handicap TINYINT = NULL
+	@Handicap TINYINT = NULL,
+	@RowCount INT OUTPUT
 )
 AS
 BEGIN
@@ -205,6 +206,8 @@ BEGIN
 					[Handicap]  = @Handicap
 				WHERE [GolferId] = @GolferId;
 
+				SET @RowCount = @@ROWCOUNT;
+
 				COMMIT TRANSACTION;
 			END TRY
 			BEGIN CATCH
@@ -215,6 +218,7 @@ BEGIN
 		END;
 	ELSE
 		BEGIN
+			SET @RowCount = 0;
 			THROW 50015, 'GolferId does not exist in the database.', 1;
 		END;
 END;
