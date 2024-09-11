@@ -2,14 +2,15 @@
 
 using GolfLeague.Application.Models;
 using GolfLeague.Application.Repositories;
+using GolfLeague.Contracts.Requests;
 
 namespace GolfLeague.Application.Validators;
 
-public class TournamentValidator : AbstractValidator<Tournament>
+public class UpdateTournamentRequestValidator : AbstractValidator<UpdateTournamentRequest>
 {
     private readonly ITournamentRepository _repository;
 
-    public TournamentValidator(ITournamentRepository repository)
+    public UpdateTournamentRequestValidator(ITournamentRepository repository)
     {
         _repository = repository;
 
@@ -32,7 +33,7 @@ public class TournamentValidator : AbstractValidator<Tournament>
             .When(t => !string.IsNullOrWhiteSpace(t.Name) && !string.IsNullOrWhiteSpace(t.Format));
     }
 
-    private async Task<bool> ValidateTournament(Tournament tournament, CancellationToken token = default)
+    private async Task<bool> ValidateTournament(UpdateTournamentRequest tournament, CancellationToken token = default)
     {
         var existingTournament = await _repository.GetByNameAndFormat(tournament.Name, tournament.Format, token);
         if (existingTournament is not null)

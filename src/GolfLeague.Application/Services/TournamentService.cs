@@ -1,15 +1,12 @@
-﻿using FluentValidation;
-
-using GolfLeague.Application.Models;
+﻿using GolfLeague.Application.Models;
 using GolfLeague.Application.Repositories;
 
 namespace GolfLeague.Application.Services;
 
-public class TournamentService(ITournamentRepository repository, IValidator<Tournament> validator) : ITournamentService
+public class TournamentService(ITournamentRepository repository) : ITournamentService
 {
     public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
     {
-        await validator.ValidateAndThrowAsync(tournament, token);
         return await repository.CreateAsync(tournament, token);
     }
 
@@ -25,7 +22,6 @@ public class TournamentService(ITournamentRepository repository, IValidator<Tour
 
     public async Task<Tournament?> UpdateAsync(Tournament tournament, CancellationToken token = default)
     {
-        await validator.ValidateAndThrowAsync(tournament, token);
         bool tournamentExists = await repository.ExistsByIdAsync(tournament.TournamentId, token);
         if (!tournamentExists)
         {

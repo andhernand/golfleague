@@ -1,4 +1,5 @@
 ﻿using GolfLeague.Api.Auth;
+using GolfLeague.Api.Endpoints.Filters;
 using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
@@ -33,6 +34,7 @@ public static class UpdateTournamentEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<UpdateTournamentRequest>(false, "application/json")
+            .AddEndpointFilter<RequestValidationFilter<UpdateTournamentRequest>>()
             .Produces<TournamentResponse>(contentType: "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
             .Produces<ValidationProblemDetails>(

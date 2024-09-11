@@ -393,6 +393,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
 
         const string changedFormat = "Match Play";
         var updateTournamentRequest = Mother.GenerateUpdateTournamentRequest(
+            createdTournament.TournamentId,
             createdTournament.Name,
             changedFormat);
 
@@ -484,6 +485,7 @@ public class TournamentEndpointTests(GolfApiFactory golfApiFactory) : IClassFixt
         var secondCreatedTournament = await Mother.CreateTournamentAsync(client);
         _createdTournamentIds.Add(secondCreatedTournament.TournamentId);
         var updateTournamentRequest = Mother.GenerateUpdateTournamentRequest(
+            secondCreatedTournament.TournamentId,
             firstCreatedTournament.Name,
             firstCreatedTournament.Format);
         var expected = Mother.CreateValidationProblemDetails(new Dictionary<string, string[]>
