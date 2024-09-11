@@ -1,11 +1,10 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints.Filters;
-using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
@@ -15,31 +14,24 @@ public static class CreateTournamentEndpoint
 
     public static void MapCreateTournament(this IEndpointRouteBuilder app)
     {
-        app.MapPost(GolfApiEndpoints.Tournaments.Create, async (
-                CreateTournamentRequest request,
-                ITournamentService service,
-                CancellationToken token = default) =>
-            {
-                var tournament = request.MapToTournament();
+        app.MapPost(GolfApiEndpoints.Tournaments.Create,
+                async Task<Results<CreatedAtRoute<TournamentResponse>, ValidationProblem>> (
+                    CreateTournamentRequest request,
+                    ITournamentService service,
+                    CancellationToken token = default) =>
+                {
+                    TournamentResponse tournament = await service.CreateAsync(request, token);
 
-                int createdId = await service.CreateAsync(tournament, token);
-                tournament.TournamentId = createdId;
-
-                var response = tournament.MapToResponse();
-
-                return TypedResults.CreatedAtRoute(
-                    response,
-                    GetTournamentByIdEndpoint.Name,
-                    new { id = tournament.TournamentId });
-            })
+                    return TypedResults.CreatedAtRoute(
+                        tournament,
+                        GetTournamentByIdEndpoint.Name,
+                        new { id = tournament.TournamentId });
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<CreateTournamentRequest>(false, "application/json")
             .AddEndpointFilter<RequestValidationFilter<CreateTournamentRequest>>()
-            .Produces<TournamentResponse>(StatusCodes.Status201Created)
-            .Produces<ValidationProblemDetails>(
-                StatusCodes.Status400BadRequest,
-                contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.TrustedPolicyName);
+            .RequireAuthorization(AuthConstants.TrustedPolicyName)
+            .WithOpenApi();
     }
 }
