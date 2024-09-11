@@ -1,7 +1,7 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Application.Services;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.Golfers;
 
@@ -11,18 +11,21 @@ public static class DeleteGolferEndpoint
 
     public static void MapDeleteGolfer(this IEndpointRouteBuilder app)
     {
-        app.MapDelete(GolfApiEndpoints.Golfers.Delete, async (
-                int id,
-                IGolferService service,
-                CancellationToken token = default) =>
-            {
-                var deleted = await service.DeleteByIdAsync(id, token);
-                return deleted ? Results.NoContent() : Results.Problem(statusCode: StatusCodes.Status404NotFound);
-            })
+        app.MapDelete(GolfApiEndpoints.Golfers.Delete,
+                async Task<Results<NoContent, NotFound>> (
+                    int id,
+                    IGolferService service,
+                    CancellationToken token = default) =>
+                {
+                    var deleted = await service.DeleteByIdAsync(id, token);
+
+                    return deleted
+                        ? TypedResults.NoContent()
+                        : TypedResults.NotFound();
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
-            .Produces(StatusCodes.Status204NoContent)
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.AdminPolicyName);
+            .RequireAuthorization(AuthConstants.AdminPolicyName)
+            .WithOpenApi();
     }
 }
