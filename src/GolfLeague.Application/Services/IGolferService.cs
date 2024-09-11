@@ -1,10 +1,12 @@
 ﻿using GolfLeague.Application.Models;
+using GolfLeague.Contracts.Requests;
+using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Application.Services;
 
 public interface IGolferService
 {
-    Task<int> CreateAsync(Golfer golfer, CancellationToken token = default);
+    Task<GolferResponse> CreateAsync(CreateGolferRequest request, CancellationToken token = default);
     Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token = default);
     Task<IEnumerable<Golfer>> GetAllGolfersAsync(CancellationToken token = default);
     Task<Golfer?> UpdateAsync(Golfer golfer, CancellationToken token = default);
