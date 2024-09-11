@@ -126,10 +126,12 @@ public static class Mother
     }
 
     public static UpdateTournamentRequest GenerateUpdateTournamentRequest(
+        int? tournamentId = default,
         string? name = default,
         string? format = default)
     {
         return new Faker<UpdateTournamentRequest>()
+            .RuleFor(r => r.TournamentId, f => tournamentId ?? f.Random.Int())
             .RuleFor(r => r.Name, f => name ?? f.Company.CompanyName())
             .RuleFor(r => r.Format, f => format ?? f.PickRandom(TournamentFormat.Values))
             .Generate();

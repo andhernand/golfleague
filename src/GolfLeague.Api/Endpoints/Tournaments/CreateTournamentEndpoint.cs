@@ -1,4 +1,5 @@
 ﻿using GolfLeague.Api.Auth;
+using GolfLeague.Api.Endpoints.Filters;
 using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
@@ -34,6 +35,7 @@ public static class CreateTournamentEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<CreateTournamentRequest>(false, "application/json")
+            .AddEndpointFilter<RequestValidationFilter<CreateTournamentRequest>>()
             .Produces<TournamentResponse>(StatusCodes.Status201Created)
             .Produces<ValidationProblemDetails>(
                 StatusCodes.Status400BadRequest,
