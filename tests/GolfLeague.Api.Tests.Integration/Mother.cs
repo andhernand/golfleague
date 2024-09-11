@@ -98,6 +98,7 @@ public static class Mother
     }
 
     public static UpdateGolferRequest GenerateUpdateGolferRequest(
+        int? golferId = default,
         string? firstName = default,
         string? lastName = default,
         string? email = default,
@@ -105,6 +106,7 @@ public static class Mother
         int? handicap = default)
     {
         return new Faker<UpdateGolferRequest>()
+            .RuleFor(r => r.GolferId, f => golferId ?? f.Random.Int())
             .RuleFor(r => r.FirstName, f => firstName ?? f.Person.FirstName)
             .RuleFor(r => r.LastName, f => lastName ?? f.Person.LastName)
             .RuleFor(r => r.Email, f => email ?? f.Person.Email)
@@ -145,7 +147,12 @@ public static class Mother
 
     public static ValidationProblemDetails CreateValidationProblemDetails(Dictionary<string, string[]> errors)
     {
-        return new ValidationProblemDetails { Status = StatusCodes.Status400BadRequest, Errors = errors };
+        return new ValidationProblemDetails
+        {
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            Status = StatusCodes.Status400BadRequest,
+            Errors = errors
+        };
     }
 
     public static int GenerateScore()

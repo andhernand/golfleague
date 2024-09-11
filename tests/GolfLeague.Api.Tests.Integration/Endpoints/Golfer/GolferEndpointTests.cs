@@ -497,6 +497,7 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
 
         const int changedHandicap = 34;
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(
+            createdGolfer.GolferId,
             createdGolfer.FirstName,
             createdGolfer.LastName,
             createdGolfer.Email,
@@ -627,6 +628,7 @@ public class GolferEndpointTests(GolfApiFactory golfApiFactory) : IClassFixture<
         });
 
         var updateGolferRequest = Mother.GenerateUpdateGolferRequest(
+            secondGolfer.GolferId,
             secondGolfer.FirstName,
             secondGolfer.LastName,
             firstGolfer.Email,

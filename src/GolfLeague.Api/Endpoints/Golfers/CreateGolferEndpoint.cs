@@ -1,4 +1,5 @@
 ﻿using GolfLeague.Api.Auth;
+using GolfLeague.Api.Endpoints.Filters;
 using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
@@ -32,6 +33,7 @@ public static class CreateGolferEndpoint
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Golfers.Tag)
             .Accepts<CreateGolferRequest>(isOptional: false, contentType: "application/json")
+            .AddEndpointFilter<RequestValidationFilter<CreateGolferRequest>>()
             .Produces<GolferResponse>(StatusCodes.Status201Created)
             .Produces<ValidationProblemDetails>(
                 StatusCodes.Status400BadRequest,

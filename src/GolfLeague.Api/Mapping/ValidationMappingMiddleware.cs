@@ -25,7 +25,11 @@ public class ValidationMappingMiddleware(RequestDelegate next)
                     .Select(error => error.ErrorMessage)
                     .ToArray());
 
-            var validationProblem = new ValidationProblemDetails(problems) { Status = StatusCodes.Status400BadRequest };
+            var validationProblem = new ValidationProblemDetails(problems)
+            {
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                Status = StatusCodes.Status400BadRequest
+            };
 
             _logger.Warning("Validation failure: {@ValidationProblemDetails}", validationProblem);
 
