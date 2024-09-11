@@ -1,8 +1,7 @@
-﻿using GolfLeague.Application.Mapping;
-using GolfLeague.Application.Services;
+﻿using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
@@ -12,24 +11,21 @@ public static class GetTournamentByIdEndpoint
 
     public static void MapGetTournamentById(this IEndpointRouteBuilder app)
     {
-        app.MapGet(GolfApiEndpoints.Tournaments.Get, async (
-                int id,
-                ITournamentService service,
-                CancellationToken token = default) =>
-            {
-                var tournament = await service.GetTournamentByIdAsync(id, token);
-                if (tournament is null)
+        app.MapGet(GolfApiEndpoints.Tournaments.Get,
+                async Task<Results<Ok<TournamentResponse>, NotFound>> (
+                    int id,
+                    ITournamentService service,
+                    CancellationToken token = default) =>
                 {
-                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-                }
+                    var tournament = await service.GetTournamentByIdAsync(id, token);
 
-                var response = tournament.MapToResponse();
-                return TypedResults.Ok(response);
-            })
+                    return tournament is null
+                        ? TypedResults.NotFound()
+                        : TypedResults.Ok(tournament);
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
-            .Produces<TournamentResponse>(contentType: "application/json")
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .WithOpenApi();
     }
 }
