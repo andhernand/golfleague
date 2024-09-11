@@ -15,9 +15,10 @@ public class GolferService(IGolferRepository golferRepository) : IGolferService
         return golfer.MapToResponse();
     }
 
-    public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token = default)
+    public async Task<GolferResponse?> GetGolferByIdAsync(int id, CancellationToken token = default)
     {
-        return await golferRepository.GetGolferByIdAsync(id, token);
+        var golfer = await golferRepository.GetGolferByIdAsync(id, token);
+        return golfer?.MapToResponse();
     }
 
     public async Task<IEnumerable<GolferResponse>> GetAllGolfersAsync(CancellationToken token = default)
