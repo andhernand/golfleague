@@ -13,7 +13,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
 {
     private readonly ILogger _logger = Log.ForContext<GolferRepository>();
 
-    public async Task<int> CreateAsync(Golfer golfer, CancellationToken token = default)
+    public async Task<Golfer> CreateAsync(Golfer golfer, CancellationToken token = default)
     {
         _logger.Information("Creating {@Golfer}", golfer);
 
@@ -36,7 +36,7 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         _ = await connection.ExecuteScalarAsync(commandDefinition);
 
         var golferId = parameters.Get<int>("@GolferId");
-        return golferId;
+        return golfer with { GolferId = golferId };
     }
 
     public async Task<Golfer?> GetGolferByIdAsync(int id, CancellationToken token = default)
