@@ -1,5 +1,4 @@
-﻿using GolfLeague.Application.Models;
-using GolfLeague.Contracts.Requests;
+﻿using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Application.Services;
