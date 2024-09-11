@@ -73,11 +73,11 @@ public static class ContractMapping
         return new Tournament { Name = request.Name, Format = request.Format, Participants = [] };
     }
 
-    public static Tournament MapToTournament(this UpdateTournamentRequest request, int tournamentId)
+    public static Tournament MapToTournament(this UpdateTournamentRequest request)
     {
         return new Tournament
         {
-            TournamentId = tournamentId, Name = request.Name, Format = request.Format, Participants = []
+            TournamentId = request.TournamentId, Name = request.Name, Format = request.Format, Participants = []
         };
     }
 

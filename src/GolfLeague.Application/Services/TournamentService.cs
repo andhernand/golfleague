@@ -1,5 +1,4 @@
 ﻿using GolfLeague.Application.Mapping;
-using GolfLeague.Application.Models;
 using GolfLeague.Application.Repositories;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
@@ -29,16 +28,16 @@ public class TournamentService(ITournamentRepository repository) : ITournamentSe
         return tournaments.MapToResponse();
     }
 
-    public async Task<Tournament?> UpdateAsync(Tournament tournament, CancellationToken token = default)
+    public async Task<TournamentResponse?> UpdateAsync(
+        int tournamentId,
+        UpdateTournamentRequest request,
+        CancellationToken token = default)
     {
-        bool tournamentExists = await repository.ExistsByIdAsync(tournament.TournamentId, token);
-        if (!tournamentExists)
-        {
-            return null;
-        }
+        if (tournamentId != request.TournamentId) return null;
 
-        await repository.UpdateAsync(tournament, token);
-        return tournament;
+        var tournament = request.MapToTournament();
+        var updated = await repository.UpdateAsync(tournament, token);
+        return updated?.MapToResponse();
     }
 
     public async Task<bool> DeleteByIdAsync(int id, CancellationToken token = default)

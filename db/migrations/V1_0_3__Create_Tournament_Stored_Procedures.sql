@@ -106,7 +106,8 @@ GO
 CREATE PROCEDURE [dbo].[usp_Tournament_Update](
 	@TournamentId INT,
 	@Name NVARCHAR(256),
-	@Format NVARCHAR(256)
+	@Format NVARCHAR(256),
+	@RowCount INT OUTPUT
 )
 AS
 BEGIN
@@ -140,6 +141,8 @@ BEGIN
 					[Format] = @Format
 				WHERE [TournamentId] = @TournamentId;
 
+				SET @RowCount = @@ROWCOUNT;
+
 				COMMIT TRANSACTION;
 			END TRY
 			BEGIN CATCH
@@ -150,6 +153,7 @@ BEGIN
 		END
 	ELSE
 		BEGIN
+			SET @RowCount = 0;
 			THROW 50025, 'TournamentId does not exist in the database.', 1;
 		END;
 END;

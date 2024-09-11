@@ -1,11 +1,10 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints.Filters;
-using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.Tournaments;
 
@@ -15,31 +14,24 @@ public static class UpdateTournamentEndpoint
 
     public static void MapUpdateTournament(this IEndpointRouteBuilder app)
     {
-        app.MapPut(GolfApiEndpoints.Tournaments.Update, async (
-                int id,
-                UpdateTournamentRequest request,
-                ITournamentService service,
-                CancellationToken token = default) =>
-            {
-                var tournament = request.MapToTournament(id);
-                var updatedTournament = await service.UpdateAsync(tournament, token);
-                if (updatedTournament is null)
+        app.MapPut(GolfApiEndpoints.Tournaments.Update,
+                async Task<Results<Ok<TournamentResponse>, NotFound, ValidationProblem>> (
+                    int id,
+                    UpdateTournamentRequest request,
+                    ITournamentService service,
+                    CancellationToken token = default) =>
                 {
-                    return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-                }
+                    var updatedTournament = await service.UpdateAsync(id, request, token);
 
-                var response = updatedTournament.MapToResponse();
-                return TypedResults.Ok(response);
-            })
+                    return updatedTournament is null
+                        ? TypedResults.NotFound()
+                        : TypedResults.Ok(updatedTournament);
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.Tournaments.Tag)
             .Accepts<UpdateTournamentRequest>(false, "application/json")
             .AddEndpointFilter<RequestValidationFilter<UpdateTournamentRequest>>()
-            .Produces<TournamentResponse>(contentType: "application/json")
-            .Produces<ProblemDetails>(StatusCodes.Status404NotFound, contentType: "application/problem+json")
-            .Produces<ValidationProblemDetails>(
-                StatusCodes.Status400BadRequest,
-                contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.TrustedPolicyName);
+            .RequireAuthorization(AuthConstants.TrustedPolicyName)
+            .WithOpenApi();
     }
 }
