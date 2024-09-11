@@ -2,7 +2,7 @@
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-namespace GolfLeague.Api.Mapping;
+namespace GolfLeague.Application.Mapping;
 
 public static class ContractMapping
 {
