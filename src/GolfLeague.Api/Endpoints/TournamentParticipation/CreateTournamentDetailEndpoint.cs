@@ -1,11 +1,10 @@
 ﻿using GolfLeague.Api.Auth;
 using GolfLeague.Api.Endpoints.Tournaments;
-using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;
 
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GolfLeague.Api.Endpoints.TournamentParticipation;
 
@@ -15,27 +14,23 @@ public static class CreateTournamentDetailEndpoint
 
     public static void MapCreateTournamentDetailEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost(GolfApiEndpoints.Tournaments.CreateTournamentDetail, async (
-                int id,
-                ITournamentParticipationService service,
-                CreateTournamentDetailRequest request,
-                CancellationToken cancellationToken = default) =>
-            {
-                var participation = request.MapToTournamentParticipation(id);
-                _ = await service.CreateAsync(participation, cancellationToken);
+        app.MapPost(GolfApiEndpoints.Tournaments.CreateTournamentDetail,
+                async Task<Results<CreatedAtRoute<TournamentParticipationResponse>, ValidationProblem>> (
+                    int id,
+                    CreateTournamentDetailRequest request,
+                    ITournamentParticipationService service,
+                    CancellationToken cancellationToken = default) =>
+                {
+                    var participation = await service.CreateAsync(id, request, cancellationToken);
 
-                var response = participation.MapToResponse();
-                return TypedResults.CreatedAtRoute(
-                    response,
-                    GetTournamentByIdEndpoint.Name,
-                    new { id = response.TournamentId });
-            })
+                    return TypedResults.CreatedAtRoute(
+                        participation,
+                        GetTournamentByIdEndpoint.Name,
+                        new { id = participation?.TournamentId });
+                })
             .WithName(Name)
             .WithTags(GolfApiEndpoints.TournamentParticipation.Tag)
-            .Produces<TournamentParticipationResponse>(StatusCodes.Status201Created)
-            .Produces<ValidationProblemDetails>(
-                StatusCodes.Status400BadRequest,
-                contentType: "application/problem+json")
-            .RequireAuthorization(AuthConstants.TrustedPolicyName);
+            .RequireAuthorization(AuthConstants.TrustedPolicyName)
+            .WithOpenApi();
     }
 }
