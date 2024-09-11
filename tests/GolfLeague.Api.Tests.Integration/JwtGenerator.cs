@@ -4,7 +4,7 @@ using System.Text;
 
 using Bogus;
 
-using GolfLeague.Api.Options;
+using GolfLeague.Application.Options;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

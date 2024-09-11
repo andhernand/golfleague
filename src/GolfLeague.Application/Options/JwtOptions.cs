@@ -1,4 +1,4 @@
-﻿namespace GolfLeague.Api.Options;
+﻿namespace GolfLeague.Application.Options;
 
 public class JwtOptions
 {
