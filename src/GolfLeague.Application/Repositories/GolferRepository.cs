@@ -106,26 +106,30 @@ public class GolferRepository(IDbConnectionFactory connectionFactory) : IGolferR
         return golferDictionary.Values;
     }
 
-    public async Task<bool> UpdateAsync(Golfer golfer, CancellationToken token = default)
+    public async Task<Golfer?> UpdateAsync(Golfer golfer, CancellationToken token = default)
     {
         _logger.Information("Updating {@Golfer}", golfer);
 
         using var connection = await connectionFactory.CreateConnectionAsync(token);
-        var result = await connection.ExecuteAsync(
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@GolferId", golfer.GolferId, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@FirstName", golfer.FirstName, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@LastName", golfer.LastName, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@Email", golfer.Email, DbType.String, ParameterDirection.Input, 256);
+        parameters.Add("@JoinDate", golfer.JoinDate, DbType.Date, ParameterDirection.Input);
+        parameters.Add("@Handicap", golfer.Handicap, DbType.Int32, ParameterDirection.Input);
+        parameters.Add("@RowCount", 0, DbType.Int32, ParameterDirection.Output);
+
+        _ = await connection.ExecuteAsync(
             new CommandDefinition(
                 "dbo.usp_Golfer_Update",
-                new
-                {
-                    golfer.GolferId,
-                    golfer.FirstName,
-                    golfer.LastName,
-                    golfer.Email,
-                    golfer.JoinDate,
-                    golfer.Handicap
-                },
+                parameters,
                 commandType: CommandType.StoredProcedure,
                 cancellationToken: token));
-        return result > 0;
+
+        var updated = parameters.Get<int>("@RowCount") > 0;
+        return updated ? golfer : null;
     }
 
     public async Task<bool> DeleteByIdAsync(int id, CancellationToken token = default)

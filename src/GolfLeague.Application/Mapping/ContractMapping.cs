@@ -38,11 +38,11 @@ public static class ContractMapping
         };
     }
 
-    public static Golfer MapToGolfer(this UpdateGolferRequest request, int id)
+    public static Golfer MapToGolfer(this UpdateGolferRequest request)
     {
         return new Golfer
         {
-            GolferId = id,
+            GolferId = request.GolferId,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
