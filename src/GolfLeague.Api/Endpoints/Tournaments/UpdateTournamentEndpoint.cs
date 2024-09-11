@@ -1,5 +1,5 @@
 ﻿using GolfLeague.Api.Auth;
-using GolfLeague.Api.Mapping;
+using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Requests;
 using GolfLeague.Contracts.Responses;

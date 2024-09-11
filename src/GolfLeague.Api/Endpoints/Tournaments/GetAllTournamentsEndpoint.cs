@@ -1,4 +1,4 @@
-﻿using GolfLeague.Api.Mapping;
+﻿using GolfLeague.Application.Mapping;
 using GolfLeague.Application.Services;
 using GolfLeague.Contracts.Responses;
 
