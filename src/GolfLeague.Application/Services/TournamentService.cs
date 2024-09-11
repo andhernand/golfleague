@@ -1,13 +1,20 @@
-﻿using GolfLeague.Application.Models;
+﻿using GolfLeague.Application.Mapping;
+using GolfLeague.Application.Models;
 using GolfLeague.Application.Repositories;
+using GolfLeague.Contracts.Requests;
+using GolfLeague.Contracts.Responses;
 
 namespace GolfLeague.Application.Services;
 
 public class TournamentService(ITournamentRepository repository) : ITournamentService
 {
-    public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
+    public async Task<TournamentResponse> CreateAsync(
+        CreateTournamentRequest request,
+        CancellationToken token = default)
     {
-        return await repository.CreateAsync(tournament, token);
+        var tournamentRequest = request.MapToTournament();
+        var tournament = await repository.CreateAsync(tournamentRequest, token);
+        return tournament.MapToResponse();
     }
 
     public async Task<Tournament?> GetTournamentByIdAsync(int id, CancellationToken token = default)

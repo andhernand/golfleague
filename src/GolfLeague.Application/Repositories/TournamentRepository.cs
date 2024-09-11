@@ -13,7 +13,7 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
 {
     private readonly ILogger _logger = Log.ForContext<TournamentRepository>();
 
-    public async Task<int> CreateAsync(Tournament tournament, CancellationToken token = default)
+    public async Task<Tournament> CreateAsync(Tournament tournament, CancellationToken token = default)
     {
         _logger.Information("Creating {@Tournament}", tournament);
 
@@ -31,7 +31,7 @@ public class TournamentRepository(IDbConnectionFactory connectionFactory) : ITou
             cancellationToken: token));
 
         var tournamentId = parameters.Get<int>("@TournamentId");
-        return tournamentId;
+        return tournament with { TournamentId = tournamentId };
     }
 
     public async Task<Tournament?> GetTournamentByIdAsync(int id, CancellationToken token = default)

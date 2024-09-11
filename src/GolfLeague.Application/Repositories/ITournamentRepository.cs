@@ -4,7 +4,7 @@ namespace GolfLeague.Application.Repositories;
 
 public interface ITournamentRepository
 {
-    Task<int> CreateAsync(Tournament tournament, CancellationToken token = default);
+    Task<Tournament> CreateAsync(Tournament tournament, CancellationToken token = default);
     Task<Tournament?> GetTournamentByIdAsync(int tournamentId, CancellationToken token = default);
     Task<Tournament?> GetByNameAndFormat(string name, string format, CancellationToken token = default);
     Task<IEnumerable<Tournament>> GetAllTournamentsAsync(CancellationToken token = default);
